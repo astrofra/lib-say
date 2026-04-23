@@ -3,15 +3,14 @@ lib-say debug report
 input_mode: text
 language: en
 sample_rate: 44100
-frame_ms: 10
+frame_ms: 5
 raw_input: Hello from lib-say. This is an English demo sentence.
-normalized_text: hello from lib say. this is an english demo sentence.
+normalized_text: hello from lib-say. this is an english demo sentence.
 
 word_to_phoneme:
   hello -> H SCHWA L 'OH W
   from -> F R AH M
-  lib -> L 'IH B
-  say -> S 'E J
+  lib-say -> L 'IH B / S 'E J
   [pause:sentence]
   this -> DH 'IH S
   is -> IH Z
@@ -72,12 +71,12 @@ segment_count: 44
   43  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 437
-frame_duration_ms: 10
-estimated_duration_ms: 4370.0
-voiced_frames: 266
-unvoiced_frames: 79
-pause_frames: 92
-pitch_hz: min=104.39 avg=120.87 max=136.77
-amplitude: min=0.016 avg=0.627 max=1.000
+frame_count: 858
+frame_duration_ms: 5
+estimated_duration_ms: 4290.0
+voiced_frames: 521
+unvoiced_frames: 153
+pause_frames: 184
+pitch_hz: min=104.39 avg=120.93 max=136.77
+amplitude: min=0.016 avg=0.632 max=1.000
 noise_mix: min=0.000 avg=0.095 max=0.520

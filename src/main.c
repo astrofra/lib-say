@@ -19,7 +19,7 @@ static void tts_print_usage(FILE *stream)
         "  -o, --output <path>   Output audio file (.raw or .aiff)\n"
         "  --lang <en|fr>        Language rules for text input (default: en)\n"
         "  --rate <hz>           Sample rate, 44100 only (default: 44100)\n"
-        "  --frame-ms <5-10>     Frame size in milliseconds (default: 10)\n"
+        "  --frame-ms <5-10>     Frame size in milliseconds (default: 5)\n"
         "  --phonemes            Treat the input as phoneme symbols instead of plain text\n"
         "  --debug-report <p>    Write a debug report to a file, or use - for stdout\n"
         "  --dry-run             Build the debug pipeline but skip audio rendering/output\n"

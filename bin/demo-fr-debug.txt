@@ -3,15 +3,14 @@ lib-say debug report
 input_mode: text
 language: fr
 sample_rate: 44100
-frame_ms: 10
+frame_ms: 5
 raw_input: Bonjour depuis lib-say. Ceci est une phrase de demonstration en francais.
-normalized_text: bonjour depuis lib say. ceci est une phrase de demonstration en francais.
+normalized_text: bonjour depuis lib-say. ceci est une phrase de demonstration en francais.
 
 word_to_phoneme:
   bonjour -> B ON ZH 'U R
   depuis -> D SCHWA P J 'I
-  lib -> L 'I B
-  say -> S 'E J
+  lib-say -> L 'I B / S 'E J
   [pause:sentence]
   ceci -> S SCHWA S 'I
   est -> EH
@@ -80,12 +79,12 @@ segment_count: 50
   49  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 511
-frame_duration_ms: 10
-estimated_duration_ms: 5110.0
-voiced_frames: 305
-unvoiced_frames: 90
-pause_frames: 116
-pitch_hz: min=96.53 avg=112.27 max=121.92
-amplitude: min=0.017 avg=0.579 max=0.928
+frame_count: 1002
+frame_duration_ms: 5
+estimated_duration_ms: 5010.0
+voiced_frames: 597
+unvoiced_frames: 173
+pause_frames: 232
+pitch_hz: min=96.53 avg=112.25 max=121.92
+amplitude: min=0.017 avg=0.582 max=0.928
 noise_mix: min=0.000 avg=0.056 max=0.340

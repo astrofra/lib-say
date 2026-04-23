@@ -15,6 +15,7 @@
 #endif
 
 #define SAY_MAX_FORMANTS 5
+#define SAY_ARRAY_COUNT(a) (sizeof(a) / sizeof((a)[0]))
 
 typedef enum phoneme_id_t {
     PH_PAUSE = 0,
@@ -135,6 +136,21 @@ typedef struct lexicon_entry_t {
     int primary_stress_vowel;
 } lexicon_entry_t;
 
+typedef struct phoneme_pattern_rule_t {
+    const char *pattern;
+    const phoneme_id_t *phonemes;
+    size_t phoneme_count;
+    int initial_only;
+    int final_only;
+} phoneme_pattern_rule_t;
+
+typedef struct elision_prefix_t {
+    const char *text;
+    const phoneme_id_t *phonemes;
+    size_t phoneme_count;
+    double duration_scale;
+} elision_prefix_t;
+
 static const phoneme_def_t g_phonemes[PH_COUNT] = {
     { PH_PAUSE, "PAUSE", 0, 0, 90.0, 0.0, 0.0, { 0 }, { 0 }, { 0 } },
     { PH_A, "A", 1, 1, 115.0, 1.00, 0.02, { 800, 1200, 2800, 3600, 4500 }, { 90, 100, 150, 200, 260 }, { 1.00, 0.85, 0.35, 0.16, 0.08 } },
@@ -208,6 +224,51 @@ static const phoneme_id_t g_word_en_these[] = { PH_DH, PH_I, PH_Z };
 static const phoneme_id_t g_word_en_those[] = { PH_DH, PH_OH, PH_W, PH_Z };
 static const phoneme_id_t g_word_en_to[] = { PH_T, PH_U };
 static const phoneme_id_t g_word_en_worth[] = { PH_W, PH_R, PH_TH };
+static const phoneme_id_t g_word_en_i[] = { PH_AH, PH_J };
+static const phoneme_id_t g_word_en_you[] = { PH_J, PH_U };
+static const phoneme_id_t g_word_en_we[] = { PH_W, PH_I };
+static const phoneme_id_t g_word_en_they[] = { PH_DH, PH_E, PH_J };
+static const phoneme_id_t g_word_en_he[] = { PH_H, PH_I };
+static const phoneme_id_t g_word_en_are[] = { PH_AH, PH_R };
+static const phoneme_id_t g_word_en_have[] = { PH_H, PH_AE, PH_V };
+static const phoneme_id_t g_word_en_will[] = { PH_W, PH_IH, PH_L };
+static const phoneme_id_t g_word_en_am[] = { PH_AE, PH_M };
+static const phoneme_id_t g_word_en_it[] = { PH_IH, PH_T };
+static const phoneme_id_t g_word_en_cant[] = { PH_K, PH_AE, PH_N, PH_T };
+static const phoneme_id_t g_word_en_dont[] = { PH_D, PH_OH, PH_W, PH_N, PH_T };
+static const phoneme_id_t g_word_en_wont[] = { PH_W, PH_OH, PH_N, PH_T };
+static const phoneme_id_t g_word_en_isnt[] = { PH_IH, PH_Z, PH_N, PH_T };
+static const phoneme_id_t g_word_en_arent[] = { PH_AH, PH_R, PH_N, PH_T };
+static const phoneme_id_t g_word_en_wasnt[] = { PH_W, PH_AH, PH_Z, PH_N, PH_T };
+static const phoneme_id_t g_word_en_werent[] = { PH_W, PH_EH, PH_R, PH_N, PH_T };
+static const phoneme_id_t g_word_en_hasnt[] = { PH_H, PH_AE, PH_Z, PH_N, PH_T };
+static const phoneme_id_t g_word_en_havent[] = { PH_H, PH_AE, PH_V, PH_N, PH_T };
+static const phoneme_id_t g_word_en_hadnt[] = { PH_H, PH_AE, PH_D, PH_N, PH_T };
+static const phoneme_id_t g_word_en_doesnt[] = { PH_D, PH_AH, PH_Z, PH_N, PH_T };
+static const phoneme_id_t g_word_en_didnt[] = { PH_D, PH_IH, PH_D, PH_N, PH_T };
+static const phoneme_id_t g_word_en_couldnt[] = { PH_K, PH_U, PH_D, PH_N, PH_T };
+static const phoneme_id_t g_word_en_wouldnt[] = { PH_W, PH_U, PH_D, PH_N, PH_T };
+static const phoneme_id_t g_word_en_shouldnt[] = { PH_SH, PH_U, PH_D, PH_N, PH_T };
+static const phoneme_id_t g_word_en_im[] = { PH_AH, PH_J, PH_M };
+static const phoneme_id_t g_word_en_ive[] = { PH_AH, PH_J, PH_V };
+static const phoneme_id_t g_word_en_ill[] = { PH_AH, PH_J, PH_L };
+static const phoneme_id_t g_word_en_id[] = { PH_AH, PH_J, PH_D };
+static const phoneme_id_t g_word_en_youre[] = { PH_J, PH_U, PH_R };
+static const phoneme_id_t g_word_en_youve[] = { PH_J, PH_U, PH_V };
+static const phoneme_id_t g_word_en_youll[] = { PH_J, PH_U, PH_L };
+static const phoneme_id_t g_word_en_youd[] = { PH_J, PH_U, PH_D };
+static const phoneme_id_t g_word_en_were[] = { PH_W, PH_I, PH_R };
+static const phoneme_id_t g_word_en_weve[] = { PH_W, PH_I, PH_V };
+static const phoneme_id_t g_word_en_well[] = { PH_W, PH_I, PH_L };
+static const phoneme_id_t g_word_en_wed[] = { PH_W, PH_I, PH_D };
+static const phoneme_id_t g_word_en_theyre[] = { PH_DH, PH_E, PH_J, PH_R };
+static const phoneme_id_t g_word_en_theyve[] = { PH_DH, PH_E, PH_J, PH_V };
+static const phoneme_id_t g_word_en_theyll[] = { PH_DH, PH_E, PH_J, PH_L };
+static const phoneme_id_t g_word_en_theyd[] = { PH_DH, PH_E, PH_J, PH_D };
+static const phoneme_id_t g_word_en_its[] = { PH_IH, PH_T, PH_S };
+static const phoneme_id_t g_word_en_thats[] = { PH_DH, PH_AE, PH_T, PH_S };
+static const phoneme_id_t g_word_en_theres[] = { PH_DH, PH_EH, PH_R, PH_Z };
+static const phoneme_id_t g_word_en_lets[] = { PH_L, PH_EH, PH_T, PH_S };
 
 static const phoneme_id_t g_word_fr_bonjour[] = { PH_B, PH_ON, PH_ZH, PH_U, PH_R };
 static const phoneme_id_t g_word_fr_depuis[] = { PH_D, PH_SCHWA, PH_P, PH_J, PH_I };
@@ -221,37 +282,127 @@ static const phoneme_id_t g_word_fr_en[] = { PH_AN };
 static const phoneme_id_t g_word_fr_francais[] = { PH_F, PH_R, PH_AN, PH_S, PH_E };
 static const phoneme_id_t g_word_fr_lib[] = { PH_L, PH_I, PH_B };
 static const phoneme_id_t g_word_fr_say[] = { PH_S, PH_E, PH_J };
+static const phoneme_id_t g_word_fr_aujourdhui[] = { PH_O, PH_ZH, PH_U, PH_R, PH_D, PH_Y, PH_I };
+
+static const phoneme_id_t g_rule_en_tion[] = { PH_SH, PH_SCHWA, PH_N };
+static const phoneme_id_t g_rule_en_sion[] = { PH_ZH, PH_SCHWA, PH_N };
+static const phoneme_id_t g_rule_en_tch[] = { PH_CH };
+static const phoneme_id_t g_rule_en_dge[] = { PH_JH };
+static const phoneme_id_t g_rule_en_igh[] = { PH_AH, PH_J };
+static const phoneme_id_t g_rule_en_ee[] = { PH_I };
+static const phoneme_id_t g_rule_en_oo[] = { PH_U };
+static const phoneme_id_t g_rule_en_ow[] = { PH_AH, PH_W };
+static const phoneme_id_t g_rule_en_oi[] = { PH_OH, PH_J };
+static const phoneme_id_t g_rule_en_ai[] = { PH_E, PH_J };
+static const phoneme_id_t g_rule_en_ph[] = { PH_F };
+static const phoneme_id_t g_rule_en_sh[] = { PH_SH };
+static const phoneme_id_t g_rule_en_ch[] = { PH_CH };
+static const phoneme_id_t g_rule_en_ng[] = { PH_NG };
+static const phoneme_id_t g_rule_en_qu[] = { PH_K, PH_W };
+static const phoneme_id_t g_rule_en_ck[] = { PH_K };
+static const phoneme_id_t g_rule_en_wr[] = { PH_R };
+static const phoneme_id_t g_rule_en_wh[] = { PH_W };
+static const phoneme_id_t g_rule_en_kn[] = { PH_N };
+
+static const phoneme_id_t g_rule_fr_tion[] = { PH_S, PH_J, PH_ON };
+static const phoneme_id_t g_rule_fr_eau[] = { PH_O };
+static const phoneme_id_t g_rule_fr_ou[] = { PH_U };
+static const phoneme_id_t g_rule_fr_oi[] = { PH_W, PH_A };
+static const phoneme_id_t g_rule_fr_oy[] = { PH_W, PH_A, PH_I };
+static const phoneme_id_t g_rule_fr_eu[] = { PH_EU };
+static const phoneme_id_t g_rule_fr_au[] = { PH_O };
+static const phoneme_id_t g_rule_fr_ai[] = { PH_E };
+static const phoneme_id_t g_rule_fr_gn[] = { PH_NY };
+static const phoneme_id_t g_rule_fr_ch[] = { PH_SH };
+static const phoneme_id_t g_rule_fr_ph[] = { PH_F };
+static const phoneme_id_t g_rule_fr_qu[] = { PH_K };
+
+static const phoneme_id_t g_elision_fr_c[] = { PH_S };
+static const phoneme_id_t g_elision_fr_d[] = { PH_D };
+static const phoneme_id_t g_elision_fr_j[] = { PH_ZH };
+static const phoneme_id_t g_elision_fr_l[] = { PH_L };
+static const phoneme_id_t g_elision_fr_m[] = { PH_M };
+static const phoneme_id_t g_elision_fr_n[] = { PH_N };
+static const phoneme_id_t g_elision_fr_qu[] = { PH_K };
+static const phoneme_id_t g_elision_fr_s[] = { PH_S };
+static const phoneme_id_t g_elision_fr_t[] = { PH_T };
 
 static const lexicon_entry_t g_english_lexicon[] = {
     { "an", g_word_en_an, sizeof(g_word_en_an) / sizeof(g_word_en_an[0]), 0.74, 1, 0 },
     { "be", g_word_en_be, sizeof(g_word_en_be) / sizeof(g_word_en_be[0]), 0.82, 1, 0 },
     { "by", g_word_en_by, sizeof(g_word_en_by) / sizeof(g_word_en_by[0]), 0.94, 0, 1 },
+    { "can't", g_word_en_cant, sizeof(g_word_en_cant) / sizeof(g_word_en_cant[0]), 0.96, 0, 1 },
     { "changing", g_word_en_changing, sizeof(g_word_en_changing) / sizeof(g_word_en_changing[0]), 1.00, 0, 1 },
     { "church", g_word_en_church, sizeof(g_word_en_church) / sizeof(g_word_en_church[0]), 0.96, 0, 1 },
     { "clothes", g_word_en_clothes, sizeof(g_word_en_clothes) / sizeof(g_word_en_clothes[0]), 1.00, 0, 1 },
+    { "couldn't", g_word_en_couldnt, sizeof(g_word_en_couldnt) / sizeof(g_word_en_couldnt[0]), 0.94, 0, 1 },
     { "demo", g_word_en_demo, sizeof(g_word_en_demo) / sizeof(g_word_en_demo[0]), 0.88, 0, 1 },
+    { "didn't", g_word_en_didnt, sizeof(g_word_en_didnt) / sizeof(g_word_en_didnt[0]), 0.94, 0, 1 },
+    { "doesn't", g_word_en_doesnt, sizeof(g_word_en_doesnt) / sizeof(g_word_en_doesnt[0]), 0.94, 0, 1 },
+    { "don't", g_word_en_dont, sizeof(g_word_en_dont) / sizeof(g_word_en_dont[0]), 0.94, 0, 1 },
     { "english", g_word_en_english, sizeof(g_word_en_english) / sizeof(g_word_en_english[0]), 1.00, 0, 1 },
     { "effort", g_word_en_effort, sizeof(g_word_en_effort) / sizeof(g_word_en_effort[0]), 1.00, 0, 1 },
     { "feathers", g_word_en_feathers, sizeof(g_word_en_feathers) / sizeof(g_word_en_feathers[0]), 1.00, 0, 1 },
     { "fricatives", g_word_en_fricatives, sizeof(g_word_en_fricatives) / sizeof(g_word_en_fricatives[0]), 0.96, 0, 1 },
     { "from", g_word_en_from, sizeof(g_word_en_from) / sizeof(g_word_en_from[0]), 0.86, 1, 0 },
     { "gather", g_word_en_gather, sizeof(g_word_en_gather) / sizeof(g_word_en_gather[0]), 1.00, 0, 1 },
+    { "hadn't", g_word_en_hadnt, sizeof(g_word_en_hadnt) / sizeof(g_word_en_hadnt[0]), 0.94, 0, 1 },
+    { "hasn't", g_word_en_hasnt, sizeof(g_word_en_hasnt) / sizeof(g_word_en_hasnt[0]), 0.94, 0, 1 },
+    { "haven't", g_word_en_havent, sizeof(g_word_en_havent) / sizeof(g_word_en_havent[0]), 0.94, 0, 1 },
+    { "he", g_word_en_he, sizeof(g_word_en_he) / sizeof(g_word_en_he[0]), 0.76, 1, 0 },
     { "hello", g_word_en_hello, sizeof(g_word_en_hello) / sizeof(g_word_en_hello[0]), 0.86, 0, 2 },
+    { "i", g_word_en_i, sizeof(g_word_en_i) / sizeof(g_word_en_i[0]), 0.78, 1, 0 },
+    { "i'd", g_word_en_id, sizeof(g_word_en_id) / sizeof(g_word_en_id[0]), 0.78, 1, 0 },
+    { "i'll", g_word_en_ill, sizeof(g_word_en_ill) / sizeof(g_word_en_ill[0]), 0.78, 1, 0 },
+    { "i'm", g_word_en_im, sizeof(g_word_en_im) / sizeof(g_word_en_im[0]), 0.78, 1, 0 },
+    { "i've", g_word_en_ive, sizeof(g_word_en_ive) / sizeof(g_word_en_ive[0]), 0.78, 1, 0 },
     { "is", g_word_en_is, sizeof(g_word_en_is) / sizeof(g_word_en_is[0]), 0.78, 1, 0 },
+    { "isn't", g_word_en_isnt, sizeof(g_word_en_isnt) / sizeof(g_word_en_isnt[0]), 0.92, 0, 1 },
+    { "it", g_word_en_it, sizeof(g_word_en_it) / sizeof(g_word_en_it[0]), 0.76, 1, 0 },
+    { "it's", g_word_en_its, sizeof(g_word_en_its) / sizeof(g_word_en_its[0]), 0.76, 1, 0 },
+    { "let's", g_word_en_lets, sizeof(g_word_en_lets) / sizeof(g_word_en_lets[0]), 0.82, 1, 0 },
     { "not", g_word_en_not, sizeof(g_word_en_not) / sizeof(g_word_en_not[0]), 0.94, 0, 1 },
     { "question", g_word_en_question, sizeof(g_word_en_question) / sizeof(g_word_en_question[0]), 1.00, 0, 1 },
+    { "shouldn't", g_word_en_shouldnt, sizeof(g_word_en_shouldnt) / sizeof(g_word_en_shouldnt[0]), 0.94, 0, 1 },
     { "sentence", g_word_en_sentence, sizeof(g_word_en_sentence) / sizeof(g_word_en_sentence[0]), 1.00, 0, 1 },
     { "she", g_word_en_she, sizeof(g_word_en_she) / sizeof(g_word_en_she[0]), 0.94, 0, 1 },
     { "sharply", g_word_en_sharply, sizeof(g_word_en_sharply) / sizeof(g_word_en_sharply[0]), 0.96, 0, 1 },
+    { "that's", g_word_en_thats, sizeof(g_word_en_thats) / sizeof(g_word_en_thats[0]), 0.90, 0, 1 },
     { "the", g_word_en_the, sizeof(g_word_en_the) / sizeof(g_word_en_the[0]), 0.72, 1, 0 },
+    { "there's", g_word_en_theres, sizeof(g_word_en_theres) / sizeof(g_word_en_theres[0]), 0.84, 0, 1 },
+    { "they", g_word_en_they, sizeof(g_word_en_they) / sizeof(g_word_en_they[0]), 0.86, 1, 0 },
+    { "they'd", g_word_en_theyd, sizeof(g_word_en_theyd) / sizeof(g_word_en_theyd[0]), 0.84, 1, 0 },
+    { "they'll", g_word_en_theyll, sizeof(g_word_en_theyll) / sizeof(g_word_en_theyll[0]), 0.84, 1, 0 },
+    { "they're", g_word_en_theyre, sizeof(g_word_en_theyre) / sizeof(g_word_en_theyre[0]), 0.84, 1, 0 },
+    { "they've", g_word_en_theyve, sizeof(g_word_en_theyve) / sizeof(g_word_en_theyve[0]), 0.84, 1, 0 },
     { "these", g_word_en_these, sizeof(g_word_en_these) / sizeof(g_word_en_these[0]), 0.94, 0, 1 },
     { "this", g_word_en_this, sizeof(g_word_en_this) / sizeof(g_word_en_this[0]), 0.92, 0, 1 },
     { "those", g_word_en_those, sizeof(g_word_en_those) / sizeof(g_word_en_those[0]), 0.94, 0, 1 },
     { "to", g_word_en_to, sizeof(g_word_en_to) / sizeof(g_word_en_to[0]), 0.76, 1, 0 },
-    { "worth", g_word_en_worth, sizeof(g_word_en_worth) / sizeof(g_word_en_worth[0]), 1.00, 0, 1 }
+    { "we", g_word_en_we, sizeof(g_word_en_we) / sizeof(g_word_en_we[0]), 0.80, 1, 0 },
+    { "we'd", g_word_en_wed, sizeof(g_word_en_wed) / sizeof(g_word_en_wed[0]), 0.80, 1, 0 },
+    { "we'll", g_word_en_well, sizeof(g_word_en_well) / sizeof(g_word_en_well[0]), 0.80, 1, 0 },
+    { "we're", g_word_en_were, sizeof(g_word_en_were) / sizeof(g_word_en_were[0]), 0.80, 1, 0 },
+    { "we've", g_word_en_weve, sizeof(g_word_en_weve) / sizeof(g_word_en_weve[0]), 0.80, 1, 0 },
+    { "weren't", g_word_en_werent, sizeof(g_word_en_werent) / sizeof(g_word_en_werent[0]), 0.94, 0, 1 },
+    { "worth", g_word_en_worth, sizeof(g_word_en_worth) / sizeof(g_word_en_worth[0]), 1.00, 0, 1 },
+    { "won't", g_word_en_wont, sizeof(g_word_en_wont) / sizeof(g_word_en_wont[0]), 0.94, 0, 1 },
+    { "wouldn't", g_word_en_wouldnt, sizeof(g_word_en_wouldnt) / sizeof(g_word_en_wouldnt[0]), 0.94, 0, 1 },
+    { "you", g_word_en_you, sizeof(g_word_en_you) / sizeof(g_word_en_you[0]), 0.80, 1, 0 },
+    { "you'd", g_word_en_youd, sizeof(g_word_en_youd) / sizeof(g_word_en_youd[0]), 0.80, 1, 0 },
+    { "you'll", g_word_en_youll, sizeof(g_word_en_youll) / sizeof(g_word_en_youll[0]), 0.80, 1, 0 },
+    { "you're", g_word_en_youre, sizeof(g_word_en_youre) / sizeof(g_word_en_youre[0]), 0.80, 1, 0 },
+    { "you've", g_word_en_youve, sizeof(g_word_en_youve) / sizeof(g_word_en_youve[0]), 0.80, 1, 0 },
+    { "are", g_word_en_are, sizeof(g_word_en_are) / sizeof(g_word_en_are[0]), 0.74, 1, 0 },
+    { "am", g_word_en_am, sizeof(g_word_en_am) / sizeof(g_word_en_am[0]), 0.74, 1, 0 },
+    { "aren't", g_word_en_arent, sizeof(g_word_en_arent) / sizeof(g_word_en_arent[0]), 0.94, 0, 1 },
+    { "have", g_word_en_have, sizeof(g_word_en_have) / sizeof(g_word_en_have[0]), 0.82, 1, 0 },
+    { "will", g_word_en_will, sizeof(g_word_en_will) / sizeof(g_word_en_will[0]), 0.82, 1, 0 },
+    { "wasn't", g_word_en_wasnt, sizeof(g_word_en_wasnt) / sizeof(g_word_en_wasnt[0]), 0.94, 0, 1 }
 };
 
 static const lexicon_entry_t g_french_lexicon[] = {
+    { "aujourd'hui", g_word_fr_aujourdhui, sizeof(g_word_fr_aujourdhui) / sizeof(g_word_fr_aujourdhui[0]), 1.00, 0, 3 },
     { "bonjour", g_word_fr_bonjour, sizeof(g_word_fr_bonjour) / sizeof(g_word_fr_bonjour[0]), 1.00, 0, 2 },
     { "ceci", g_word_fr_ceci, sizeof(g_word_fr_ceci) / sizeof(g_word_fr_ceci[0]), 0.96, 0, 2 },
     { "demonstration", g_word_fr_demonstration, sizeof(g_word_fr_demonstration) / sizeof(g_word_fr_demonstration[0]), 1.00, 0, 4 },
@@ -264,6 +415,66 @@ static const lexicon_entry_t g_french_lexicon[] = {
     { "phrase", g_word_fr_phrase, sizeof(g_word_fr_phrase) / sizeof(g_word_fr_phrase[0]), 1.00, 0, 1 },
     { "say", g_word_fr_say, sizeof(g_word_fr_say) / sizeof(g_word_fr_say[0]), 0.92, 0, 1 },
     { "une", g_word_fr_une, sizeof(g_word_fr_une) / sizeof(g_word_fr_une[0]), 0.78, 1, 0 }
+};
+
+static const phoneme_pattern_rule_t g_english_patterns[] = {
+    { "tion", g_rule_en_tion, SAY_ARRAY_COUNT(g_rule_en_tion), 0, 0 },
+    { "sion", g_rule_en_sion, SAY_ARRAY_COUNT(g_rule_en_sion), 0, 0 },
+    { "tch", g_rule_en_tch, SAY_ARRAY_COUNT(g_rule_en_tch), 0, 0 },
+    { "dge", g_rule_en_dge, SAY_ARRAY_COUNT(g_rule_en_dge), 0, 0 },
+    { "igh", g_rule_en_igh, SAY_ARRAY_COUNT(g_rule_en_igh), 0, 0 },
+    { "ee", g_rule_en_ee, SAY_ARRAY_COUNT(g_rule_en_ee), 0, 0 },
+    { "ea", g_rule_en_ee, SAY_ARRAY_COUNT(g_rule_en_ee), 0, 0 },
+    { "oo", g_rule_en_oo, SAY_ARRAY_COUNT(g_rule_en_oo), 0, 0 },
+    { "ow", g_rule_en_ow, SAY_ARRAY_COUNT(g_rule_en_ow), 0, 0 },
+    { "ou", g_rule_en_ow, SAY_ARRAY_COUNT(g_rule_en_ow), 0, 0 },
+    { "oi", g_rule_en_oi, SAY_ARRAY_COUNT(g_rule_en_oi), 0, 0 },
+    { "oy", g_rule_en_oi, SAY_ARRAY_COUNT(g_rule_en_oi), 0, 0 },
+    { "ai", g_rule_en_ai, SAY_ARRAY_COUNT(g_rule_en_ai), 0, 0 },
+    { "ay", g_rule_en_ai, SAY_ARRAY_COUNT(g_rule_en_ai), 0, 0 },
+    { "ei", g_rule_en_ai, SAY_ARRAY_COUNT(g_rule_en_ai), 0, 0 },
+    { "ey", g_rule_en_ai, SAY_ARRAY_COUNT(g_rule_en_ai), 0, 0 },
+    { "ph", g_rule_en_ph, SAY_ARRAY_COUNT(g_rule_en_ph), 0, 0 },
+    { "sh", g_rule_en_sh, SAY_ARRAY_COUNT(g_rule_en_sh), 0, 0 },
+    { "ch", g_rule_en_ch, SAY_ARRAY_COUNT(g_rule_en_ch), 0, 0 },
+    { "ng", g_rule_en_ng, SAY_ARRAY_COUNT(g_rule_en_ng), 0, 0 },
+    { "qu", g_rule_en_qu, SAY_ARRAY_COUNT(g_rule_en_qu), 0, 0 },
+    { "ck", g_rule_en_ck, SAY_ARRAY_COUNT(g_rule_en_ck), 0, 0 },
+    { "wr", g_rule_en_wr, SAY_ARRAY_COUNT(g_rule_en_wr), 0, 0 },
+    { "wh", g_rule_en_wh, SAY_ARRAY_COUNT(g_rule_en_wh), 0, 0 },
+    { "kn", g_rule_en_kn, SAY_ARRAY_COUNT(g_rule_en_kn), 1, 0 }
+};
+
+static const phoneme_pattern_rule_t g_french_patterns[] = {
+    { "tion", g_rule_fr_tion, SAY_ARRAY_COUNT(g_rule_fr_tion), 0, 0 },
+    { "eaux", g_rule_fr_eau, SAY_ARRAY_COUNT(g_rule_fr_eau), 0, 0 },
+    { "eau", g_rule_fr_eau, SAY_ARRAY_COUNT(g_rule_fr_eau), 0, 0 },
+    { "ou", g_rule_fr_ou, SAY_ARRAY_COUNT(g_rule_fr_ou), 0, 0 },
+    { "oi", g_rule_fr_oi, SAY_ARRAY_COUNT(g_rule_fr_oi), 0, 0 },
+    { "oy", g_rule_fr_oy, SAY_ARRAY_COUNT(g_rule_fr_oy), 0, 0 },
+    { "oeu", g_rule_fr_eu, SAY_ARRAY_COUNT(g_rule_fr_eu), 0, 0 },
+    { "eu", g_rule_fr_eu, SAY_ARRAY_COUNT(g_rule_fr_eu), 0, 0 },
+    { "au", g_rule_fr_au, SAY_ARRAY_COUNT(g_rule_fr_au), 0, 0 },
+    { "ai", g_rule_fr_ai, SAY_ARRAY_COUNT(g_rule_fr_ai), 0, 0 },
+    { "ei", g_rule_fr_ai, SAY_ARRAY_COUNT(g_rule_fr_ai), 0, 0 },
+    { "er", g_rule_fr_ai, SAY_ARRAY_COUNT(g_rule_fr_ai), 0, 1 },
+    { "ez", g_rule_fr_ai, SAY_ARRAY_COUNT(g_rule_fr_ai), 0, 1 },
+    { "gn", g_rule_fr_gn, SAY_ARRAY_COUNT(g_rule_fr_gn), 0, 0 },
+    { "ch", g_rule_fr_ch, SAY_ARRAY_COUNT(g_rule_fr_ch), 0, 0 },
+    { "ph", g_rule_fr_ph, SAY_ARRAY_COUNT(g_rule_fr_ph), 0, 0 },
+    { "qu", g_rule_fr_qu, SAY_ARRAY_COUNT(g_rule_fr_qu), 0, 0 }
+};
+
+static const elision_prefix_t g_french_elision_prefixes[] = {
+    { "c", g_elision_fr_c, SAY_ARRAY_COUNT(g_elision_fr_c), 0.68 },
+    { "d", g_elision_fr_d, SAY_ARRAY_COUNT(g_elision_fr_d), 0.68 },
+    { "j", g_elision_fr_j, SAY_ARRAY_COUNT(g_elision_fr_j), 0.72 },
+    { "l", g_elision_fr_l, SAY_ARRAY_COUNT(g_elision_fr_l), 0.68 },
+    { "m", g_elision_fr_m, SAY_ARRAY_COUNT(g_elision_fr_m), 0.72 },
+    { "n", g_elision_fr_n, SAY_ARRAY_COUNT(g_elision_fr_n), 0.72 },
+    { "qu", g_elision_fr_qu, SAY_ARRAY_COUNT(g_elision_fr_qu), 0.76 },
+    { "s", g_elision_fr_s, SAY_ARRAY_COUNT(g_elision_fr_s), 0.72 },
+    { "t", g_elision_fr_t, SAY_ARRAY_COUNT(g_elision_fr_t), 0.72 }
 };
 
 static void say_set_error(char *error, size_t error_size, const char *fmt, ...)
@@ -302,6 +513,11 @@ static int say_is_word_char(char c)
     return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
 }
 
+static int say_is_token_char(char c)
+{
+    return say_is_word_char(c) || c == '\'' || c == '-';
+}
+
 static int say_equals_icase(const char *a, const char *b)
 {
     while (*a != '\0' && *b != '\0') {
@@ -313,6 +529,9 @@ static int say_equals_icase(const char *a, const char *b)
     }
     return *a == '\0' && *b == '\0';
 }
+
+static int say_match_at(const char *word, size_t index, const char *pattern);
+static int say_append_text_word(const char *word, say_language_t language, segment_buffer_t *segments);
 
 static int say_segment_buffer_reserve(segment_buffer_t *buffer, size_t extra)
 {
@@ -361,6 +580,20 @@ static int say_segment_buffer_push(
     segment->boundary_type = boundary_type;
     segment->weak_word = 0;
     segment->stress = 0;
+    return 1;
+}
+
+static int say_segment_buffer_append(segment_buffer_t *buffer, const segment_buffer_t *extra)
+{
+    if (extra == NULL || extra->count == 0) {
+        return 1;
+    }
+    if (!say_segment_buffer_reserve(buffer, extra->count)) {
+        return 0;
+    }
+
+    memcpy(buffer->data + buffer->count, extra->data, extra->count * sizeof(*extra->data));
+    buffer->count += extra->count;
     return 1;
 }
 
@@ -580,11 +813,11 @@ static char *say_normalize_text(const char *input, char *error, size_t error_siz
             if (ascii >= 'A' && ascii <= 'Z') {
                 ascii = (char) (ascii - 'A' + 'a');
             }
-            if (ascii == '\'' || ascii == '-' || ascii == '\n' || ascii == '\r' || ascii == '\t') {
+            if (ascii == '\n' || ascii == '\r' || ascii == '\t') {
                 ascii = ' ';
             }
 
-            if (say_is_word_char(ascii) || say_is_boundary_char(ascii) || ascii == ' ') {
+            if (say_is_token_char(ascii) || say_is_boundary_char(ascii) || ascii == ' ') {
                 output[count++] = ascii;
             }
             else {
@@ -596,10 +829,7 @@ static char *say_normalize_text(const char *input, char *error, size_t error_siz
             if (folded != NULL) {
                 while (*folded != '\0') {
                     ascii = *folded++;
-                    if (ascii == '\'' || ascii == '-') {
-                        ascii = ' ';
-                    }
-                    if (!say_is_word_char(ascii) && ascii != ' ' && !say_is_boundary_char(ascii)) {
+                    if (!say_is_token_char(ascii) && ascii != ' ' && !say_is_boundary_char(ascii)) {
                         ascii = ' ';
                     }
                     output[count++] = ascii;
@@ -630,6 +860,64 @@ static char *say_normalize_text(const char *input, char *error, size_t error_siz
 static int say_append_phone(segment_buffer_t *segments, phoneme_id_t phoneme)
 {
     return say_segment_buffer_push(segments, phoneme, 1.0, 0);
+}
+
+static int say_append_phone_list(
+    segment_buffer_t *segments,
+    const phoneme_id_t *phonemes,
+    size_t phoneme_count
+)
+{
+    size_t i;
+
+    for (i = 0; i < phoneme_count; ++i) {
+        if (!say_append_phone(segments, phonemes[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static int say_pattern_rule_matches(const phoneme_pattern_rule_t *rule, const char *word, size_t index)
+{
+    size_t pattern_len;
+
+    if (rule->initial_only && index != 0) {
+        return 0;
+    }
+    if (!say_match_at(word, index, rule->pattern)) {
+        return 0;
+    }
+
+    pattern_len = strlen(rule->pattern);
+    if (rule->final_only && word[index + pattern_len] != '\0') {
+        return 0;
+    }
+    return 1;
+}
+
+static int say_try_apply_pattern_rules(
+    const char *word,
+    size_t index,
+    const phoneme_pattern_rule_t *rules,
+    size_t rule_count,
+    segment_buffer_t *segments,
+    size_t *out_consumed
+)
+{
+    size_t i;
+
+    for (i = 0; i < rule_count; ++i) {
+        if (!say_pattern_rule_matches(&rules[i], word, index)) {
+            continue;
+        }
+        if (!say_append_phone_list(segments, rules[i].phonemes, rules[i].phoneme_count)) {
+            return -1;
+        }
+        *out_consumed = strlen(rules[i].pattern);
+        return 1;
+    }
+    return 0;
 }
 
 static int say_append_phone_sequence(
@@ -924,6 +1212,8 @@ static int say_phonemize_english_word(const char *word, segment_buffer_t *segmen
 {
     size_t i;
     size_t start;
+    size_t consumed;
+    int rule_result;
 
     start = segments->count;
     i = 0;
@@ -932,142 +1222,23 @@ static int say_phonemize_english_word(const char *word, segment_buffer_t *segmen
             ++i;
             continue;
         }
-        if (say_match_at(word, i, "tion")) {
-            if (!say_append_phone(segments, PH_SH) || !say_append_phone(segments, PH_SCHWA) || !say_append_phone(segments, PH_N)) {
-                return 0;
-            }
-            i += 4;
-            continue;
+        rule_result = say_try_apply_pattern_rules(
+            word,
+            i,
+            g_english_patterns,
+            SAY_ARRAY_COUNT(g_english_patterns),
+            segments,
+            &consumed);
+        if (rule_result < 0) {
+            return 0;
         }
-        if (say_match_at(word, i, "sion")) {
-            if (!say_append_phone(segments, PH_ZH) || !say_append_phone(segments, PH_SCHWA) || !say_append_phone(segments, PH_N)) {
-                return 0;
-            }
-            i += 4;
-            continue;
-        }
-        if (say_match_at(word, i, "tch")) {
-            if (!say_append_phone(segments, PH_CH)) {
-                return 0;
-            }
-            i += 3;
-            continue;
-        }
-        if (say_match_at(word, i, "dge")) {
-            if (!say_append_phone(segments, PH_JH)) {
-                return 0;
-            }
-            i += 3;
-            continue;
-        }
-        if (say_match_at(word, i, "igh")) {
-            if (!say_append_phone(segments, PH_AH) || !say_append_phone(segments, PH_J)) {
-                return 0;
-            }
-            i += 3;
-            continue;
-        }
-        if (say_match_at(word, i, "ee") || say_match_at(word, i, "ea")) {
-            if (!say_append_phone(segments, PH_I)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "oo")) {
-            if (!say_append_phone(segments, PH_U)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "ow") || say_match_at(word, i, "ou")) {
-            if (!say_append_phone(segments, PH_AH) || !say_append_phone(segments, PH_W)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "oi") || say_match_at(word, i, "oy")) {
-            if (!say_append_phone(segments, PH_OH) || !say_append_phone(segments, PH_J)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "ai") || say_match_at(word, i, "ay") || say_match_at(word, i, "ei") || say_match_at(word, i, "ey")) {
-            if (!say_append_phone(segments, PH_E) || !say_append_phone(segments, PH_J)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "ph")) {
-            if (!say_append_phone(segments, PH_F)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "sh")) {
-            if (!say_append_phone(segments, PH_SH)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "ch")) {
-            if (!say_append_phone(segments, PH_CH)) {
-                return 0;
-            }
-            i += 2;
+        if (rule_result > 0) {
+            i += consumed;
             continue;
         }
         if (say_match_at(word, i, "th")) {
             phoneme_id_t phone = say_english_th_phone(word, i);
             if (!say_append_phone(segments, phone)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "ng")) {
-            if (!say_append_phone(segments, PH_NG)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "qu")) {
-            if (!say_append_phone(segments, PH_K) || !say_append_phone(segments, PH_W)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "ck")) {
-            if (!say_append_phone(segments, PH_K)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "wr")) {
-            if (!say_append_phone(segments, PH_R)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "wh")) {
-            if (!say_append_phone(segments, PH_W)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (i == 0 && say_match_at(word, i, "kn")) {
-            if (!say_append_phone(segments, PH_N)) {
                 return 0;
             }
             i += 2;
@@ -1105,6 +1276,10 @@ static int say_phonemize_english_word(const char *word, segment_buffer_t *segmen
         }
 
         switch (word[i]) {
+            case '\'':
+            case '-':
+                ++i;
+                break;
             case 'a':
             case 'e':
             case 'i':
@@ -1296,11 +1471,17 @@ static int say_phonemize_french_word(const char *word, segment_buffer_t *segment
     size_t i;
     size_t start;
     size_t len;
+    size_t consumed;
+    int rule_result;
 
     start = segments->count;
     len = strlen(word);
     i = 0;
     while (i < len) {
+        if (i > 0 && word[i] == word[i - 1] && !say_is_vowel_char(word[i])) {
+            ++i;
+            continue;
+        }
         if (i + 2 == len && say_match_at(word, i, "es")) {
             break;
         }
@@ -1309,20 +1490,6 @@ static int say_phonemize_french_word(const char *word, segment_buffer_t *segment
         }
         if (i + 1 == len && word[i] == 'e') {
             break;
-        }
-        if (say_match_at(word, i, "tion")) {
-            if (!say_append_phone(segments, PH_S) || !say_append_phone(segments, PH_J) || !say_append_phone(segments, PH_ON)) {
-                return 0;
-            }
-            i += 4;
-            continue;
-        }
-        if (say_match_at(word, i, "eaux") || say_match_at(word, i, "eau")) {
-            if (!say_append_phone(segments, PH_O)) {
-                return 0;
-            }
-            i += say_match_at(word, i, "eaux") ? 4 : 3;
-            continue;
         }
         if ((say_match_at(word, i, "ain") || say_match_at(word, i, "ein") || say_match_at(word, i, "aim") || say_match_at(word, i, "eim")) &&
             say_french_nasal_applicable(word, i + 3)) {
@@ -1357,53 +1524,18 @@ static int say_phonemize_french_word(const char *word, segment_buffer_t *segment
             i += 2;
             continue;
         }
-        if (say_match_at(word, i, "ou")) {
-            if (!say_append_phone(segments, PH_U)) {
-                return 0;
-            }
-            i += 2;
-            continue;
+        rule_result = say_try_apply_pattern_rules(
+            word,
+            i,
+            g_french_patterns,
+            SAY_ARRAY_COUNT(g_french_patterns),
+            segments,
+            &consumed);
+        if (rule_result < 0) {
+            return 0;
         }
-        if (say_match_at(word, i, "oi")) {
-            if (!say_append_phone(segments, PH_W) || !say_append_phone(segments, PH_A)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "oy")) {
-            if (!say_append_phone(segments, PH_W) || !say_append_phone(segments, PH_A) || !say_append_phone(segments, PH_I)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "eu") || say_match_at(word, i, "oeu")) {
-            if (!say_append_phone(segments, PH_EU)) {
-                return 0;
-            }
-            i += say_match_at(word, i, "oeu") ? 3 : 2;
-            continue;
-        }
-        if (say_match_at(word, i, "au")) {
-            if (!say_append_phone(segments, PH_O)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "ai") || say_match_at(word, i, "ei") || say_match_at(word, i, "er") || say_match_at(word, i, "ez")) {
-            if (!say_append_phone(segments, PH_E)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "gn")) {
-            if (!say_append_phone(segments, PH_NY)) {
-                return 0;
-            }
-            i += 2;
+        if (rule_result > 0) {
+            i += consumed;
             continue;
         }
         if (say_match_at(word, i, "ill") && i > 0 && say_is_vowel_char(word[i - 1])) {
@@ -1413,29 +1545,12 @@ static int say_phonemize_french_word(const char *word, segment_buffer_t *segment
             i += 3;
             continue;
         }
-        if (say_match_at(word, i, "ch")) {
-            if (!say_append_phone(segments, PH_SH)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "ph")) {
-            if (!say_append_phone(segments, PH_F)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
-        if (say_match_at(word, i, "qu")) {
-            if (!say_append_phone(segments, PH_K)) {
-                return 0;
-            }
-            i += 2;
-            continue;
-        }
 
         switch (word[i]) {
+            case '\'':
+            case '-':
+                ++i;
+                break;
             case 'a':
                 if (!say_append_phone(segments, PH_A)) {
                     return 0;
@@ -1629,21 +1744,227 @@ static int say_phonemize_french_word(const char *word, segment_buffer_t *segment
     return 1;
 }
 
-static int say_append_text_word(const char *word, say_language_t language, segment_buffer_t *segments)
+static int say_append_simple_text_word(const char *word, say_language_t language, segment_buffer_t *segments)
 {
-    int lexicon_result;
-
-    if (word[0] == '\0') {
-        return 1;
-    }
-    lexicon_result = say_try_append_lexicon_word(word, language, segments);
-    if (lexicon_result != 0) {
-        return lexicon_result > 0;
-    }
     if (language == SAY_LANG_FR) {
         return say_phonemize_french_word(word, segments);
     }
     return say_phonemize_english_word(word, segments);
+}
+
+static int say_try_append_compound_word(const char *word, say_language_t language, segment_buffer_t *segments)
+{
+    const char *part_start;
+    const char *cursor;
+    int appended_any;
+
+    if (strchr(word, '-') == NULL) {
+        return 0;
+    }
+
+    part_start = word;
+    cursor = word;
+    appended_any = 0;
+    for (;;) {
+        if (*cursor == '-' || *cursor == '\0') {
+            size_t length;
+
+            length = (size_t) (cursor - part_start);
+            if (length > 0) {
+                char part[128];
+
+                if (length >= sizeof(part)) {
+                    return 0;
+                }
+                memcpy(part, part_start, length);
+                part[length] = '\0';
+                if (!say_append_text_word(part, language, segments)) {
+                    return -1;
+                }
+                appended_any = 1;
+            }
+            if (*cursor == '\0') {
+                break;
+            }
+            part_start = cursor + 1;
+        }
+        ++cursor;
+    }
+    return appended_any ? 1 : 0;
+}
+
+static int say_try_append_french_elision_word(const char *word, segment_buffer_t *segments)
+{
+    const char *apostrophe;
+    char prefix[16];
+    const elision_prefix_t *rule;
+    size_t prefix_len;
+    size_t i;
+
+    apostrophe = strchr(word, '\'');
+    if (apostrophe == NULL || apostrophe == word || apostrophe[1] == '\0' || strchr(apostrophe + 1, '\'') != NULL) {
+        return 0;
+    }
+
+    prefix_len = (size_t) (apostrophe - word);
+    if (prefix_len >= sizeof(prefix)) {
+        return 0;
+    }
+
+    memcpy(prefix, word, prefix_len);
+    prefix[prefix_len] = '\0';
+
+    rule = NULL;
+    for (i = 0; i < SAY_ARRAY_COUNT(g_french_elision_prefixes); ++i) {
+        if (strcmp(prefix, g_french_elision_prefixes[i].text) == 0) {
+            rule = &g_french_elision_prefixes[i];
+            break;
+        }
+    }
+    if (rule == NULL) {
+        return 0;
+    }
+
+    if (!say_append_phone_sequence(segments, rule->phonemes, rule->phoneme_count, rule->duration_scale, 1, 0)) {
+        return -1;
+    }
+    return say_append_text_word(apostrophe + 1, SAY_LANG_FR, segments) ? 1 : -1;
+}
+
+static int say_append_english_contraction_suffix(segment_buffer_t *segments, const char *suffix)
+{
+    size_t old_count;
+    size_t append_start;
+    int weak_word;
+    phoneme_id_t previous;
+
+    if (segments->count == 0) {
+        return 0;
+    }
+
+    old_count = segments->count;
+    append_start = segments->count;
+    weak_word = segments->data[0].weak_word;
+    previous = segments->data[segments->count - 1].phoneme;
+
+    if (strcmp(suffix, "s") == 0) {
+        if (say_phone_is_sibilant_or_affricate(previous)) {
+            if (!say_append_phone(segments, PH_SCHWA) || !say_append_phone(segments, PH_Z)) {
+                return -1;
+            }
+        }
+        else {
+            if (!say_append_phone(segments, say_phone_is_plural_voiced(previous) ? PH_Z : PH_S)) {
+                return -1;
+            }
+        }
+    }
+    else if (strcmp(suffix, "re") == 0) {
+        if (!say_append_phone(segments, PH_R)) {
+            return -1;
+        }
+    }
+    else if (strcmp(suffix, "ve") == 0) {
+        if (!say_append_phone(segments, PH_V)) {
+            return -1;
+        }
+    }
+    else if (strcmp(suffix, "ll") == 0) {
+        if (!say_append_phone(segments, PH_L)) {
+            return -1;
+        }
+    }
+    else if (strcmp(suffix, "d") == 0) {
+        if (!say_append_phone(segments, PH_D)) {
+            return -1;
+        }
+    }
+    else if (strcmp(suffix, "m") == 0) {
+        if (!say_append_phone(segments, PH_M)) {
+            return -1;
+        }
+    }
+    else {
+        return 0;
+    }
+
+    segments->data[old_count - 1].word_end = 0;
+    for (; append_start < segments->count; ++append_start) {
+        segments->data[append_start].weak_word = weak_word;
+    }
+    segments->data[segments->count - 1].word_end = 1;
+    return 1;
+}
+
+static int say_try_append_english_contraction_word(const char *word, segment_buffer_t *segments)
+{
+    const char *apostrophe;
+    char base[128];
+    segment_buffer_t temp_segments;
+    size_t base_len;
+    int suffix_result;
+    int append_ok;
+
+    apostrophe = strchr(word, '\'');
+    if (apostrophe == NULL || apostrophe == word || apostrophe[1] == '\0' || strchr(apostrophe + 1, '\'') != NULL) {
+        return 0;
+    }
+
+    base_len = (size_t) (apostrophe - word);
+    if (base_len >= sizeof(base)) {
+        return 0;
+    }
+
+    memcpy(base, word, base_len);
+    base[base_len] = '\0';
+
+    memset(&temp_segments, 0, sizeof(temp_segments));
+    if (!say_append_text_word(base, SAY_LANG_EN, &temp_segments)) {
+        free(temp_segments.data);
+        return -1;
+    }
+
+    suffix_result = say_append_english_contraction_suffix(&temp_segments, apostrophe + 1);
+    if (suffix_result <= 0) {
+        free(temp_segments.data);
+        return suffix_result;
+    }
+
+    append_ok = say_segment_buffer_append(segments, &temp_segments);
+    free(temp_segments.data);
+    return append_ok ? 1 : -1;
+}
+
+static int say_append_text_word(const char *word, say_language_t language, segment_buffer_t *segments)
+{
+    int lexicon_result;
+    int special_result;
+
+    if (word[0] == '\0') {
+        return 1;
+    }
+
+    lexicon_result = say_try_append_lexicon_word(word, language, segments);
+    if (lexicon_result != 0) {
+        return lexicon_result > 0;
+    }
+
+    special_result = say_try_append_compound_word(word, language, segments);
+    if (special_result != 0) {
+        return special_result > 0;
+    }
+
+    if (language == SAY_LANG_FR) {
+        special_result = say_try_append_french_elision_word(word, segments);
+    }
+    else {
+        special_result = say_try_append_english_contraction_word(word, segments);
+    }
+    if (special_result != 0) {
+        return special_result > 0;
+    }
+
+    return say_append_simple_text_word(word, language, segments);
 }
 
 static const char *say_digit_word(char digit, say_language_t language)
@@ -1734,13 +2055,13 @@ static int say_phonemize_text(
             ++i;
             continue;
         }
-        if (say_is_word_char(normalized_text[i])) {
+        if (say_is_token_char(normalized_text[i])) {
             size_t start;
             char word[128];
             size_t count;
 
             start = i;
-            while (normalized_text[i] != '\0' && say_is_word_char(normalized_text[i])) {
+            while (normalized_text[i] != '\0' && say_is_token_char(normalized_text[i])) {
                 ++i;
             }
 
@@ -3125,14 +3446,14 @@ static int say_text_buffer_append_word_debug(
             ++i;
             continue;
         }
-        if (say_is_word_char(normalized_text[i])) {
+        if (say_is_token_char(normalized_text[i])) {
             size_t start;
             char word[128];
             size_t count;
             segment_buffer_t temp_segments;
 
             start = i;
-            while (normalized_text[i] != '\0' && say_is_word_char(normalized_text[i])) {
+            while (normalized_text[i] != '\0' && say_is_token_char(normalized_text[i])) {
                 ++i;
             }
 
@@ -3321,7 +3642,7 @@ void say_default_options(say_options_t *options)
         return;
     }
     options->sample_rate = 44100;
-    options->frame_ms = 10;
+    options->frame_ms = 5;
     options->language = SAY_LANG_EN;
     options->phoneme_input = 0;
 }
