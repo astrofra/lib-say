@@ -118,6 +118,12 @@ typedef struct biquad_t {
     double z2;
 } biquad_t;
 
+typedef struct lexicon_entry_t {
+    const char *word;
+    const phoneme_id_t *phonemes;
+    size_t phoneme_count;
+} lexicon_entry_t;
+
 static const phoneme_def_t g_phonemes[PH_COUNT] = {
     { PH_PAUSE, "PAUSE", 0, 0, 90.0, 0.0, 0.0, { 0 }, { 0 }, { 0 } },
     { PH_A, "A", 1, 1, 115.0, 1.00, 0.02, { 800, 1200, 2800, 3600, 4500 }, { 90, 100, 150, 200, 260 }, { 1.00, 0.85, 0.35, 0.16, 0.08 } },
@@ -163,6 +169,52 @@ static const phoneme_def_t g_phonemes[PH_COUNT] = {
     { PH_JH, "JH", 0, 1, 92.0, 0.70, 0.70, { 1300, 2600, 3700, 4800, 5900 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } },
     { PH_TS, "TS", 0, 0, 90.0, 0.66, 1.00, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.46, 0.38, 0.30, 0.24, 0.18 } },
     { PH_DZ, "DZ", 0, 1, 90.0, 0.68, 0.70, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } }
+};
+
+static const phoneme_id_t g_word_en_hello[] = { PH_H, PH_EH, PH_L, PH_OH };
+static const phoneme_id_t g_word_en_from[] = { PH_F, PH_R, PH_AH, PH_M };
+static const phoneme_id_t g_word_en_this[] = { PH_DH, PH_IH, PH_S };
+static const phoneme_id_t g_word_en_is[] = { PH_IH, PH_Z };
+static const phoneme_id_t g_word_en_an[] = { PH_AH, PH_N };
+static const phoneme_id_t g_word_en_english[] = { PH_IH, PH_NG, PH_G, PH_L, PH_IH, PH_SH };
+static const phoneme_id_t g_word_en_demo[] = { PH_D, PH_EH, PH_M, PH_OH };
+static const phoneme_id_t g_word_en_sentence[] = { PH_S, PH_EH, PH_N, PH_T, PH_AH, PH_N, PH_S };
+static const phoneme_id_t g_word_en_the[] = { PH_DH, PH_SCHWA };
+
+static const phoneme_id_t g_word_fr_bonjour[] = { PH_B, PH_ON, PH_ZH, PH_U, PH_R };
+static const phoneme_id_t g_word_fr_depuis[] = { PH_D, PH_SCHWA, PH_P, PH_Y, PH_I };
+static const phoneme_id_t g_word_fr_ceci[] = { PH_S, PH_SCHWA, PH_S, PH_I };
+static const phoneme_id_t g_word_fr_est[] = { PH_EH };
+static const phoneme_id_t g_word_fr_une[] = { PH_Y, PH_N };
+static const phoneme_id_t g_word_fr_phrase[] = { PH_F, PH_R, PH_A, PH_Z };
+static const phoneme_id_t g_word_fr_demonstration[] = { PH_D, PH_E, PH_M, PH_ON, PH_S, PH_T, PH_R, PH_A, PH_S, PH_J, PH_ON };
+static const phoneme_id_t g_word_fr_de[] = { PH_D, PH_SCHWA };
+static const phoneme_id_t g_word_fr_en[] = { PH_AN };
+static const phoneme_id_t g_word_fr_francais[] = { PH_F, PH_R, PH_AN, PH_S, PH_E };
+
+static const lexicon_entry_t g_english_lexicon[] = {
+    { "an", g_word_en_an, sizeof(g_word_en_an) / sizeof(g_word_en_an[0]) },
+    { "demo", g_word_en_demo, sizeof(g_word_en_demo) / sizeof(g_word_en_demo[0]) },
+    { "english", g_word_en_english, sizeof(g_word_en_english) / sizeof(g_word_en_english[0]) },
+    { "from", g_word_en_from, sizeof(g_word_en_from) / sizeof(g_word_en_from[0]) },
+    { "hello", g_word_en_hello, sizeof(g_word_en_hello) / sizeof(g_word_en_hello[0]) },
+    { "is", g_word_en_is, sizeof(g_word_en_is) / sizeof(g_word_en_is[0]) },
+    { "sentence", g_word_en_sentence, sizeof(g_word_en_sentence) / sizeof(g_word_en_sentence[0]) },
+    { "the", g_word_en_the, sizeof(g_word_en_the) / sizeof(g_word_en_the[0]) },
+    { "this", g_word_en_this, sizeof(g_word_en_this) / sizeof(g_word_en_this[0]) }
+};
+
+static const lexicon_entry_t g_french_lexicon[] = {
+    { "bonjour", g_word_fr_bonjour, sizeof(g_word_fr_bonjour) / sizeof(g_word_fr_bonjour[0]) },
+    { "ceci", g_word_fr_ceci, sizeof(g_word_fr_ceci) / sizeof(g_word_fr_ceci[0]) },
+    { "demonstration", g_word_fr_demonstration, sizeof(g_word_fr_demonstration) / sizeof(g_word_fr_demonstration[0]) },
+    { "de", g_word_fr_de, sizeof(g_word_fr_de) / sizeof(g_word_fr_de[0]) },
+    { "depuis", g_word_fr_depuis, sizeof(g_word_fr_depuis) / sizeof(g_word_fr_depuis[0]) },
+    { "en", g_word_fr_en, sizeof(g_word_fr_en) / sizeof(g_word_fr_en[0]) },
+    { "est", g_word_fr_est, sizeof(g_word_fr_est) / sizeof(g_word_fr_est[0]) },
+    { "francais", g_word_fr_francais, sizeof(g_word_fr_francais) / sizeof(g_word_fr_francais[0]) },
+    { "phrase", g_word_fr_phrase, sizeof(g_word_fr_phrase) / sizeof(g_word_fr_phrase[0]) },
+    { "une", g_word_fr_une, sizeof(g_word_fr_une) / sizeof(g_word_fr_une[0]) }
 };
 
 static void say_set_error(char *error, size_t error_size, const char *fmt, ...)
@@ -460,6 +512,57 @@ static char *say_normalize_text(const char *input, char *error, size_t error_siz
 static int say_append_phone(segment_buffer_t *segments, phoneme_id_t phoneme)
 {
     return say_segment_buffer_push(segments, phoneme, 1.0, 0);
+}
+
+static int say_append_phone_sequence(
+    segment_buffer_t *segments,
+    const phoneme_id_t *phonemes,
+    size_t phoneme_count
+)
+{
+    size_t start;
+    size_t i;
+
+    start = segments->count;
+    for (i = 0; i < phoneme_count; ++i) {
+        if (!say_append_phone(segments, phonemes[i])) {
+            return 0;
+        }
+    }
+
+    if (segments->count > start) {
+        segments->data[start].word_start = 1;
+        segments->data[segments->count - 1].word_end = 1;
+    }
+    return 1;
+}
+
+static int say_try_append_lexicon_word(
+    const char *word,
+    say_language_t language,
+    segment_buffer_t *segments
+)
+{
+    const lexicon_entry_t *entries;
+    size_t entry_count;
+    size_t i;
+
+    if (language == SAY_LANG_FR) {
+        entries = g_french_lexicon;
+        entry_count = sizeof(g_french_lexicon) / sizeof(g_french_lexicon[0]);
+    }
+    else {
+        entries = g_english_lexicon;
+        entry_count = sizeof(g_english_lexicon) / sizeof(g_english_lexicon[0]);
+    }
+
+    for (i = 0; i < entry_count; ++i) {
+        if (strcmp(word, entries[i].word) == 0) {
+            return say_append_phone_sequence(segments, entries[i].phonemes, entries[i].phoneme_count) ? 1 : -1;
+        }
+    }
+
+    return 0;
 }
 
 static int say_match_at(const char *word, size_t index, const char *pattern)
@@ -876,6 +979,13 @@ static int say_phonemize_french_word(const char *word, segment_buffer_t *segment
         if (i + 1 == len && word[i] == 'e') {
             break;
         }
+        if (say_match_at(word, i, "tion")) {
+            if (!say_append_phone(segments, PH_S) || !say_append_phone(segments, PH_J) || !say_append_phone(segments, PH_ON)) {
+                return 0;
+            }
+            i += 4;
+            continue;
+        }
         if (say_match_at(word, i, "eaux") || say_match_at(word, i, "eau")) {
             if (!say_append_phone(segments, PH_O)) {
                 return 0;
@@ -1111,7 +1221,10 @@ static int say_phonemize_french_word(const char *word, segment_buffer_t *segment
                 ++i;
                 break;
             case 's':
-                if (word[i + 1] != '\0' && say_is_vowel_char(word[i - (i > 0 ? 1 : 0)]) && say_is_vowel_char(word[i + 1])) {
+                if (i == len - 1) {
+                    ++i;
+                }
+                else if (i > 0 && word[i + 1] != '\0' && say_is_vowel_char(word[i - 1]) && say_is_vowel_char(word[i + 1])) {
                     if (!say_append_phone(segments, PH_Z)) {
                         return 0;
                     }
@@ -1183,8 +1296,14 @@ static int say_phonemize_french_word(const char *word, segment_buffer_t *segment
 
 static int say_append_text_word(const char *word, say_language_t language, segment_buffer_t *segments)
 {
+    int lexicon_result;
+
     if (word[0] == '\0') {
         return 1;
+    }
+    lexicon_result = say_try_append_lexicon_word(word, language, segments);
+    if (lexicon_result != 0) {
+        return lexicon_result > 0;
     }
     if (language == SAY_LANG_FR) {
         return say_phonemize_french_word(word, segments);
@@ -1411,6 +1530,26 @@ static double say_pause_duration_ms(int boundary_type)
     }
 }
 
+static double say_glottal_pulse(double phase)
+{
+    double flow;
+
+    if (phase < 0.42) {
+        double x = phase / 0.42;
+        flow = 0.5 - 0.5 * cos(M_PI * x);
+    }
+    else if (phase < 0.78) {
+        double x = (phase - 0.42) / 0.36;
+        flow = cos(x * (M_PI * 0.5));
+    }
+    else {
+        double x = (phase - 0.78) / 0.22;
+        flow = -0.18 * x;
+    }
+
+    return flow - 0.22;
+}
+
 static int say_generate_frames(
     const segment_t *segments,
     size_t segment_count,
@@ -1632,10 +1771,23 @@ static int say_synthesize_frames(
     size_t i;
     int64_t frame_sample_accum;
     size_t total_samples;
+    double *mix;
     int16_t *samples;
     size_t sample_index;
     double phase;
     unsigned int rng;
+    double amplitude_state;
+    double pitch_state;
+    double noise_mix_state;
+    double voicing_state;
+    double formant_freq_state[SAY_MAX_FORMANTS];
+    double bandwidth_state[SAY_MAX_FORMANTS];
+    double gain_state[SAY_MAX_FORMANTS];
+    double source_state;
+    double hp_x1;
+    double hp_y1;
+    double peak;
+    int state_ready;
 
     memset(filters, 0, sizeof(filters));
     frame_sample_accum = 0;
@@ -1648,9 +1800,9 @@ static int say_synthesize_frames(
         total_samples += (size_t) frame_samples;
     }
 
-    samples = (int16_t *) malloc(total_samples * sizeof(*samples));
-    if (samples == NULL) {
-        say_set_error(error, error_size, "out of memory while allocating %zu samples", total_samples);
+    mix = (double *) malloc(total_samples * sizeof(*mix));
+    if (mix == NULL) {
+        say_set_error(error, error_size, "out of memory while allocating %zu synthesis samples", total_samples);
         return 0;
     }
 
@@ -1658,12 +1810,44 @@ static int say_synthesize_frames(
     rng = 0x12345678u;
     sample_index = 0;
     frame_sample_accum = 0;
+    amplitude_state = 0.0;
+    pitch_state = 120.0;
+    noise_mix_state = 0.0;
+    voicing_state = 0.0;
+    source_state = 0.0;
+    hp_x1 = 0.0;
+    hp_y1 = 0.0;
+    peak = 0.0;
+    state_ready = 0;
+    memset(formant_freq_state, 0, sizeof(formant_freq_state));
+    memset(bandwidth_state, 0, sizeof(bandwidth_state));
+    memset(gain_state, 0, sizeof(gain_state));
+
     for (i = 0; i < frame_count; ++i) {
         size_t j;
         int frame_samples;
+        double target_amplitude;
+        double target_pitch;
+        double target_noise_mix;
+        double target_voicing;
 
-        for (j = 0; j < SAY_MAX_FORMANTS; ++j) {
-            say_biquad_set_bandpass(&filters[j], (double) sample_rate, frames[i].formant_freq[j], frames[i].bandwidth[j], frames[i].gain[j]);
+        target_amplitude = frames[i].is_pause ? 0.0 : frames[i].amplitude;
+        target_pitch = frames[i].pitch_hz > 1.0 ? frames[i].pitch_hz : pitch_state;
+        target_noise_mix = frames[i].is_pause ? 0.0 : frames[i].noise_mix;
+        target_voicing = frames[i].voiced ? 1.0 : 0.0;
+
+        if (!state_ready) {
+            for (j = 0; j < SAY_MAX_FORMANTS; ++j) {
+                formant_freq_state[j] = frames[i].formant_freq[j];
+                bandwidth_state[j] = frames[i].bandwidth[j];
+                gain_state[j] = frames[i].gain[j];
+                say_biquad_set_bandpass(&filters[j], (double) sample_rate, formant_freq_state[j], bandwidth_state[j], gain_state[j]);
+            }
+            amplitude_state = target_amplitude;
+            pitch_state = target_pitch;
+            noise_mix_state = target_noise_mix;
+            voicing_state = target_voicing;
+            state_ready = 1;
         }
 
         frame_sample_accum += (int64_t) sample_rate * (int64_t) frame_ms;
@@ -1676,15 +1860,29 @@ static int say_synthesize_frames(
             double excitation;
             double voiced_mix;
             double output;
+            double envelope;
+            double frame_alpha;
             size_t k;
 
-            if (frames[i].voiced && frames[i].pitch_hz > 1.0) {
-                phase += frames[i].pitch_hz / (double) sample_rate;
+            frame_alpha = frame_samples > 1 ? (double) j / (double) (frame_samples - 1) : 0.5;
+            amplitude_state += 0.020 * (target_amplitude - amplitude_state);
+            pitch_state += 0.012 * (target_pitch - pitch_state);
+            noise_mix_state += 0.030 * (target_noise_mix - noise_mix_state);
+            voicing_state += 0.030 * (target_voicing - voicing_state);
+
+            for (k = 0; k < SAY_MAX_FORMANTS; ++k) {
+                formant_freq_state[k] += 0.025 * (frames[i].formant_freq[k] - formant_freq_state[k]);
+                bandwidth_state[k] += 0.025 * (frames[i].bandwidth[k] - bandwidth_state[k]);
+                gain_state[k] += 0.025 * (frames[i].gain[k] - gain_state[k]);
+                say_biquad_set_bandpass(&filters[k], (double) sample_rate, formant_freq_state[k], bandwidth_state[k], gain_state[k]);
+            }
+
+            if (voicing_state > 0.02 && pitch_state > 1.0) {
+                phase += pitch_state / (double) sample_rate;
                 if (phase >= 1.0) {
                     phase -= floor(phase);
                 }
-                glottal = 2.0 * phase - 1.0;
-                glottal = tanh(glottal * 1.4) * 0.9;
+                glottal = say_glottal_pulse(phase);
             }
             else {
                 glottal = 0.0;
@@ -1693,8 +1891,10 @@ static int say_synthesize_frames(
             rng = rng * 1664525u + 1013904223u;
             noise = ((double) ((rng >> 8) & 0x00FFFFFFu) / 8388608.0) - 1.0;
 
-            voiced_mix = frames[i].voiced ? (1.0 - frames[i].noise_mix) : 0.0;
-            excitation = voiced_mix * glottal + frames[i].noise_mix * noise;
+            voiced_mix = voicing_state * (1.0 - noise_mix_state);
+            excitation = voiced_mix * glottal + (noise_mix_state + 0.06 * voicing_state) * noise;
+            source_state += 0.18 * (excitation - source_state);
+            excitation = 0.68 * source_state + 0.32 * excitation;
 
             output = 0.0;
             for (k = 0; k < SAY_MAX_FORMANTS; ++k) {
@@ -1702,27 +1902,53 @@ static int say_synthesize_frames(
             }
 
             if (frames[i].is_pause) {
-                output *= 0.1;
+                output *= 0.08;
                 for (k = 0; k < SAY_MAX_FORMANTS; ++k) {
-                    filters[k].z1 *= 0.86;
-                    filters[k].z2 *= 0.86;
+                    filters[k].z1 *= 0.84;
+                    filters[k].z2 *= 0.84;
                 }
             }
 
-            output *= frames[i].amplitude * 0.46;
-            output = tanh(output);
-
-            if (output > 1.0) {
-                output = 1.0;
+            envelope = frame_samples > 1 ? sin(M_PI * frame_alpha) : 1.0;
+            envelope = 0.35 + 0.65 * envelope;
+            output *= amplitude_state * envelope * 0.78;
+            {
+                double hp_output = output - hp_x1 + 0.995 * hp_y1;
+                hp_x1 = output;
+                hp_y1 = hp_output;
+                output = hp_output;
             }
-            if (output < -1.0) {
-                output = -1.0;
+            mix[sample_index++] = output;
+            if (fabs(output) > peak) {
+                peak = fabs(output);
             }
-
-            samples[sample_index++] = (int16_t) lrint(output * 32767.0);
         }
     }
 
+    samples = (int16_t *) malloc(total_samples * sizeof(*samples));
+    if (samples == NULL) {
+        free(mix);
+        say_set_error(error, error_size, "out of memory while allocating %zu pcm samples", total_samples);
+        return 0;
+    }
+
+    if (peak < 1e-6) {
+        peak = 1.0;
+    }
+
+    for (i = 0; i < sample_index; ++i) {
+        double scaled = mix[i] * (0.82 / peak);
+        double shaped = tanh(scaled * 1.15) * 0.96;
+        if (shaped > 0.98) {
+            shaped = 0.98;
+        }
+        if (shaped < -0.98) {
+            shaped = -0.98;
+        }
+        samples[i] = (int16_t) lrint(shaped * 32767.0);
+    }
+
+    free(mix);
     *out_samples = samples;
     *out_sample_count = sample_index;
     return 1;
