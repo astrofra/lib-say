@@ -1,0 +1,23 @@
+English Reference Comparison
+============================
+
+01-demo: Hello from lib-say. This is an English demo sentence.
+  SAM     : sam-01-demo.wav (22050 Hz, 8-bit)
+    duration=4.194s peak=1.000 mean_rms=0.2297 zcr=0.1106 diff_mean=0.0660 diff_max=1.9766
+  lib-say : ours-01-demo.aiff (22050 Hz, 16-bit)
+    duration=4.760s peak=0.707 mean_rms=0.0904 zcr=0.0553 diff_mean=0.0107 diff_max=0.2709
+  delta   : duration x1.13, rms x0.39, zcr x0.50
+
+02-hamlet: To be or not to be, that is the question.
+  SAM     : sam-02-hamlet.wav (22050 Hz, 8-bit)
+    duration=2.814s peak=1.000 mean_rms=0.1793 zcr=0.0777 diff_mean=0.0440 diff_max=1.5000
+  lib-say : ours-02-hamlet.aiff (22050 Hz, 16-bit)
+    duration=3.060s peak=0.707 mean_rms=0.1206 zcr=0.0538 diff_mean=0.0116 diff_max=0.2708
+  delta   : duration x1.09, rms x0.67, zcr x0.69
+
+03-sibilants: She sells seashells by the seashore.
+  SAM     : sam-03-sibilants.wav (22050 Hz, 8-bit)
+    duration=2.403s peak=1.000 mean_rms=0.2305 zcr=0.1457 diff_mean=0.0783 diff_max=1.5000
+  lib-say : ours-03-sibilants.aiff (22050 Hz, 16-bit)
+    duration=2.870s peak=0.707 mean_rms=0.1507 zcr=0.0908 diff_mean=0.0287 diff_max=0.3959
+  delta   : duration x1.19, rms x0.65, zcr x0.62
