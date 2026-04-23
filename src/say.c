@@ -1756,6 +1756,53 @@ static double say_glottal_pulse(double phase)
     return flow - 0.22;
 }
 
+static double say_clamp01(double value)
+{
+    if (value < 0.0) {
+        return 0.0;
+    }
+    if (value > 1.0) {
+        return 1.0;
+    }
+    return value;
+}
+
+static double say_smoothstep01(double value)
+{
+    value = say_clamp01(value);
+    return value * value * (3.0 - 2.0 * value);
+}
+
+static double say_transition_alpha(double position, double steady_ratio)
+{
+    if (position <= steady_ratio) {
+        return 0.0;
+    }
+    return say_smoothstep01((position - steady_ratio) / (1.0 - steady_ratio));
+}
+
+static int say_is_plosive_phone(phoneme_id_t id)
+{
+    return id == PH_P || id == PH_B || id == PH_T || id == PH_D || id == PH_K || id == PH_G;
+}
+
+static int say_is_fricative_phone(phoneme_id_t id)
+{
+    return id == PH_F || id == PH_V || id == PH_S || id == PH_Z || id == PH_SH ||
+           id == PH_ZH || id == PH_H || id == PH_TH || id == PH_DH;
+}
+
+static int say_is_affricate_phone(phoneme_id_t id)
+{
+    return id == PH_CH || id == PH_JH || id == PH_TS || id == PH_DZ;
+}
+
+static int say_is_sonorant_phone(phoneme_id_t id)
+{
+    return id == PH_W || id == PH_J || id == PH_R || id == PH_L || id == PH_M ||
+           id == PH_N || id == PH_NY || id == PH_NG;
+}
+
 static int say_generate_frames(
     const segment_t *segments,
     size_t segment_count,
@@ -1895,19 +1942,63 @@ static int say_generate_frames(
 
         for (frame_index = 0; frame_index < (size_t) frame_count; ++frame_index) {
             double alpha;
+            double transition_alpha;
+            double segment_envelope;
+            double local_noise_mix;
 
             alpha = frame_count == 1 ? 0.0 : (double) frame_index / (double) (frame_count - 1);
+            transition_alpha = say_transition_alpha(alpha, say_is_vowel_phone(segments[i].phoneme) ? 0.62 : 0.42);
+            segment_envelope = 1.0;
+            local_noise_mix = current->noise_mix;
+
+            if (say_is_vowel_phone(segments[i].phoneme)) {
+                local_noise_mix *= 0.30;
+                segment_envelope = 0.94 + 0.06 * sin(alpha * M_PI);
+            }
+            else if (say_is_sonorant_phone(segments[i].phoneme)) {
+                local_noise_mix *= 0.22;
+                segment_envelope = 0.86 + 0.14 * sin(alpha * M_PI);
+            }
+            else if (say_is_plosive_phone(segments[i].phoneme)) {
+                double burst = say_smoothstep01((alpha - 0.34) / 0.26);
+                if (alpha < 0.26) {
+                    segment_envelope = 0.04;
+                    local_noise_mix = 0.0;
+                }
+                else {
+                    segment_envelope = 0.18 + 0.82 * burst;
+                    local_noise_mix = current->voiced ? (0.08 + 0.16 * burst) : (0.14 + 0.62 * burst);
+                }
+            }
+            else if (say_is_affricate_phone(segments[i].phoneme)) {
+                local_noise_mix = current->voiced ? 0.42 : 0.82;
+                segment_envelope = 0.78 + 0.22 * sin(alpha * M_PI);
+            }
+            else if (say_is_fricative_phone(segments[i].phoneme)) {
+                if (segments[i].phoneme == PH_H) {
+                    local_noise_mix = 0.52;
+                    segment_envelope = 0.55 + 0.20 * sin(alpha * M_PI);
+                }
+                else {
+                    local_noise_mix = current->voiced ? 0.34 : 0.78;
+                    segment_envelope = current->voiced ? 0.84 : 0.74;
+                }
+            }
+
             memset(&frame, 0, sizeof(frame));
             frame.voiced = current->voiced;
             frame.is_pause = 0;
+            if (say_is_plosive_phone(segments[i].phoneme) && alpha < 0.26) {
+                frame.voiced = 0;
+            }
             frame.pitch_hz = base_pitch + 12.0 * stress_boost;
-            frame.amplitude = current->amplitude * (0.88 + 0.14 * stress_boost);
-            frame.noise_mix = current->noise_mix;
+            frame.amplitude = current->amplitude * (0.88 + 0.14 * stress_boost) * segment_envelope;
+            frame.noise_mix = local_noise_mix;
 
             for (j = 0; j < SAY_MAX_FORMANTS; ++j) {
-                frame.formant_freq[j] = current->formant_freq[j] + (target->formant_freq[j] - current->formant_freq[j]) * alpha;
-                frame.bandwidth[j] = current->bandwidth[j] + (target->bandwidth[j] - current->bandwidth[j]) * alpha;
-                frame.gain[j] = current->gain[j] + (target->gain[j] - current->gain[j]) * alpha;
+                frame.formant_freq[j] = current->formant_freq[j] + (target->formant_freq[j] - current->formant_freq[j]) * transition_alpha;
+                frame.bandwidth[j] = current->bandwidth[j] + (target->bandwidth[j] - current->bandwidth[j]) * transition_alpha;
+                frame.gain[j] = current->gain[j] + (target->gain[j] - current->gain[j]) * transition_alpha;
             }
 
             if (!say_frame_buffer_push(frames, &frame)) {
@@ -2001,9 +2092,14 @@ static int say_synthesize_frames(
     double bandwidth_state[SAY_MAX_FORMANTS];
     double gain_state[SAY_MAX_FORMANTS];
     double source_state;
+    double source_hp_x1;
+    double source_hp_y1;
     double hp_x1;
     double hp_y1;
     double peak;
+    double jitter_state;
+    double jitter_target;
+    int jitter_countdown;
     int state_ready;
 
     memset(filters, 0, sizeof(filters));
@@ -2032,9 +2128,14 @@ static int say_synthesize_frames(
     noise_mix_state = 0.0;
     voicing_state = 0.0;
     source_state = 0.0;
+    source_hp_x1 = 0.0;
+    source_hp_y1 = 0.0;
     hp_x1 = 0.0;
     hp_y1 = 0.0;
     peak = 0.0;
+    jitter_state = 0.0;
+    jitter_target = 0.0;
+    jitter_countdown = 0;
     state_ready = 0;
     memset(formant_freq_state, 0, sizeof(formant_freq_state));
     memset(bandwidth_state, 0, sizeof(bandwidth_state));
@@ -2077,11 +2178,9 @@ static int say_synthesize_frames(
             double excitation;
             double voiced_mix;
             double output;
-            double envelope;
-            double frame_alpha;
+            double source_hp;
             size_t k;
 
-            frame_alpha = frame_samples > 1 ? (double) j / (double) (frame_samples - 1) : 0.5;
             amplitude_state += 0.020 * (target_amplitude - amplitude_state);
             pitch_state += 0.012 * (target_pitch - pitch_state);
             noise_mix_state += 0.030 * (target_noise_mix - noise_mix_state);
@@ -2095,7 +2194,17 @@ static int say_synthesize_frames(
             }
 
             if (voicing_state > 0.02 && pitch_state > 1.0) {
-                phase += pitch_state / (double) sample_rate;
+                if (jitter_countdown <= 0) {
+                    rng = rng * 1664525u + 1013904223u;
+                    jitter_target = ((((double) ((rng >> 8) & 0xFFFFu) / 32768.0) - 1.0) * 0.0045);
+                    jitter_countdown = sample_rate / 180;
+                    if (jitter_countdown < 1) {
+                        jitter_countdown = 1;
+                    }
+                }
+                --jitter_countdown;
+                jitter_state += 0.010 * (jitter_target - jitter_state);
+                phase += (pitch_state * (1.0 + jitter_state)) / (double) sample_rate;
                 if (phase >= 1.0) {
                     phase -= floor(phase);
                 }
@@ -2103,15 +2212,19 @@ static int say_synthesize_frames(
             }
             else {
                 glottal = 0.0;
+                jitter_state *= 0.98;
             }
 
             rng = rng * 1664525u + 1013904223u;
             noise = ((double) ((rng >> 8) & 0x00FFFFFFu) / 8388608.0) - 1.0;
 
             voiced_mix = voicing_state * (1.0 - noise_mix_state);
-            excitation = voiced_mix * glottal + (noise_mix_state + 0.06 * voicing_state) * noise;
-            source_state += 0.18 * (excitation - source_state);
-            excitation = 0.68 * source_state + 0.32 * excitation;
+            excitation = voiced_mix * glottal + (noise_mix_state + 0.012 * voicing_state) * noise;
+            source_hp = excitation - source_hp_x1 + 0.972 * source_hp_y1;
+            source_hp_x1 = excitation;
+            source_hp_y1 = source_hp;
+            source_state += 0.16 * (source_hp - source_state);
+            excitation = 0.82 * source_state + 0.18 * source_hp;
 
             output = 0.0;
             for (k = 0; k < SAY_MAX_FORMANTS; ++k) {
@@ -2126,9 +2239,7 @@ static int say_synthesize_frames(
                 }
             }
 
-            envelope = frame_samples > 1 ? sin(M_PI * frame_alpha) : 1.0;
-            envelope = 0.35 + 0.65 * envelope;
-            output *= amplitude_state * envelope * 0.78;
+            output *= amplitude_state * 0.86;
             {
                 double hp_output = output - hp_x1 + 0.995 * hp_y1;
                 hp_x1 = output;
