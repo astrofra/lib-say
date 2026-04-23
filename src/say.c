@@ -162,24 +162,24 @@ static const phoneme_def_t g_phonemes[PH_COUNT] = {
     { PH_NY, "NY", 0, 1, 78.0, 0.72, 0.06, { 300, 1800, 2600, 3500, 4300 }, { 130, 150, 200, 240, 300 }, { 0.74, 0.54, 0.18, 0.07, 0.03 } },
     { PH_NG, "NG", 0, 1, 78.0, 0.72, 0.06, { 300, 1400, 2200, 3000, 3800 }, { 130, 150, 200, 240, 300 }, { 0.74, 0.54, 0.18, 0.07, 0.03 } },
     { PH_P, "P", 0, 0, 68.0, 0.62, 1.00, { 500, 1400, 2400, 3500, 4500 }, { 300, 340, 380, 420, 500 }, { 0.40, 0.28, 0.24, 0.20, 0.14 } },
-    { PH_B, "B", 0, 1, 70.0, 0.64, 0.50, { 500, 1400, 2400, 3500, 4500 }, { 300, 340, 380, 420, 500 }, { 0.42, 0.30, 0.24, 0.20, 0.14 } },
+    { PH_B, "B", 0, 1, 70.0, 0.64, 0.36, { 500, 1400, 2400, 3500, 4500 }, { 300, 340, 380, 420, 500 }, { 0.42, 0.30, 0.24, 0.20, 0.14 } },
     { PH_T, "T", 0, 0, 66.0, 0.62, 1.00, { 600, 1700, 2800, 3800, 4800 }, { 280, 330, 380, 420, 500 }, { 0.40, 0.28, 0.24, 0.20, 0.14 } },
-    { PH_D, "D", 0, 1, 68.0, 0.64, 0.45, { 600, 1700, 2800, 3800, 4800 }, { 280, 330, 380, 420, 500 }, { 0.42, 0.30, 0.24, 0.20, 0.14 } },
+    { PH_D, "D", 0, 1, 68.0, 0.64, 0.34, { 600, 1700, 2800, 3800, 4800 }, { 280, 330, 380, 420, 500 }, { 0.42, 0.30, 0.24, 0.20, 0.14 } },
     { PH_K, "K", 0, 0, 70.0, 0.62, 1.00, { 700, 1800, 3000, 3900, 4900 }, { 280, 330, 380, 420, 500 }, { 0.40, 0.28, 0.24, 0.20, 0.14 } },
-    { PH_G, "G", 0, 1, 72.0, 0.64, 0.50, { 700, 1800, 3000, 3900, 4900 }, { 280, 330, 380, 420, 500 }, { 0.42, 0.30, 0.24, 0.20, 0.14 } },
+    { PH_G, "G", 0, 1, 72.0, 0.64, 0.36, { 700, 1800, 3000, 3900, 4900 }, { 280, 330, 380, 420, 500 }, { 0.42, 0.30, 0.24, 0.20, 0.14 } },
     { PH_F, "F", 0, 0, 82.0, 0.66, 1.00, { 900, 1800, 2900, 3900, 5000 }, { 250, 290, 340, 390, 450 }, { 0.42, 0.34, 0.28, 0.22, 0.16 } },
-    { PH_V, "V", 0, 1, 84.0, 0.68, 0.60, { 900, 1800, 2900, 3900, 5000 }, { 250, 290, 340, 390, 450 }, { 0.44, 0.34, 0.28, 0.22, 0.16 } },
+    { PH_V, "V", 0, 1, 84.0, 0.68, 0.42, { 900, 1800, 2900, 3900, 5000 }, { 250, 290, 340, 390, 450 }, { 0.44, 0.34, 0.28, 0.22, 0.16 } },
     { PH_S, "S", 0, 0, 88.0, 0.66, 1.00, { 1000, 2300, 3500, 4500, 5600 }, { 230, 280, 330, 380, 430 }, { 0.44, 0.36, 0.30, 0.24, 0.18 } },
-    { PH_Z, "Z", 0, 1, 88.0, 0.68, 0.65, { 1000, 2300, 3500, 4500, 5600 }, { 230, 280, 330, 380, 430 }, { 0.46, 0.36, 0.30, 0.24, 0.18 } },
+    { PH_Z, "Z", 0, 1, 88.0, 0.68, 0.46, { 1000, 2300, 3500, 4500, 5600 }, { 230, 280, 330, 380, 430 }, { 0.46, 0.36, 0.30, 0.24, 0.18 } },
     { PH_SH, "SH", 0, 0, 90.0, 0.68, 1.00, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.46, 0.38, 0.30, 0.24, 0.18 } },
-    { PH_ZH, "ZH", 0, 1, 90.0, 0.70, 0.70, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } },
-    { PH_H, "H", 0, 0, 68.0, 0.48, 0.85, { 1000, 1700, 2600, 3500, 4400 }, { 260, 310, 360, 410, 470 }, { 0.34, 0.26, 0.20, 0.16, 0.12 } },
+    { PH_ZH, "ZH", 0, 1, 90.0, 0.70, 0.48, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } },
+    { PH_H, "H", 0, 0, 68.0, 0.48, 0.68, { 1000, 1700, 2600, 3500, 4400 }, { 260, 310, 360, 410, 470 }, { 0.34, 0.26, 0.20, 0.16, 0.12 } },
     { PH_TH, "TH", 0, 0, 86.0, 0.64, 1.00, { 1200, 2400, 3400, 4500, 5600 }, { 220, 270, 320, 370, 420 }, { 0.42, 0.34, 0.28, 0.22, 0.16 } },
-    { PH_DH, "DH", 0, 1, 86.0, 0.66, 0.65, { 1200, 2400, 3400, 4500, 5600 }, { 220, 270, 320, 370, 420 }, { 0.44, 0.34, 0.28, 0.22, 0.16 } },
+    { PH_DH, "DH", 0, 1, 86.0, 0.66, 0.44, { 1200, 2400, 3400, 4500, 5600 }, { 220, 270, 320, 370, 420 }, { 0.44, 0.34, 0.28, 0.22, 0.16 } },
     { PH_CH, "CH", 0, 0, 92.0, 0.68, 1.00, { 1300, 2600, 3700, 4800, 5900 }, { 220, 270, 320, 370, 420 }, { 0.46, 0.38, 0.30, 0.24, 0.18 } },
-    { PH_JH, "JH", 0, 1, 92.0, 0.70, 0.70, { 1300, 2600, 3700, 4800, 5900 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } },
+    { PH_JH, "JH", 0, 1, 92.0, 0.70, 0.48, { 1300, 2600, 3700, 4800, 5900 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } },
     { PH_TS, "TS", 0, 0, 90.0, 0.66, 1.00, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.46, 0.38, 0.30, 0.24, 0.18 } },
-    { PH_DZ, "DZ", 0, 1, 90.0, 0.68, 0.70, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } }
+    { PH_DZ, "DZ", 0, 1, 90.0, 0.68, 0.48, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } }
 };
 
 static const phoneme_id_t g_word_en_hello[] = { PH_H, PH_EH, PH_L, PH_OH };
@@ -1960,35 +1960,37 @@ static int say_generate_frames(
                 segment_envelope = 0.86 + 0.14 * sin(alpha * M_PI);
             }
             else if (say_is_plosive_phone(segments[i].phoneme)) {
-                double burst = say_smoothstep01((alpha - 0.34) / 0.26);
-                if (alpha < 0.26) {
-                    segment_envelope = 0.04;
+                double burst_attack = say_smoothstep01((alpha - 0.32) / 0.12);
+                double burst_decay = 1.0 - say_smoothstep01((alpha - 0.58) / 0.18);
+                double burst = burst_attack * burst_decay;
+                if (alpha < 0.30) {
+                    segment_envelope = 0.03;
                     local_noise_mix = 0.0;
                 }
                 else {
-                    segment_envelope = 0.18 + 0.82 * burst;
-                    local_noise_mix = current->voiced ? (0.08 + 0.16 * burst) : (0.14 + 0.62 * burst);
+                    segment_envelope = current->voiced ? (0.12 + 0.34 * burst) : (0.10 + 0.40 * burst);
+                    local_noise_mix = current->voiced ? (0.04 + 0.08 * burst) : (0.10 + 0.28 * burst);
                 }
             }
             else if (say_is_affricate_phone(segments[i].phoneme)) {
-                local_noise_mix = current->voiced ? 0.42 : 0.82;
-                segment_envelope = 0.78 + 0.22 * sin(alpha * M_PI);
+                local_noise_mix = current->voiced ? 0.22 : 0.46;
+                segment_envelope = 0.56 + 0.16 * sin(alpha * M_PI);
             }
             else if (say_is_fricative_phone(segments[i].phoneme)) {
                 if (segments[i].phoneme == PH_H) {
-                    local_noise_mix = 0.52;
-                    segment_envelope = 0.55 + 0.20 * sin(alpha * M_PI);
+                    local_noise_mix = 0.30;
+                    segment_envelope = 0.42 + 0.12 * sin(alpha * M_PI);
                 }
                 else {
-                    local_noise_mix = current->voiced ? 0.34 : 0.78;
-                    segment_envelope = current->voiced ? 0.84 : 0.74;
+                    local_noise_mix = current->voiced ? 0.20 : 0.48;
+                    segment_envelope = current->voiced ? 0.70 : 0.62;
                 }
             }
 
             memset(&frame, 0, sizeof(frame));
             frame.voiced = current->voiced;
             frame.is_pause = 0;
-            if (say_is_plosive_phone(segments[i].phoneme) && alpha < 0.26) {
+            if (say_is_plosive_phone(segments[i].phoneme) && alpha < 0.30) {
                 frame.voiced = 0;
             }
             frame.pitch_hz = base_pitch + 12.0 * stress_boost;
@@ -2096,6 +2098,7 @@ static int say_synthesize_frames(
     double source_hp_y1;
     double hp_x1;
     double hp_y1;
+    double limiter_env;
     double peak;
     double jitter_state;
     double jitter_target;
@@ -2132,6 +2135,7 @@ static int say_synthesize_frames(
     source_hp_y1 = 0.0;
     hp_x1 = 0.0;
     hp_y1 = 0.0;
+    limiter_env = 0.0;
     peak = 0.0;
     jitter_state = 0.0;
     jitter_target = 0.0;
@@ -2179,12 +2183,19 @@ static int say_synthesize_frames(
             double voiced_mix;
             double output;
             double source_hp;
+            double amplitude_rate;
+            double noise_rate;
+            double voicing_rate;
             size_t k;
 
-            amplitude_state += 0.020 * (target_amplitude - amplitude_state);
+            amplitude_rate = target_amplitude > amplitude_state ? 0.007 : 0.030;
+            noise_rate = target_noise_mix > noise_mix_state ? 0.010 : 0.040;
+            voicing_rate = target_voicing > voicing_state ? 0.014 : 0.050;
+
+            amplitude_state += amplitude_rate * (target_amplitude - amplitude_state);
             pitch_state += 0.012 * (target_pitch - pitch_state);
-            noise_mix_state += 0.030 * (target_noise_mix - noise_mix_state);
-            voicing_state += 0.030 * (target_voicing - voicing_state);
+            noise_mix_state += noise_rate * (target_noise_mix - noise_mix_state);
+            voicing_state += voicing_rate * (target_voicing - voicing_state);
 
             for (k = 0; k < SAY_MAX_FORMANTS; ++k) {
                 formant_freq_state[k] += 0.025 * (frames[i].formant_freq[k] - formant_freq_state[k]);
@@ -2245,6 +2256,22 @@ static int say_synthesize_frames(
                 hp_x1 = output;
                 hp_y1 = hp_output;
                 output = hp_output;
+            }
+            {
+                double abs_output = fabs(output);
+                double threshold = 0.34;
+                double release = 0.9985;
+
+                if (abs_output > limiter_env) {
+                    limiter_env = abs_output;
+                }
+                else {
+                    limiter_env *= release;
+                }
+
+                if (limiter_env > threshold) {
+                    output *= threshold / limiter_env;
+                }
             }
             mix[sample_index++] = output;
             if (fabs(output) > peak) {
