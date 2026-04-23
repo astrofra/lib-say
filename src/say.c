@@ -1884,20 +1884,21 @@ static double say_glottal_pulse(double phase)
 {
     double flow;
 
-    if (phase < 0.42) {
-        double x = phase / 0.42;
-        flow = 0.5 - 0.5 * cos(M_PI * x);
+    if (phase < 0.46) {
+        double x = phase / 0.46;
+        flow = sin(0.5 * M_PI * x);
+        flow *= flow;
     }
-    else if (phase < 0.78) {
-        double x = (phase - 0.42) / 0.36;
+    else if (phase < 0.74) {
+        double x = (phase - 0.46) / 0.28;
         flow = cos(x * (M_PI * 0.5));
     }
     else {
-        double x = (phase - 0.78) / 0.22;
-        flow = -0.18 * x;
+        double x = (phase - 0.74) / 0.26;
+        flow = -0.12 * sin(M_PI * x);
     }
 
-    return flow - 0.22;
+    return flow;
 }
 
 static double say_clamp01(double value)
@@ -2516,7 +2517,8 @@ static int say_synthesize_frames(
     size_t error_size
 )
 {
-    biquad_t filters[SAY_MAX_FORMANTS];
+    biquad_t voiced_filters[SAY_MAX_FORMANTS];
+    biquad_t noise_filters[SAY_MAX_FORMANTS];
     size_t i;
     int64_t frame_sample_accum;
     size_t total_samples;
@@ -2535,6 +2537,10 @@ static int say_synthesize_frames(
     double source_state;
     double source_hp_x1;
     double source_hp_y1;
+    double noise_hp1_x1;
+    double noise_hp1_y1;
+    double noise_hp2_x1;
+    double noise_hp2_y1;
     double hp_x1;
     double hp_y1;
     double limiter_env;
@@ -2544,7 +2550,8 @@ static int say_synthesize_frames(
     int jitter_countdown;
     int state_ready;
 
-    memset(filters, 0, sizeof(filters));
+    memset(voiced_filters, 0, sizeof(voiced_filters));
+    memset(noise_filters, 0, sizeof(noise_filters));
     frame_sample_accum = 0;
     total_samples = 0;
     for (i = 0; i < frame_count; ++i) {
@@ -2572,6 +2579,10 @@ static int say_synthesize_frames(
     source_state = 0.0;
     source_hp_x1 = 0.0;
     source_hp_y1 = 0.0;
+    noise_hp1_x1 = 0.0;
+    noise_hp1_y1 = 0.0;
+    noise_hp2_x1 = 0.0;
+    noise_hp2_y1 = 0.0;
     hp_x1 = 0.0;
     hp_y1 = 0.0;
     limiter_env = 0.0;
@@ -2602,7 +2613,8 @@ static int say_synthesize_frames(
                 formant_freq_state[j] = frames[i].formant_freq[j];
                 bandwidth_state[j] = frames[i].bandwidth[j];
                 gain_state[j] = frames[i].gain[j];
-                say_biquad_set_bandpass(&filters[j], (double) sample_rate, formant_freq_state[j], bandwidth_state[j], gain_state[j]);
+                say_biquad_set_bandpass(&voiced_filters[j], (double) sample_rate, formant_freq_state[j], bandwidth_state[j], gain_state[j]);
+                say_biquad_set_bandpass(&noise_filters[j], (double) sample_rate, formant_freq_state[j], bandwidth_state[j], gain_state[j]);
             }
             amplitude_state = target_amplitude;
             pitch_state = target_pitch;
@@ -2620,8 +2632,14 @@ static int say_synthesize_frames(
             double noise;
             double excitation;
             double voiced_mix;
+            double voiced_excitation;
+            double noise_excitation;
+            double voiced_output;
+            double noise_output;
             double output;
             double source_hp;
+            double noise_hp1;
+            double noise_hp2;
             double amplitude_rate;
             double noise_rate;
             double voicing_rate;
@@ -2637,10 +2655,50 @@ static int say_synthesize_frames(
             voicing_state += voicing_rate * (target_voicing - voicing_state);
 
             for (k = 0; k < SAY_MAX_FORMANTS; ++k) {
+                double noise_focus;
+                double sibilant_focus;
+                double noise_gain_mul;
+                double noise_bandwidth;
+
                 formant_freq_state[k] += 0.025 * (frames[i].formant_freq[k] - formant_freq_state[k]);
                 bandwidth_state[k] += 0.025 * (frames[i].bandwidth[k] - bandwidth_state[k]);
                 gain_state[k] += 0.025 * (frames[i].gain[k] - gain_state[k]);
-                say_biquad_set_bandpass(&filters[k], (double) sample_rate, formant_freq_state[k], bandwidth_state[k], gain_state[k]);
+                noise_focus = say_clamp01((frames[i].noise_mix - 0.14) / 0.26);
+                sibilant_focus = say_clamp01((frames[i].noise_mix - 0.24) / 0.18);
+                switch (k) {
+                    case 0:
+                        noise_gain_mul = 1.0 - 0.86 * noise_focus;
+                        break;
+                    case 1:
+                        noise_gain_mul = 1.0 - 0.64 * noise_focus;
+                        break;
+                    case 2:
+                        noise_gain_mul = 1.0 - 0.12 * noise_focus;
+                        break;
+                    case 3:
+                        noise_gain_mul = 1.0 + 0.16 * noise_focus;
+                        break;
+                    default:
+                        noise_gain_mul = 1.0 + 0.28 * noise_focus;
+                        break;
+                }
+                if (k < 2) {
+                    noise_gain_mul *= 1.0 - 0.16 * sibilant_focus;
+                }
+                else if (k >= 3) {
+                    noise_gain_mul *= 1.0 + 0.12 * sibilant_focus;
+                }
+
+                noise_bandwidth = bandwidth_state[k] * (1.10 + 0.26 * noise_focus);
+                if (k < 2) {
+                    noise_bandwidth *= 1.12 + 0.10 * sibilant_focus;
+                }
+                else if (k >= 3) {
+                    noise_bandwidth *= 1.04 + 0.08 * sibilant_focus;
+                }
+
+                say_biquad_set_bandpass(&voiced_filters[k], (double) sample_rate, formant_freq_state[k], bandwidth_state[k], gain_state[k]);
+                say_biquad_set_bandpass(&noise_filters[k], (double) sample_rate, formant_freq_state[k], noise_bandwidth, gain_state[k] * noise_gain_mul);
             }
 
             if (voicing_state > 0.02 && pitch_state > 1.0) {
@@ -2669,23 +2727,37 @@ static int say_synthesize_frames(
             noise = ((double) ((rng >> 8) & 0x00FFFFFFu) / 8388608.0) - 1.0;
 
             voiced_mix = voicing_state * (1.0 - noise_mix_state);
-            excitation = voiced_mix * glottal + (noise_mix_state + 0.012 * voicing_state) * noise;
-            source_hp = excitation - source_hp_x1 + 0.972 * source_hp_y1;
-            source_hp_x1 = excitation;
+            voiced_excitation = voiced_mix * glottal;
+            source_hp = voiced_excitation - source_hp_x1 + 0.972 * source_hp_y1;
+            source_hp_x1 = voiced_excitation;
             source_hp_y1 = source_hp;
             source_state += 0.16 * (source_hp - source_state);
-            excitation = 0.82 * source_state + 0.18 * source_hp;
+            voiced_excitation = 0.80 * source_state + 0.20 * source_hp;
 
-            output = 0.0;
+            noise_hp1 = noise - noise_hp1_x1 + 0.985 * noise_hp1_y1;
+            noise_hp1_x1 = noise;
+            noise_hp1_y1 = noise_hp1;
+            noise_hp2 = noise_hp1 - noise_hp2_x1 + 0.940 * noise_hp2_y1;
+            noise_hp2_x1 = noise_hp1;
+            noise_hp2_y1 = noise_hp2;
+            noise_excitation = noise_mix_state * (0.58 * noise_hp1 + 0.42 * noise_hp2);
+
+            voiced_output = 0.0;
+            noise_output = 0.0;
             for (k = 0; k < SAY_MAX_FORMANTS; ++k) {
-                output += say_biquad_process(&filters[k], excitation);
+                voiced_output += say_biquad_process(&voiced_filters[k], voiced_excitation);
+                noise_output += say_biquad_process(&noise_filters[k], noise_excitation);
             }
+            excitation = voiced_excitation + noise_excitation;
+            output = voiced_output + noise_output;
 
             if (frames[i].is_pause) {
                 output *= 0.08;
                 for (k = 0; k < SAY_MAX_FORMANTS; ++k) {
-                    filters[k].z1 *= 0.84;
-                    filters[k].z2 *= 0.84;
+                    voiced_filters[k].z1 *= 0.84;
+                    voiced_filters[k].z2 *= 0.84;
+                    noise_filters[k].z1 *= 0.84;
+                    noise_filters[k].z2 *= 0.84;
                 }
             }
 
@@ -2916,6 +2988,8 @@ static int say_prepare_pipeline(
         return 0;
     }
 
+    memset(segments, 0, sizeof(*segments));
+    memset(frames, 0, sizeof(*frames));
     resolved_options = *options;
     if (resolved_options.sample_rate != 44100) {
         say_set_error(error, error_size, "sample rate must be 44100 Hz");
@@ -2925,9 +2999,6 @@ static int say_prepare_pipeline(
         say_set_error(error, error_size, "frame size must be between 5 and 10 ms");
         return 0;
     }
-
-    memset(segments, 0, sizeof(*segments));
-    memset(frames, 0, sizeof(*frames));
     normalized = NULL;
 
     if (resolved_options.phoneme_input) {
@@ -3428,6 +3499,10 @@ int say_synthesize(
 
     normalized = NULL;
     ok = 0;
+    memset(&segments, 0, sizeof(segments));
+    memset(&frames, 0, sizeof(frames));
+    *out_samples = NULL;
+    *out_sample_count = 0;
     resolved_options = *options;
     if (!say_prepare_pipeline(input, &resolved_options, &normalized, &segments, &frames, error, error_size)) {
         goto cleanup;

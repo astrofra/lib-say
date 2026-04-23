@@ -14,9 +14,9 @@ Corpus:
 
 01-demo [baseline]: Hello from lib-say. This is an English demo sentence.
   SAM     : sam-01-demo.wav duration=4.194s mean_rms=0.2297 zcr=0.1106 diff_mean=0.0660 diff_max=1.5000
-  MaryTTS : mary-01-demo.wav duration=3.325s mean_rms=0.1032 zcr=0.0921 diff_mean=0.0098 diff_max=0.3103
-  lib-say : ours-01-demo.aiff duration=4.370s mean_rms=0.0947 zcr=0.0332 diff_mean=0.0054 diff_max=0.0943
-  delta vs Mary: duration x1.31, rms x0.92, zcr x0.36
+  MaryTTS : mary-01-demo.wav duration=3.325s mean_rms=0.1028 zcr=0.0933 diff_mean=0.0098 diff_max=0.2905
+  lib-say : ours-01-demo.aiff duration=4.370s mean_rms=0.0879 zcr=0.0532 diff_mean=0.0091 diff_max=0.2673
+  delta vs Mary: duration x1.31, rms x0.85, zcr x0.57
   word_diffs:
     stress_mismatch        Hello: ours=H SCHWA L OH W | mary=H SCHWA L OH W
     exact                  from: ours=F R AH M | mary=F R AH M
@@ -31,9 +31,9 @@ Corpus:
 
 02-hamlet [function-words]: To be or not to be, that is the question.
   SAM     : sam-02-hamlet.wav duration=2.814s mean_rms=0.1793 zcr=0.0777 diff_mean=0.0440 diff_max=1.5000
-  MaryTTS : mary-02-hamlet.wav duration=2.550s mean_rms=0.1066 zcr=0.0753 diff_mean=0.0086 diff_max=0.2585
-  lib-say : ours-02-hamlet.aiff duration=2.900s mean_rms=0.1130 zcr=0.0349 diff_mean=0.0073 diff_max=0.1852
-  delta vs Mary: duration x1.14, rms x1.06, zcr x0.46
+  MaryTTS : mary-02-hamlet.wav duration=2.550s mean_rms=0.1066 zcr=0.0766 diff_mean=0.0087 diff_max=0.2641
+  lib-say : ours-02-hamlet.aiff duration=2.900s mean_rms=0.0911 zcr=0.0544 diff_mean=0.0104 diff_max=0.4532
+  delta vs Mary: duration x1.14, rms x0.86, zcr x0.71
   word_diffs:
     exact                  To: ours=T U | mary=T U
     exact                  be: ours=B I | mary=B I
@@ -47,10 +47,10 @@ Corpus:
     stress_mismatch        question: ours=K W EH S CH SCHWA N | mary=K W EH S CH SCHWA N
 
 03-sibilants [sibilants]: She sells seashells by the seashore.
-  SAM     : sam-03-sibilants.wav duration=2.403s mean_rms=0.2306 zcr=0.1457 diff_mean=0.0783 diff_max=1.5000
-  MaryTTS : mary-03-sibilants.wav duration=2.210s mean_rms=0.0674 zcr=0.1143 diff_mean=0.0083 diff_max=0.1074
-  lib-say : ours-03-sibilants.aiff duration=2.620s mean_rms=0.1273 zcr=0.0497 diff_mean=0.0091 diff_max=0.1183
-  delta vs Mary: duration x1.19, rms x1.89, zcr x0.44
+  SAM     : sam-03-sibilants.wav duration=2.403s mean_rms=0.2305 zcr=0.1457 diff_mean=0.0783 diff_max=1.5000
+  MaryTTS : mary-03-sibilants.wav duration=2.210s mean_rms=0.0672 zcr=0.1138 diff_mean=0.0082 diff_max=0.1068
+  lib-say : ours-03-sibilants.aiff duration=2.620s mean_rms=0.1046 zcr=0.0812 diff_mean=0.0140 diff_max=0.2508
+  delta vs Mary: duration x1.19, rms x1.56, zcr x0.71
   word_diffs:
     exact                  She: ours=SH I | mary=SH I
     exact                  sells: ours=S EH L Z | mary=S EH L Z
@@ -61,9 +61,9 @@ Corpus:
 
 04-dentals [th-dh]: This thing is worth the effort.
   SAM     : sam-04-dentals.wav duration=1.895s mean_rms=0.2097 zcr=0.0845 diff_mean=0.0573 diff_max=1.5000
-  MaryTTS : mary-04-dentals.wav duration=1.535s mean_rms=0.1196 zcr=0.1092 diff_mean=0.0088 diff_max=0.2659
-  lib-say : ours-04-dentals.aiff duration=1.990s mean_rms=0.1013 zcr=0.0487 diff_mean=0.0090 diff_max=0.1373
-  delta vs Mary: duration x1.30, rms x0.85, zcr x0.45
+  MaryTTS : mary-04-dentals.wav duration=1.535s mean_rms=0.1197 zcr=0.1132 diff_mean=0.0088 diff_max=0.2491
+  lib-say : ours-04-dentals.aiff duration=1.990s mean_rms=0.0954 zcr=0.0819 diff_mean=0.0171 diff_max=0.3572
+  delta vs Mary: duration x1.30, rms x0.80, zcr x0.72
   word_diffs:
     exact                  This: ours=DH IH S | mary=DH IH S
     exact                  thing: ours=TH IH NG | mary=TH IH NG
@@ -73,10 +73,10 @@ Corpus:
     exact                  effort: ours=EH F R T | mary=EH F R T
 
 05-voiced-dentals [dh-there]: Those feathers gather there.
-  SAM     : sam-05-voiced-dentals.wav duration=1.778s mean_rms=0.2147 zcr=0.0723 diff_mean=0.0510 diff_max=1.5000
-  MaryTTS : mary-05-voiced-dentals.wav duration=1.545s mean_rms=0.1100 zcr=0.0770 diff_mean=0.0087 diff_max=0.1771
-  lib-say : ours-05-voiced-dentals.aiff duration=2.050s mean_rms=0.1107 zcr=0.0467 diff_mean=0.0095 diff_max=0.3009
-  delta vs Mary: duration x1.33, rms x1.01, zcr x0.61
+  SAM     : sam-05-voiced-dentals.wav duration=1.778s mean_rms=0.2148 zcr=0.0723 diff_mean=0.0510 diff_max=1.5000
+  MaryTTS : mary-05-voiced-dentals.wav duration=1.545s mean_rms=0.1098 zcr=0.0708 diff_mean=0.0087 diff_max=0.1613
+  lib-say : ours-05-voiced-dentals.aiff duration=2.050s mean_rms=0.0976 zcr=0.0737 diff_mean=0.0153 diff_max=0.4764
+  delta vs Mary: duration x1.33, rms x0.89, zcr x1.04
   word_diffs:
     exact                  Those: ours=DH OH W Z | mary=DH OH W Z
     exact                  feathers: ours=F EH DH R Z | mary=F EH DH R Z
@@ -84,10 +84,10 @@ Corpus:
     exact                  there: ours=DH EH R | mary=DH EH R
 
 06-affricates [affricates]: Judge the changing church bells.
-  SAM     : sam-06-affricates.wav duration=2.405s mean_rms=0.1788 zcr=0.0695 diff_mean=0.0468 diff_max=1.5000
-  MaryTTS : mary-06-affricates.wav duration=1.840s mean_rms=0.0858 zcr=0.1054 diff_mean=0.0084 diff_max=0.1252
-  lib-say : ours-06-affricates.aiff duration=2.320s mean_rms=0.1223 zcr=0.0535 diff_mean=0.0142 diff_max=0.2422
-  delta vs Mary: duration x1.26, rms x1.43, zcr x0.51
+  SAM     : sam-06-affricates.wav duration=2.405s mean_rms=0.1789 zcr=0.0695 diff_mean=0.0468 diff_max=1.5000
+  MaryTTS : mary-06-affricates.wav duration=1.840s mean_rms=0.0856 zcr=0.1065 diff_mean=0.0084 diff_max=0.1166
+  lib-say : ours-06-affricates.aiff duration=2.320s mean_rms=0.1177 zcr=0.0894 diff_mean=0.0287 diff_max=0.6388
+  delta vs Mary: duration x1.26, rms x1.37, zcr x0.84
   word_diffs:
     exact                  Judge: ours=JH AH JH | mary=JH AH JH
     exact                  the: ours=DH SCHWA | mary=DH SCHWA
@@ -96,10 +96,10 @@ Corpus:
     exact                  bells: ours=B EH L Z | mary=B EH L Z
 
 07-stress [stress]: English fricatives shift sharply.
-  SAM     : sam-07-stress.wav duration=2.319s mean_rms=0.2204 zcr=0.0947 diff_mean=0.0669 diff_max=1.5000
-  MaryTTS : mary-07-stress.wav duration=2.090s mean_rms=0.0791 zcr=0.1167 diff_mean=0.0097 diff_max=0.2000
-  lib-say : ours-07-stress.aiff duration=2.830s mean_rms=0.1172 zcr=0.0442 diff_mean=0.0077 diff_max=0.1491
-  delta vs Mary: duration x1.35, rms x1.48, zcr x0.38
+  SAM     : sam-07-stress.wav duration=2.319s mean_rms=0.2205 zcr=0.0947 diff_mean=0.0669 diff_max=1.9922
+  MaryTTS : mary-07-stress.wav duration=2.090s mean_rms=0.0787 zcr=0.1147 diff_mean=0.0097 diff_max=0.1888
+  lib-say : ours-07-stress.aiff duration=2.830s mean_rms=0.1113 zcr=0.0744 diff_mean=0.0138 diff_max=0.3515
+  delta vs Mary: duration x1.35, rms x1.41, zcr x0.65
   word_diffs:
     exact                  English: ours=IH NG G L IH SH | mary=IH NG G L IH SH
     stress_mismatch        fricatives: ours=F R I K SCHWA T IH V Z | mary=F R I K SCHWA T IH V Z
@@ -108,9 +108,9 @@ Corpus:
 
 08-finals [word-final-fricatives]: Leave these clothes and bags.
   SAM     : sam-08-finals.wav duration=2.000s mean_rms=0.1863 zcr=0.0841 diff_mean=0.0523 diff_max=1.5000
-  MaryTTS : mary-08-finals.wav duration=1.665s mean_rms=0.1175 zcr=0.0869 diff_mean=0.0100 diff_max=0.1812
-  lib-say : ours-08-finals.aiff duration=2.310s mean_rms=0.1117 zcr=0.0418 diff_mean=0.0069 diff_max=0.0768
-  delta vs Mary: duration x1.39, rms x0.95, zcr x0.48
+  MaryTTS : mary-08-finals.wav duration=1.665s mean_rms=0.1174 zcr=0.0871 diff_mean=0.0100 diff_max=0.1966
+  lib-say : ours-08-finals.aiff duration=2.310s mean_rms=0.0935 zcr=0.0676 diff_mean=0.0094 diff_max=0.1653
+  delta vs Mary: duration x1.39, rms x0.80, zcr x0.78
   word_diffs:
     exact                  Leave: ours=L I V | mary=L I V
     exact                  these: ours=DH I Z | mary=DH I Z
