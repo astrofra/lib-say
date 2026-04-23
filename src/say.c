@@ -193,7 +193,7 @@ static const phoneme_id_t g_word_en_sentence[] = { PH_S, PH_EH, PH_N, PH_T, PH_A
 static const phoneme_id_t g_word_en_the[] = { PH_DH, PH_SCHWA };
 
 static const phoneme_id_t g_word_fr_bonjour[] = { PH_B, PH_ON, PH_ZH, PH_U, PH_R };
-static const phoneme_id_t g_word_fr_depuis[] = { PH_D, PH_SCHWA, PH_P, PH_Y, PH_I };
+static const phoneme_id_t g_word_fr_depuis[] = { PH_D, PH_SCHWA, PH_P, PH_J, PH_I };
 static const phoneme_id_t g_word_fr_ceci[] = { PH_S, PH_SCHWA, PH_S, PH_I };
 static const phoneme_id_t g_word_fr_est[] = { PH_EH };
 static const phoneme_id_t g_word_fr_une[] = { PH_Y, PH_N };
@@ -202,6 +202,8 @@ static const phoneme_id_t g_word_fr_demonstration[] = { PH_D, PH_E, PH_M, PH_ON,
 static const phoneme_id_t g_word_fr_de[] = { PH_D, PH_SCHWA };
 static const phoneme_id_t g_word_fr_en[] = { PH_AN };
 static const phoneme_id_t g_word_fr_francais[] = { PH_F, PH_R, PH_AN, PH_S, PH_E };
+static const phoneme_id_t g_word_fr_lib[] = { PH_L, PH_I, PH_B };
+static const phoneme_id_t g_word_fr_say[] = { PH_S, PH_E, PH_J };
 
 static const lexicon_entry_t g_english_lexicon[] = {
     { "an", g_word_en_an, sizeof(g_word_en_an) / sizeof(g_word_en_an[0]), 0.74, 1, 0 },
@@ -216,16 +218,18 @@ static const lexicon_entry_t g_english_lexicon[] = {
 };
 
 static const lexicon_entry_t g_french_lexicon[] = {
-    { "bonjour", g_word_fr_bonjour, sizeof(g_word_fr_bonjour) / sizeof(g_word_fr_bonjour[0]), 1.00, 0, 0 },
-    { "ceci", g_word_fr_ceci, sizeof(g_word_fr_ceci) / sizeof(g_word_fr_ceci[0]), 1.00, 0, 0 },
-    { "demonstration", g_word_fr_demonstration, sizeof(g_word_fr_demonstration) / sizeof(g_word_fr_demonstration[0]), 1.00, 0, 0 },
-    { "de", g_word_fr_de, sizeof(g_word_fr_de) / sizeof(g_word_fr_de[0]), 1.00, 0, 0 },
-    { "depuis", g_word_fr_depuis, sizeof(g_word_fr_depuis) / sizeof(g_word_fr_depuis[0]), 1.00, 0, 0 },
-    { "en", g_word_fr_en, sizeof(g_word_fr_en) / sizeof(g_word_fr_en[0]), 1.00, 0, 0 },
-    { "est", g_word_fr_est, sizeof(g_word_fr_est) / sizeof(g_word_fr_est[0]), 1.00, 0, 0 },
-    { "francais", g_word_fr_francais, sizeof(g_word_fr_francais) / sizeof(g_word_fr_francais[0]), 1.00, 0, 0 },
-    { "phrase", g_word_fr_phrase, sizeof(g_word_fr_phrase) / sizeof(g_word_fr_phrase[0]), 1.00, 0, 0 },
-    { "une", g_word_fr_une, sizeof(g_word_fr_une) / sizeof(g_word_fr_une[0]), 1.00, 0, 0 }
+    { "bonjour", g_word_fr_bonjour, sizeof(g_word_fr_bonjour) / sizeof(g_word_fr_bonjour[0]), 1.00, 0, 2 },
+    { "ceci", g_word_fr_ceci, sizeof(g_word_fr_ceci) / sizeof(g_word_fr_ceci[0]), 0.96, 0, 2 },
+    { "demonstration", g_word_fr_demonstration, sizeof(g_word_fr_demonstration) / sizeof(g_word_fr_demonstration[0]), 1.00, 0, 4 },
+    { "de", g_word_fr_de, sizeof(g_word_fr_de) / sizeof(g_word_fr_de[0]), 0.68, 1, 0 },
+    { "depuis", g_word_fr_depuis, sizeof(g_word_fr_depuis) / sizeof(g_word_fr_depuis[0]), 0.92, 0, 2 },
+    { "en", g_word_fr_en, sizeof(g_word_fr_en) / sizeof(g_word_fr_en[0]), 0.74, 1, 0 },
+    { "est", g_word_fr_est, sizeof(g_word_fr_est) / sizeof(g_word_fr_est[0]), 0.74, 1, 0 },
+    { "francais", g_word_fr_francais, sizeof(g_word_fr_francais) / sizeof(g_word_fr_francais[0]), 1.00, 0, 2 },
+    { "lib", g_word_fr_lib, sizeof(g_word_fr_lib) / sizeof(g_word_fr_lib[0]), 0.92, 0, 1 },
+    { "phrase", g_word_fr_phrase, sizeof(g_word_fr_phrase) / sizeof(g_word_fr_phrase[0]), 1.00, 0, 1 },
+    { "say", g_word_fr_say, sizeof(g_word_fr_say) / sizeof(g_word_fr_say[0]), 0.92, 0, 1 },
+    { "une", g_word_fr_une, sizeof(g_word_fr_une) / sizeof(g_word_fr_une[0]), 0.78, 1, 0 }
 };
 
 static void say_set_error(char *error, size_t error_size, const char *fmt, ...)
@@ -751,6 +755,14 @@ static int say_guess_english_primary_stress(
         return vowel_count >= 3 ? vowel_count - 2 : 1;
     }
     return 1;
+}
+
+static int say_guess_french_primary_stress(const segment_buffer_t *segments, size_t start)
+{
+    int vowel_count;
+
+    vowel_count = say_count_segment_vowels(segments, start);
+    return vowel_count > 0 ? vowel_count : 0;
 }
 
 static void say_finalize_word_metadata(
@@ -1480,7 +1492,12 @@ static int say_phonemize_french_word(const char *word, segment_buffer_t *segment
     }
 
     if (segments->count > start) {
-        say_finalize_word_metadata(segments, start, 1.0, 0, 0);
+        say_finalize_word_metadata(
+            segments,
+            start,
+            1.0,
+            0,
+            say_guess_french_primary_stress(segments, start));
     }
     return 1;
 }
@@ -1803,6 +1820,16 @@ static int say_is_sonorant_phone(phoneme_id_t id)
            id == PH_N || id == PH_NY || id == PH_NG;
 }
 
+static int say_is_nasal_vowel_phone(phoneme_id_t id)
+{
+    return id == PH_AN || id == PH_ON || id == PH_IN;
+}
+
+static int say_is_sibilant_phone(phoneme_id_t id)
+{
+    return id == PH_S || id == PH_Z || id == PH_SH || id == PH_ZH;
+}
+
 static int say_generate_frames(
     const segment_t *segments,
     size_t segment_count,
@@ -1839,6 +1866,7 @@ static int say_generate_frames(
         double progress;
         double base_pitch;
         double stress_boost;
+        double steady_ratio;
         int next_index;
         int vowel_count_in_word;
         size_t j;
@@ -1908,16 +1936,33 @@ static int say_generate_frames(
                 }
             }
             else {
-                if (segments[i].word_end) {
-                    stress_boost = 0.9;
+                if (segments[i].weak_word) {
+                    if (segments[i].phoneme == PH_SCHWA) {
+                        stress_boost = -0.52;
+                    }
+                    else {
+                        stress_boost = -0.30;
+                    }
+                }
+                else if (segments[i].stress >= 2) {
+                    stress_boost = vowel_count_in_word <= 1 ? 0.28 : 0.40;
+                }
+                else if (segments[i].phoneme == PH_SCHWA) {
+                    stress_boost = -0.28;
+                }
+                else if (vowel_count_in_word <= 1) {
+                    stress_boost = 0.10;
                 }
                 else {
-                    stress_boost = 0.35;
+                    stress_boost = -0.12;
                 }
             }
         }
         else if (options->language == SAY_LANG_EN && segments[i].weak_word) {
             stress_boost = current->voiced ? -0.12 : -0.18;
+        }
+        else if (options->language == SAY_LANG_FR && segments[i].weak_word) {
+            stress_boost = current->voiced ? -0.10 : -0.16;
         }
         else if (current->voiced) {
             stress_boost = 0.1;
@@ -1929,10 +1974,37 @@ static int say_generate_frames(
         else if (options->language == SAY_LANG_EN && say_is_vowel_phone(segments[i].phoneme) && segments[i].stress == 0 && vowel_count_in_word > 1) {
             base_pitch -= 3.0;
         }
+        else if (options->language == SAY_LANG_FR && segments[i].weak_word) {
+            base_pitch -= 6.5;
+        }
+        else if (options->language == SAY_LANG_FR && say_is_vowel_phone(segments[i].phoneme) && segments[i].stress >= 2) {
+            base_pitch += 2.2;
+        }
 
         duration_ms *= 1.0 + 0.18 * stress_boost;
-        if (segments[i].word_end && say_is_vowel_phone(segments[i].phoneme) && options->language == SAY_LANG_FR) {
-            duration_ms *= 1.10;
+        if (say_is_vowel_phone(segments[i].phoneme) && options->language == SAY_LANG_FR) {
+            if (segments[i].weak_word) {
+                duration_ms *= segments[i].phoneme == PH_SCHWA ? 0.76 : 0.82;
+            }
+            else if (segments[i].stress >= 2) {
+                duration_ms *= vowel_count_in_word <= 1 ? 1.02 : 1.05;
+            }
+            else if (segments[i].phoneme == PH_SCHWA) {
+                duration_ms *= 0.84;
+            }
+            else if (vowel_count_in_word > 1) {
+                duration_ms *= 0.94;
+            }
+            if (say_is_nasal_vowel_phone(segments[i].phoneme)) {
+                duration_ms *= 1.05;
+            }
+        }
+        else if (options->language == SAY_LANG_FR &&
+                 (segments[i].phoneme == PH_J || segments[i].phoneme == PH_W)) {
+            duration_ms *= 0.82;
+        }
+        if (options->language == SAY_LANG_FR && say_is_sibilant_phone(segments[i].phoneme)) {
+            duration_ms *= current->voiced ? 0.90 : 0.86;
         }
 
         frame_count = (int) ceil(duration_ms / options->frame_ms);
@@ -1947,34 +2019,61 @@ static int say_generate_frames(
             double local_noise_mix;
 
             alpha = frame_count == 1 ? 0.0 : (double) frame_index / (double) (frame_count - 1);
-            transition_alpha = say_transition_alpha(alpha, say_is_vowel_phone(segments[i].phoneme) ? 0.62 : 0.42);
+            steady_ratio = say_is_vowel_phone(segments[i].phoneme) ?
+                (options->language == SAY_LANG_FR ? 0.68 : 0.62) :
+                (options->language == SAY_LANG_FR ? 0.46 : 0.42);
+            if (options->language == SAY_LANG_FR && say_is_nasal_vowel_phone(segments[i].phoneme)) {
+                steady_ratio = 0.74;
+            }
+            transition_alpha = say_transition_alpha(alpha, steady_ratio);
             segment_envelope = 1.0;
             local_noise_mix = current->noise_mix;
 
             if (say_is_vowel_phone(segments[i].phoneme)) {
-                local_noise_mix *= 0.30;
-                segment_envelope = 0.94 + 0.06 * sin(alpha * M_PI);
+                local_noise_mix *= options->language == SAY_LANG_FR ? 0.24 : 0.30;
+                segment_envelope = options->language == SAY_LANG_FR ?
+                    (0.95 + 0.05 * sin(alpha * M_PI)) :
+                    (0.94 + 0.06 * sin(alpha * M_PI));
+                if (options->language == SAY_LANG_FR && say_is_nasal_vowel_phone(segments[i].phoneme)) {
+                    local_noise_mix *= 0.72;
+                    segment_envelope = 0.96 + 0.04 * sin(alpha * M_PI);
+                }
             }
             else if (say_is_sonorant_phone(segments[i].phoneme)) {
-                local_noise_mix *= 0.22;
-                segment_envelope = 0.86 + 0.14 * sin(alpha * M_PI);
+                local_noise_mix *= options->language == SAY_LANG_FR ? 0.16 : 0.22;
+                segment_envelope = options->language == SAY_LANG_FR ?
+                    (0.88 + 0.10 * sin(alpha * M_PI)) :
+                    (0.86 + 0.14 * sin(alpha * M_PI));
             }
             else if (say_is_plosive_phone(segments[i].phoneme)) {
-                double burst_attack = say_smoothstep01((alpha - 0.32) / 0.12);
-                double burst_decay = 1.0 - say_smoothstep01((alpha - 0.58) / 0.18);
+                double closure = options->language == SAY_LANG_FR ? 0.34 : 0.30;
+                double burst_attack = say_smoothstep01((alpha - (options->language == SAY_LANG_FR ? 0.36 : 0.32)) /
+                                                       (options->language == SAY_LANG_FR ? 0.10 : 0.12));
+                double burst_decay = 1.0 - say_smoothstep01((alpha - (options->language == SAY_LANG_FR ? 0.52 : 0.58)) /
+                                                            (options->language == SAY_LANG_FR ? 0.14 : 0.18));
                 double burst = burst_attack * burst_decay;
-                if (alpha < 0.30) {
+                if (alpha < closure) {
                     segment_envelope = 0.03;
                     local_noise_mix = 0.0;
                 }
                 else {
-                    segment_envelope = current->voiced ? (0.12 + 0.34 * burst) : (0.10 + 0.40 * burst);
-                    local_noise_mix = current->voiced ? (0.04 + 0.08 * burst) : (0.10 + 0.28 * burst);
+                    if (options->language == SAY_LANG_FR) {
+                        segment_envelope = current->voiced ? (0.08 + 0.24 * burst) : (0.08 + 0.28 * burst);
+                        local_noise_mix = current->voiced ? (0.02 + 0.05 * burst) : (0.08 + 0.20 * burst);
+                    }
+                    else {
+                        segment_envelope = current->voiced ? (0.12 + 0.34 * burst) : (0.10 + 0.40 * burst);
+                        local_noise_mix = current->voiced ? (0.04 + 0.08 * burst) : (0.10 + 0.28 * burst);
+                    }
                 }
             }
             else if (say_is_affricate_phone(segments[i].phoneme)) {
-                local_noise_mix = current->voiced ? 0.22 : 0.46;
-                segment_envelope = 0.56 + 0.16 * sin(alpha * M_PI);
+                local_noise_mix = current->voiced ?
+                    (options->language == SAY_LANG_FR ? 0.18 : 0.22) :
+                    (options->language == SAY_LANG_FR ? 0.38 : 0.46);
+                segment_envelope = options->language == SAY_LANG_FR ?
+                    (0.52 + 0.12 * sin(alpha * M_PI)) :
+                    (0.56 + 0.16 * sin(alpha * M_PI));
             }
             else if (say_is_fricative_phone(segments[i].phoneme)) {
                 if (segments[i].phoneme == PH_H) {
@@ -1982,8 +2081,23 @@ static int say_generate_frames(
                     segment_envelope = 0.42 + 0.12 * sin(alpha * M_PI);
                 }
                 else {
-                    local_noise_mix = current->voiced ? 0.20 : 0.48;
-                    segment_envelope = current->voiced ? 0.70 : 0.62;
+                    if (options->language == SAY_LANG_FR) {
+                        if (say_is_sibilant_phone(segments[i].phoneme)) {
+                            local_noise_mix = current->voiced ? 0.08 : 0.24;
+                            if (segments[i].phoneme == PH_ZH) {
+                                local_noise_mix *= 0.85;
+                            }
+                            segment_envelope = current->voiced ? 0.50 : 0.44;
+                        }
+                        else {
+                            local_noise_mix = current->voiced ? 0.12 : 0.34;
+                            segment_envelope = current->voiced ? 0.60 : 0.54;
+                        }
+                    }
+                    else {
+                        local_noise_mix = current->voiced ? 0.20 : 0.48;
+                        segment_envelope = current->voiced ? 0.70 : 0.62;
+                    }
                 }
             }
 
@@ -1993,14 +2107,49 @@ static int say_generate_frames(
             if (say_is_plosive_phone(segments[i].phoneme) && alpha < 0.30) {
                 frame.voiced = 0;
             }
-            frame.pitch_hz = base_pitch + 12.0 * stress_boost;
-            frame.amplitude = current->amplitude * (0.88 + 0.14 * stress_boost) * segment_envelope;
+            frame.pitch_hz = base_pitch + (options->language == SAY_LANG_FR ? 9.0 : 12.0) * stress_boost;
+            if (options->language == SAY_LANG_FR && say_is_nasal_vowel_phone(segments[i].phoneme)) {
+                frame.pitch_hz -= 1.6;
+            }
+            frame.amplitude = current->amplitude *
+                (options->language == SAY_LANG_FR ? (0.90 + 0.10 * stress_boost) : (0.88 + 0.14 * stress_boost)) *
+                segment_envelope;
             frame.noise_mix = local_noise_mix;
+            if (options->language == SAY_LANG_FR && say_is_nasal_vowel_phone(segments[i].phoneme)) {
+                frame.amplitude *= 0.95;
+            }
+            if (options->language == SAY_LANG_FR && say_is_sibilant_phone(segments[i].phoneme)) {
+                frame.amplitude *= current->voiced ? 0.88 : 0.82;
+            }
 
             for (j = 0; j < SAY_MAX_FORMANTS; ++j) {
                 frame.formant_freq[j] = current->formant_freq[j] + (target->formant_freq[j] - current->formant_freq[j]) * transition_alpha;
                 frame.bandwidth[j] = current->bandwidth[j] + (target->bandwidth[j] - current->bandwidth[j]) * transition_alpha;
                 frame.gain[j] = current->gain[j] + (target->gain[j] - current->gain[j]) * transition_alpha;
+            }
+            if (options->language == SAY_LANG_FR && say_is_nasal_vowel_phone(segments[i].phoneme)) {
+                frame.bandwidth[0] *= 1.12;
+                frame.bandwidth[1] *= 1.10;
+                frame.bandwidth[2] *= 1.20;
+                frame.bandwidth[3] *= 1.24;
+                frame.bandwidth[4] *= 1.28;
+                frame.gain[0] *= 1.05;
+                frame.gain[1] *= 0.92;
+                frame.gain[2] *= 0.78;
+                frame.gain[3] *= 0.72;
+                frame.gain[4] *= 0.66;
+            }
+            else if (options->language == SAY_LANG_FR && say_is_sibilant_phone(segments[i].phoneme)) {
+                frame.bandwidth[0] *= 1.04;
+                frame.bandwidth[1] *= 1.08;
+                frame.bandwidth[2] *= 1.10;
+                frame.bandwidth[3] *= 1.14;
+                frame.bandwidth[4] *= 1.18;
+                frame.gain[0] *= 0.92;
+                frame.gain[1] *= 0.88;
+                frame.gain[2] *= 0.86;
+                frame.gain[3] *= 0.78;
+                frame.gain[4] *= 0.70;
             }
 
             if (!say_frame_buffer_push(frames, &frame)) {
