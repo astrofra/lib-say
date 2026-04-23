@@ -9,46 +9,46 @@ normalized_text: leave these clothes and bags.
 
 word_to_phoneme:
   leave -> L 'I V
-  these -> DH 'EH S
-  clothes -> K L 'O TH EH S
+  these -> DH 'I Z
+  clothes -> K L 'OH W DH Z
   and -> 'AE N D
-  bags -> B 'AE G S
+  bags -> B 'AE G Z
   [pause:sentence]
 
 phoneme_stream:
-  L 'I V / DH 'EH S / K L 'O TH EH S / 'AE N D / B 'AE G S [pause x2:sentence]
+  L 'I V / DH 'I Z / K L 'OH W DH Z / 'AE N D / B 'AE G Z [pause x2:sentence]
 
 segments:
 segment_count: 21
   00  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
   01  I          nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
   02  V          nominal_ms=84.0 voiced=1 vowel=0 noise=0.42 scale=1.00 weak=0 stress=0
-  03  DH         nominal_ms=86.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
-  04  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
-  05  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  03  DH         nominal_ms=80.8 voiced=1 vowel=0 noise=0.44 scale=0.94 weak=0 stress=0
+  04  I          nominal_ms=101.5 voiced=1 vowel=1 noise=0.02 scale=0.94 weak=0 stress=2
+  05  Z          nominal_ms=82.7 voiced=1 vowel=0 noise=0.46 scale=0.94 weak=0 stress=0
   06  K          nominal_ms=70.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   07  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
-  08  O          nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
-  09  TH         nominal_ms=86.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
-  10  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=0
-  11  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  08  OH         nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  09  W          nominal_ms=72.0 voiced=1 vowel=0 noise=0.03 scale=1.00 weak=0 stress=0
+  10  DH         nominal_ms=86.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
+  11  Z          nominal_ms=88.0 voiced=1 vowel=0 noise=0.46 scale=1.00 weak=0 stress=0
   12  AE         nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
   13  N          nominal_ms=76.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0 stress=0
   14  D          nominal_ms=68.0 voiced=1 vowel=0 noise=0.34 scale=1.00 weak=0 stress=0
   15  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
   16  AE         nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
   17  G          nominal_ms=72.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
-  18  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  18  Z          nominal_ms=88.0 voiced=1 vowel=0 noise=0.46 scale=1.00 weak=0 stress=0
   19  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
   20  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 256
+frame_count: 246
 frame_duration_ms: 10
-estimated_duration_ms: 2560.0
-voiced_frames: 136
-unvoiced_frames: 62
+estimated_duration_ms: 2460.0
+voiced_frames: 173
+unvoiced_frames: 15
 pause_frames: 58
-pitch_hz: min=112.09 avg=125.87 max=137.11
-amplitude: min=0.016 avg=0.651 max=1.020
-noise_mix: min=0.000 avg=0.176 max=0.670
+pitch_hz: min=111.20 avg=123.44 max=137.11
+amplitude: min=0.016 avg=0.638 max=1.020
+noise_mix: min=0.000 avg=0.099 max=0.380

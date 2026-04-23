@@ -294,6 +294,10 @@ def levenshtein_distance(left: list[str], right: list[str]) -> int:
     return previous[-1]
 
 
+def count_vowels(tokens: list[str]) -> int:
+    return sum(1 for token in tokens if token in VOWEL_TOKENS)
+
+
 def classify_difference(ours: dict[str, object], mary: dict[str, object]) -> str:
     our_tokens = ours["tokens"]
     mary_tokens = mary["tokens"]
@@ -301,7 +305,10 @@ def classify_difference(ours: dict[str, object], mary: dict[str, object]) -> str
     mary_stress = mary["stress"]
 
     if our_tokens == mary_tokens:
-        return "exact" if our_stress == mary_stress else "stress_mismatch"
+        vowel_count = max(count_vowels(our_tokens), count_vowels(mary_tokens))
+        if our_stress == mary_stress or vowel_count <= 1:
+            return "exact"
+        return "stress_mismatch"
 
     our_vowels = [token for token in our_tokens if token in VOWEL_TOKENS]
     mary_vowels = [token for token in mary_tokens if token in VOWEL_TOKENS]
@@ -512,6 +519,18 @@ def main() -> int:
     report_lines.append("-------")
     for label, count in sorted(aggregate_counts.items()):
         report_lines.append(f"  {label}: {count}")
+
+    actionable = {
+        label: count
+        for label, count in sorted(aggregate_counts.items())
+        if label not in {"exact", "stress_mismatch"}
+    }
+    if actionable:
+        report_lines.append("")
+        report_lines.append("Actionable Summary")
+        report_lines.append("------------------")
+        for label, count in actionable.items():
+            report_lines.append(f"  {label}: {count}")
 
     if mismatch_examples:
         report_lines.append("")
