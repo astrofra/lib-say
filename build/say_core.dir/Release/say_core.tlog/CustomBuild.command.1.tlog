@@ -1,0 +1,10 @@
+^C:\WORKS\PROJECTS\LIB-SAY\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/works/projects/lib-say -BC:/works/projects/lib-say/build --check-stamp-file C:/works/projects/lib-say/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

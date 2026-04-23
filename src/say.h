@@ -26,6 +26,9 @@ void say_default_options(say_options_t *options);
 const char *say_language_name(say_language_t language);
 int say_parse_language(const char *name, say_language_t *out_language);
 
+const char *say_audio_format_name(say_audio_format_t format);
+int say_parse_audio_format(const char *name, say_audio_format_t *out_format);
+
 say_audio_format_t say_guess_audio_format(const char *path);
 
 int say_synthesize(
@@ -51,6 +54,17 @@ int say_write_audio_file(
     int sample_rate,
     const int16_t *samples,
     size_t sample_count,
+    char *error,
+    size_t error_size
+);
+
+int say_encode_audio(
+    say_audio_format_t format,
+    int sample_rate,
+    const int16_t *samples,
+    size_t sample_count,
+    uint8_t **out_data,
+    size_t *out_size,
     char *error,
     size_t error_size
 );

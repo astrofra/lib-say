@@ -24,12 +24,14 @@ echo Configuring %CONFIG% build...
 cmake -S "%ROOT%" -B "%BUILD_DIR%"
 if errorlevel 1 exit /b 1
 
-echo Building tts.exe...
+echo Building targets...
 cmake --build "%BUILD_DIR%" --config "%CONFIG%" --clean-first
 if errorlevel 1 exit /b 1
 
 echo Done.
 echo Built:
 echo   "%ROOT%\bin\tts.exe"
+if exist "%ROOT%\bin\lua\lua54.dll" echo   "%ROOT%\bin\lua\lua54.dll"
+if exist "%ROOT%\bin\lua\say.dll" echo   "%ROOT%\bin\lua\say.dll"
 
 endlocal

@@ -1,0 +1,6 @@
+C:/works/projects/lib-say/build/CMakeFiles/say_core.dir
+C:/works/projects/lib-say/build/CMakeFiles/tts.dir
+C:/works/projects/lib-say/build/CMakeFiles/say_lua.dir
+C:/works/projects/lib-say/build/CMakeFiles/ALL_BUILD.dir
+C:/works/projects/lib-say/build/CMakeFiles/ZERO_CHECK.dir
+C:/works/projects/lib-say/build/bundled-lua/CMakeFiles/say_bundled_lua.dir

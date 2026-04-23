@@ -2757,6 +2757,12 @@ static void say_write_u16_be(FILE *file, unsigned int value)
     fwrite(bytes, sizeof(bytes), 1, file);
 }
 
+static void say_store_u16_be(unsigned char *bytes, unsigned int value)
+{
+    bytes[0] = (unsigned char) ((value >> 8) & 0xFFu);
+    bytes[1] = (unsigned char) (value & 0xFFu);
+}
+
 static void say_write_u32_be(FILE *file, unsigned int value)
 {
     unsigned char bytes[4];
@@ -2766,6 +2772,14 @@ static void say_write_u32_be(FILE *file, unsigned int value)
     bytes[2] = (unsigned char) ((value >> 8) & 0xFFu);
     bytes[3] = (unsigned char) (value & 0xFFu);
     fwrite(bytes, sizeof(bytes), 1, file);
+}
+
+static void say_store_u32_be(unsigned char *bytes, unsigned int value)
+{
+    bytes[0] = (unsigned char) ((value >> 24) & 0xFFu);
+    bytes[1] = (unsigned char) ((value >> 16) & 0xFFu);
+    bytes[2] = (unsigned char) ((value >> 8) & 0xFFu);
+    bytes[3] = (unsigned char) (value & 0xFFu);
 }
 
 static void say_write_ieee_extended(FILE *file, double value)
@@ -2800,6 +2814,37 @@ static void say_write_ieee_extended(FILE *file, double value)
     }
 
     fwrite(bytes, sizeof(bytes), 1, file);
+}
+
+static void say_store_ieee_extended(unsigned char *bytes, double value)
+{
+    unsigned int exponent;
+    unsigned long long significand;
+    int exp2;
+    double fraction;
+    double mantissa;
+    long double scaled;
+    size_t i;
+
+    memset(bytes, 0, 10);
+
+    if (value > 0.0) {
+        fraction = frexp(value, &exp2);
+        exponent = (unsigned int) (exp2 - 1 + 16383);
+        mantissa = ldexp(fraction, 1);
+        scaled = (long double) mantissa * (long double) (1ull << 63);
+        significand = (unsigned long long) (scaled + 0.5L);
+
+        if (significand == 0ull) {
+            exponent = 0;
+        }
+
+        bytes[0] = (unsigned char) ((exponent >> 8) & 0x7F);
+        bytes[1] = (unsigned char) (exponent & 0xFFu);
+        for (i = 0; i < 8; ++i) {
+            bytes[2 + i] = (unsigned char) ((significand >> (56 - 8 * i)) & 0xFFu);
+        }
+    }
 }
 
 static int say_write_raw(
@@ -3292,6 +3337,17 @@ const char *say_language_name(say_language_t language)
     }
 }
 
+const char *say_audio_format_name(say_audio_format_t format)
+{
+    switch (format) {
+        case SAY_FORMAT_AIFF:
+            return "aiff";
+        case SAY_FORMAT_RAW:
+        default:
+            return "raw";
+    }
+}
+
 int say_parse_language(const char *name, say_language_t *out_language)
 {
     if (name == NULL || out_language == NULL) {
@@ -3303,6 +3359,22 @@ int say_parse_language(const char *name, say_language_t *out_language)
     }
     if (say_equals_icase(name, "fr")) {
         *out_language = SAY_LANG_FR;
+        return 1;
+    }
+    return 0;
+}
+
+int say_parse_audio_format(const char *name, say_audio_format_t *out_format)
+{
+    if (name == NULL || out_format == NULL) {
+        return 0;
+    }
+    if (say_equals_icase(name, "raw")) {
+        *out_format = SAY_FORMAT_RAW;
+        return 1;
+    }
+    if (say_equals_icase(name, "aiff") || say_equals_icase(name, "aif")) {
+        *out_format = SAY_FORMAT_AIFF;
         return 1;
     }
     return 0;
@@ -3466,6 +3538,100 @@ int say_write_audio_file(
         return say_write_aiff(path, sample_rate, samples, sample_count, error, error_size);
     }
     return say_write_raw(path, samples, sample_count, error, error_size);
+}
+
+int say_encode_audio(
+    say_audio_format_t format,
+    int sample_rate,
+    const int16_t *samples,
+    size_t sample_count,
+    uint8_t **out_data,
+    size_t *out_size,
+    char *error,
+    size_t error_size
+)
+{
+    uint8_t *data;
+    size_t byte_count;
+    size_t i;
+
+    if (out_data == NULL || out_size == NULL) {
+        say_set_error(error, error_size, "encoded audio output pointers must not be null");
+        return 0;
+    }
+    if (samples == NULL && sample_count != 0) {
+        say_set_error(error, error_size, "sample buffer is null");
+        return 0;
+    }
+
+    *out_data = NULL;
+    *out_size = 0;
+
+    if (format == SAY_FORMAT_AIFF) {
+        unsigned int sound_bytes;
+
+        if (sample_count > 0x7FFFFFFFu / 2u) {
+            say_set_error(error, error_size, "sample buffer is too large for AIFF");
+            return 0;
+        }
+        if (sample_count > (SIZE_MAX - 54u) / 2u) {
+            say_set_error(error, error_size, "sample buffer is too large to encode");
+            return 0;
+        }
+
+        sound_bytes = (unsigned int) (sample_count * 2u);
+        byte_count = 54u + (size_t) sound_bytes;
+        data = (uint8_t *) malloc(byte_count);
+        if (data == NULL) {
+            say_set_error(error, error_size, "out of memory while encoding AIFF blob");
+            return 0;
+        }
+
+        memcpy(data + 0, "FORM", 4);
+        say_store_u32_be(data + 4, 46u + sound_bytes);
+        memcpy(data + 8, "AIFF", 4);
+
+        memcpy(data + 12, "COMM", 4);
+        say_store_u32_be(data + 16, 18u);
+        say_store_u16_be(data + 20, 1u);
+        say_store_u32_be(data + 22, (unsigned int) sample_count);
+        say_store_u16_be(data + 26, 16u);
+        say_store_ieee_extended(data + 28, (double) sample_rate);
+
+        memcpy(data + 38, "SSND", 4);
+        say_store_u32_be(data + 42, 8u + sound_bytes);
+        say_store_u32_be(data + 46, 0u);
+        say_store_u32_be(data + 50, 0u);
+
+        for (i = 0; i < sample_count; ++i) {
+            unsigned short value = (unsigned short) samples[i];
+            data[54u + i * 2u + 0u] = (uint8_t) ((value >> 8) & 0xFFu);
+            data[54u + i * 2u + 1u] = (uint8_t) (value & 0xFFu);
+        }
+    }
+    else {
+        if (sample_count > SIZE_MAX / 2u) {
+            say_set_error(error, error_size, "sample buffer is too large to encode");
+            return 0;
+        }
+
+        byte_count = sample_count * 2u;
+        data = (uint8_t *) malloc(byte_count > 0 ? byte_count : 1u);
+        if (data == NULL) {
+            say_set_error(error, error_size, "out of memory while encoding raw blob");
+            return 0;
+        }
+
+        for (i = 0; i < sample_count; ++i) {
+            unsigned short value = (unsigned short) samples[i];
+            data[i * 2u + 0u] = (uint8_t) (value & 0xFFu);
+            data[i * 2u + 1u] = (uint8_t) ((value >> 8) & 0xFFu);
+        }
+    }
+
+    *out_data = data;
+    *out_size = byte_count;
+    return 1;
 }
 
 void say_free(void *ptr)
