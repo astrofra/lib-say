@@ -83,6 +83,7 @@ typedef struct segment_t {
     int word_start;
     int word_end;
     int boundary_type;
+    int weak_word;
 } segment_t;
 
 typedef struct segment_buffer_t {
@@ -108,6 +109,12 @@ typedef struct frame_buffer_t {
     size_t capacity;
 } frame_buffer_t;
 
+typedef struct text_buffer_t {
+    char *data;
+    size_t count;
+    size_t capacity;
+} text_buffer_t;
+
 typedef struct biquad_t {
     double b0;
     double b1;
@@ -122,6 +129,8 @@ typedef struct lexicon_entry_t {
     const char *word;
     const phoneme_id_t *phonemes;
     size_t phoneme_count;
+    double duration_scale;
+    int weak_word;
 } lexicon_entry_t;
 
 static const phoneme_def_t g_phonemes[PH_COUNT] = {
@@ -172,10 +181,10 @@ static const phoneme_def_t g_phonemes[PH_COUNT] = {
 };
 
 static const phoneme_id_t g_word_en_hello[] = { PH_H, PH_EH, PH_L, PH_OH };
-static const phoneme_id_t g_word_en_from[] = { PH_F, PH_R, PH_AH, PH_M };
+static const phoneme_id_t g_word_en_from[] = { PH_F, PH_R, PH_SCHWA, PH_M };
 static const phoneme_id_t g_word_en_this[] = { PH_DH, PH_IH, PH_S };
 static const phoneme_id_t g_word_en_is[] = { PH_IH, PH_Z };
-static const phoneme_id_t g_word_en_an[] = { PH_AH, PH_N };
+static const phoneme_id_t g_word_en_an[] = { PH_SCHWA, PH_N };
 static const phoneme_id_t g_word_en_english[] = { PH_IH, PH_NG, PH_G, PH_L, PH_IH, PH_SH };
 static const phoneme_id_t g_word_en_demo[] = { PH_D, PH_EH, PH_M, PH_OH };
 static const phoneme_id_t g_word_en_sentence[] = { PH_S, PH_EH, PH_N, PH_T, PH_AH, PH_N, PH_S };
@@ -193,28 +202,28 @@ static const phoneme_id_t g_word_fr_en[] = { PH_AN };
 static const phoneme_id_t g_word_fr_francais[] = { PH_F, PH_R, PH_AN, PH_S, PH_E };
 
 static const lexicon_entry_t g_english_lexicon[] = {
-    { "an", g_word_en_an, sizeof(g_word_en_an) / sizeof(g_word_en_an[0]) },
-    { "demo", g_word_en_demo, sizeof(g_word_en_demo) / sizeof(g_word_en_demo[0]) },
-    { "english", g_word_en_english, sizeof(g_word_en_english) / sizeof(g_word_en_english[0]) },
-    { "from", g_word_en_from, sizeof(g_word_en_from) / sizeof(g_word_en_from[0]) },
-    { "hello", g_word_en_hello, sizeof(g_word_en_hello) / sizeof(g_word_en_hello[0]) },
-    { "is", g_word_en_is, sizeof(g_word_en_is) / sizeof(g_word_en_is[0]) },
-    { "sentence", g_word_en_sentence, sizeof(g_word_en_sentence) / sizeof(g_word_en_sentence[0]) },
-    { "the", g_word_en_the, sizeof(g_word_en_the) / sizeof(g_word_en_the[0]) },
-    { "this", g_word_en_this, sizeof(g_word_en_this) / sizeof(g_word_en_this[0]) }
+    { "an", g_word_en_an, sizeof(g_word_en_an) / sizeof(g_word_en_an[0]), 0.74, 1 },
+    { "demo", g_word_en_demo, sizeof(g_word_en_demo) / sizeof(g_word_en_demo[0]), 1.00, 0 },
+    { "english", g_word_en_english, sizeof(g_word_en_english) / sizeof(g_word_en_english[0]), 1.00, 0 },
+    { "from", g_word_en_from, sizeof(g_word_en_from) / sizeof(g_word_en_from[0]), 0.86, 1 },
+    { "hello", g_word_en_hello, sizeof(g_word_en_hello) / sizeof(g_word_en_hello[0]), 1.00, 0 },
+    { "is", g_word_en_is, sizeof(g_word_en_is) / sizeof(g_word_en_is[0]), 0.78, 1 },
+    { "sentence", g_word_en_sentence, sizeof(g_word_en_sentence) / sizeof(g_word_en_sentence[0]), 1.00, 0 },
+    { "the", g_word_en_the, sizeof(g_word_en_the) / sizeof(g_word_en_the[0]), 0.72, 1 },
+    { "this", g_word_en_this, sizeof(g_word_en_this) / sizeof(g_word_en_this[0]), 0.92, 0 }
 };
 
 static const lexicon_entry_t g_french_lexicon[] = {
-    { "bonjour", g_word_fr_bonjour, sizeof(g_word_fr_bonjour) / sizeof(g_word_fr_bonjour[0]) },
-    { "ceci", g_word_fr_ceci, sizeof(g_word_fr_ceci) / sizeof(g_word_fr_ceci[0]) },
-    { "demonstration", g_word_fr_demonstration, sizeof(g_word_fr_demonstration) / sizeof(g_word_fr_demonstration[0]) },
-    { "de", g_word_fr_de, sizeof(g_word_fr_de) / sizeof(g_word_fr_de[0]) },
-    { "depuis", g_word_fr_depuis, sizeof(g_word_fr_depuis) / sizeof(g_word_fr_depuis[0]) },
-    { "en", g_word_fr_en, sizeof(g_word_fr_en) / sizeof(g_word_fr_en[0]) },
-    { "est", g_word_fr_est, sizeof(g_word_fr_est) / sizeof(g_word_fr_est[0]) },
-    { "francais", g_word_fr_francais, sizeof(g_word_fr_francais) / sizeof(g_word_fr_francais[0]) },
-    { "phrase", g_word_fr_phrase, sizeof(g_word_fr_phrase) / sizeof(g_word_fr_phrase[0]) },
-    { "une", g_word_fr_une, sizeof(g_word_fr_une) / sizeof(g_word_fr_une[0]) }
+    { "bonjour", g_word_fr_bonjour, sizeof(g_word_fr_bonjour) / sizeof(g_word_fr_bonjour[0]), 1.00, 0 },
+    { "ceci", g_word_fr_ceci, sizeof(g_word_fr_ceci) / sizeof(g_word_fr_ceci[0]), 1.00, 0 },
+    { "demonstration", g_word_fr_demonstration, sizeof(g_word_fr_demonstration) / sizeof(g_word_fr_demonstration[0]), 1.00, 0 },
+    { "de", g_word_fr_de, sizeof(g_word_fr_de) / sizeof(g_word_fr_de[0]), 1.00, 0 },
+    { "depuis", g_word_fr_depuis, sizeof(g_word_fr_depuis) / sizeof(g_word_fr_depuis[0]), 1.00, 0 },
+    { "en", g_word_fr_en, sizeof(g_word_fr_en) / sizeof(g_word_fr_en[0]), 1.00, 0 },
+    { "est", g_word_fr_est, sizeof(g_word_fr_est) / sizeof(g_word_fr_est[0]), 1.00, 0 },
+    { "francais", g_word_fr_francais, sizeof(g_word_fr_francais) / sizeof(g_word_fr_francais[0]), 1.00, 0 },
+    { "phrase", g_word_fr_phrase, sizeof(g_word_fr_phrase) / sizeof(g_word_fr_phrase[0]), 1.00, 0 },
+    { "une", g_word_fr_une, sizeof(g_word_fr_une) / sizeof(g_word_fr_une[0]), 1.00, 0 }
 };
 
 static void say_set_error(char *error, size_t error_size, const char *fmt, ...)
@@ -310,6 +319,7 @@ static int say_segment_buffer_push(
     segment->word_start = 0;
     segment->word_end = 0;
     segment->boundary_type = boundary_type;
+    segment->weak_word = 0;
     return 1;
 }
 
@@ -345,6 +355,73 @@ static int say_frame_buffer_push(frame_buffer_t *buffer, const frame_t *frame)
         return 0;
     }
     buffer->data[buffer->count++] = *frame;
+    return 1;
+}
+
+static int say_text_buffer_reserve(text_buffer_t *buffer, size_t extra)
+{
+    size_t required;
+    size_t capacity;
+    char *data;
+
+    required = buffer->count + extra + 1;
+    if (required <= buffer->capacity) {
+        return 1;
+    }
+
+    capacity = buffer->capacity == 0 ? 256 : buffer->capacity;
+    while (capacity < required) {
+        capacity *= 2;
+    }
+
+    data = (char *) realloc(buffer->data, capacity);
+    if (data == NULL) {
+        return 0;
+    }
+
+    buffer->data = data;
+    buffer->capacity = capacity;
+    return 1;
+}
+
+static int say_text_buffer_append(text_buffer_t *buffer, const char *text)
+{
+    size_t length;
+
+    length = strlen(text);
+    if (!say_text_buffer_reserve(buffer, length)) {
+        return 0;
+    }
+
+    memcpy(buffer->data + buffer->count, text, length);
+    buffer->count += length;
+    buffer->data[buffer->count] = '\0';
+    return 1;
+}
+
+static int say_text_buffer_appendf(text_buffer_t *buffer, const char *fmt, ...)
+{
+    va_list args;
+    va_list copy;
+    int written;
+
+    va_start(args, fmt);
+    va_copy(copy, args);
+    written = vsnprintf(NULL, 0, fmt, copy);
+    va_end(copy);
+    if (written < 0) {
+        va_end(args);
+        return 0;
+    }
+
+    if (!say_text_buffer_reserve(buffer, (size_t) written)) {
+        va_end(args);
+        return 0;
+    }
+
+    vsnprintf(buffer->data + buffer->count, buffer->capacity - buffer->count, fmt, args);
+    buffer->count += (size_t) written;
+    va_end(args);
     return 1;
 }
 
@@ -517,7 +594,9 @@ static int say_append_phone(segment_buffer_t *segments, phoneme_id_t phoneme)
 static int say_append_phone_sequence(
     segment_buffer_t *segments,
     const phoneme_id_t *phonemes,
-    size_t phoneme_count
+    size_t phoneme_count,
+    double duration_scale,
+    int weak_word
 )
 {
     size_t start;
@@ -525,7 +604,7 @@ static int say_append_phone_sequence(
 
     start = segments->count;
     for (i = 0; i < phoneme_count; ++i) {
-        if (!say_append_phone(segments, phonemes[i])) {
+        if (!say_segment_buffer_push(segments, phonemes[i], duration_scale, 0)) {
             return 0;
         }
     }
@@ -533,6 +612,9 @@ static int say_append_phone_sequence(
     if (segments->count > start) {
         segments->data[start].word_start = 1;
         segments->data[segments->count - 1].word_end = 1;
+        for (i = start; i < segments->count; ++i) {
+            segments->data[i].weak_word = weak_word;
+        }
     }
     return 1;
 }
@@ -558,7 +640,12 @@ static int say_try_append_lexicon_word(
 
     for (i = 0; i < entry_count; ++i) {
         if (strcmp(word, entries[i].word) == 0) {
-            return say_append_phone_sequence(segments, entries[i].phonemes, entries[i].phoneme_count) ? 1 : -1;
+            return say_append_phone_sequence(
+                segments,
+                entries[i].phonemes,
+                entries[i].phoneme_count,
+                entries[i].duration_scale,
+                entries[i].weak_word) ? 1 : -1;
         }
     }
 
@@ -676,7 +763,7 @@ static int say_phonemize_english_word(const char *word, segment_buffer_t *segmen
             continue;
         }
         if (say_match_at(word, i, "igh")) {
-            if (!say_append_phone(segments, PH_AH) || !say_append_phone(segments, PH_I)) {
+            if (!say_append_phone(segments, PH_AH) || !say_append_phone(segments, PH_J)) {
                 return 0;
             }
             i += 3;
@@ -697,21 +784,21 @@ static int say_phonemize_english_word(const char *word, segment_buffer_t *segmen
             continue;
         }
         if (say_match_at(word, i, "ow") || say_match_at(word, i, "ou")) {
-            if (!say_append_phone(segments, PH_AH) || !say_append_phone(segments, PH_U)) {
+            if (!say_append_phone(segments, PH_AH) || !say_append_phone(segments, PH_W)) {
                 return 0;
             }
             i += 2;
             continue;
         }
         if (say_match_at(word, i, "oi") || say_match_at(word, i, "oy")) {
-            if (!say_append_phone(segments, PH_OH) || !say_append_phone(segments, PH_I)) {
+            if (!say_append_phone(segments, PH_OH) || !say_append_phone(segments, PH_J)) {
                 return 0;
             }
             i += 2;
             continue;
         }
         if (say_match_at(word, i, "ai") || say_match_at(word, i, "ay") || say_match_at(word, i, "ei") || say_match_at(word, i, "ey")) {
-            if (!say_append_phone(segments, PH_E) || !say_append_phone(segments, PH_I)) {
+            if (!say_append_phone(segments, PH_E) || !say_append_phone(segments, PH_J)) {
                 return 0;
             }
             i += 2;
@@ -1311,7 +1398,7 @@ static int say_append_text_word(const char *word, say_language_t language, segme
     return say_phonemize_english_word(word, segments);
 }
 
-static int say_append_digit_word(char digit, say_language_t language, segment_buffer_t *segments)
+static const char *say_digit_word(char digit, say_language_t language)
 {
     static const char *g_en_digits[] = {
         "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"
@@ -1319,9 +1406,24 @@ static int say_append_digit_word(char digit, say_language_t language, segment_bu
     static const char *g_fr_digits[] = {
         "zero", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"
     };
+
+    if (digit < '0' || digit > '9') {
+        return NULL;
+    }
+    if (language == SAY_LANG_FR) {
+        return g_fr_digits[digit - '0'];
+    }
+    return g_en_digits[digit - '0'];
+}
+
+static int say_append_digit_word(char digit, say_language_t language, segment_buffer_t *segments)
+{
     const char *word;
 
-    word = language == SAY_LANG_FR ? g_fr_digits[digit - '0'] : g_en_digits[digit - '0'];
+    word = say_digit_word(digit, language);
+    if (word == NULL) {
+        return 0;
+    }
     return say_append_text_word(word, language, segments);
 }
 
@@ -1646,11 +1748,16 @@ static int say_generate_frames(
         stress_boost = 0.0;
         if (say_is_vowel_phone(segments[i].phoneme)) {
             if (options->language == SAY_LANG_EN) {
-                if (this_vowel_rank == 1) {
-                    stress_boost = 1.0;
+                if (segments[i].weak_word) {
+                    stress_boost = -0.45;
                 }
-                if (vowel_count_in_word == 1) {
-                    stress_boost = 0.8;
+                else {
+                    if (this_vowel_rank == 1) {
+                        stress_boost = 1.0;
+                    }
+                    if (vowel_count_in_word == 1) {
+                        stress_boost = 0.8;
+                    }
                 }
             }
             else {
@@ -1662,8 +1769,15 @@ static int say_generate_frames(
                 }
             }
         }
+        else if (options->language == SAY_LANG_EN && segments[i].weak_word) {
+            stress_boost = current->voiced ? -0.12 : -0.18;
+        }
         else if (current->voiced) {
             stress_boost = 0.1;
+        }
+
+        if (options->language == SAY_LANG_EN && segments[i].weak_word) {
+            base_pitch -= 8.0;
         }
 
         duration_ms *= 1.0 + 0.18 * stress_boost;
@@ -2087,6 +2201,389 @@ static int say_write_aiff(
     return 1;
 }
 
+static void say_release_pipeline_buffers(
+    char *normalized,
+    segment_buffer_t *segments,
+    frame_buffer_t *frames
+)
+{
+    free(normalized);
+    if (segments != NULL) {
+        free(segments->data);
+        memset(segments, 0, sizeof(*segments));
+    }
+    if (frames != NULL) {
+        free(frames->data);
+        memset(frames, 0, sizeof(*frames));
+    }
+}
+
+static int say_prepare_pipeline(
+    const char *input,
+    const say_options_t *options,
+    char **out_normalized,
+    segment_buffer_t *segments,
+    frame_buffer_t *frames,
+    char *error,
+    size_t error_size
+)
+{
+    say_options_t resolved_options;
+    char *normalized;
+
+    if (input == NULL || options == NULL || segments == NULL || frames == NULL) {
+        say_set_error(error, error_size, "pipeline arguments must not be null");
+        return 0;
+    }
+
+    resolved_options = *options;
+    if (resolved_options.sample_rate != 22050 && resolved_options.sample_rate != 44100) {
+        say_set_error(error, error_size, "sample rate must be 22050 or 44100 Hz");
+        return 0;
+    }
+    if (resolved_options.frame_ms < 5 || resolved_options.frame_ms > 10) {
+        say_set_error(error, error_size, "frame size must be between 5 and 10 ms");
+        return 0;
+    }
+
+    memset(segments, 0, sizeof(*segments));
+    memset(frames, 0, sizeof(*frames));
+    normalized = NULL;
+
+    if (resolved_options.phoneme_input) {
+        if (!say_parse_phoneme_input(input, segments, error, error_size)) {
+            say_release_pipeline_buffers(NULL, segments, frames);
+            return 0;
+        }
+    }
+    else {
+        normalized = say_normalize_text(input, error, error_size);
+        if (normalized == NULL) {
+            say_release_pipeline_buffers(NULL, segments, frames);
+            return 0;
+        }
+        if (!say_phonemize_text(normalized, resolved_options.language, segments, error, error_size)) {
+            say_release_pipeline_buffers(normalized, segments, frames);
+            return 0;
+        }
+    }
+
+    if (!say_generate_frames(segments->data, segments->count, &resolved_options, frames, error, error_size)) {
+        say_release_pipeline_buffers(normalized, segments, frames);
+        return 0;
+    }
+
+    if (out_normalized != NULL) {
+        *out_normalized = normalized;
+    }
+    else {
+        free(normalized);
+    }
+    return 1;
+}
+
+static const char *say_boundary_name(int boundary_type)
+{
+    switch (boundary_type) {
+        case 1:
+            return "clause";
+        case 2:
+            return "sentence";
+        case 3:
+            return "question";
+        case 4:
+            return "exclamation";
+        default:
+            return "manual";
+    }
+}
+
+static int say_text_buffer_append_phoneme_stream(
+    text_buffer_t *buffer,
+    const segment_t *segments,
+    size_t segment_count
+)
+{
+    size_t i;
+    int first;
+
+    first = 1;
+    for (i = 0; i < segment_count; ++i) {
+        const phoneme_def_t *phoneme;
+
+        if (segments[i].phoneme == PH_PAUSE) {
+            size_t run;
+
+            run = 1;
+            while (i + run < segment_count && segments[i + run].phoneme == PH_PAUSE &&
+                   segments[i + run].boundary_type == segments[i].boundary_type) {
+                ++run;
+            }
+            if (!first && !say_text_buffer_append(buffer, " ")) {
+                return 0;
+            }
+            if (!say_text_buffer_appendf(buffer, "[pause x%zu:%s]", run, say_boundary_name(segments[i].boundary_type))) {
+                return 0;
+            }
+            first = 0;
+            i += run - 1;
+            continue;
+        }
+
+        phoneme = say_get_phoneme(segments[i].phoneme);
+        if (!first) {
+            if (!say_text_buffer_append(buffer, segments[i].word_start ? " / " : " ")) {
+                return 0;
+            }
+        }
+        if (!say_text_buffer_append(buffer, phoneme->symbol)) {
+            return 0;
+        }
+        first = 0;
+    }
+    return 1;
+}
+
+static int say_text_buffer_append_word_debug(
+    text_buffer_t *buffer,
+    const char *normalized_text,
+    say_language_t language,
+    char *error,
+    size_t error_size
+)
+{
+    size_t i;
+
+    if (normalized_text == NULL) {
+        return 1;
+    }
+
+    i = 0;
+    while (normalized_text[i] != '\0') {
+        if (say_is_boundary_char(normalized_text[i])) {
+            if (!say_text_buffer_appendf(buffer, "  [pause:%s]\n", say_boundary_name(
+                normalized_text[i] == ',' || normalized_text[i] == ';' || normalized_text[i] == ':' ? 1 :
+                normalized_text[i] == '?' ? 3 :
+                normalized_text[i] == '!' ? 4 : 2))) {
+                return 0;
+            }
+            ++i;
+            continue;
+        }
+        if (normalized_text[i] == ' ') {
+            ++i;
+            continue;
+        }
+        if (normalized_text[i] >= '0' && normalized_text[i] <= '9') {
+            segment_buffer_t temp_segments;
+            const char *digit_word;
+
+            memset(&temp_segments, 0, sizeof(temp_segments));
+            digit_word = say_digit_word(normalized_text[i], language);
+            if (digit_word == NULL || !say_append_text_word(digit_word, language, &temp_segments)) {
+                free(temp_segments.data);
+                say_set_error(error, error_size, "failed to debug digit token %c", normalized_text[i]);
+                return 0;
+            }
+            if (!say_text_buffer_appendf(buffer, "  %c -> %s -> ", normalized_text[i], digit_word) ||
+                !say_text_buffer_append_phoneme_stream(buffer, temp_segments.data, temp_segments.count) ||
+                !say_text_buffer_append(buffer, "\n")) {
+                free(temp_segments.data);
+                return 0;
+            }
+            free(temp_segments.data);
+            ++i;
+            continue;
+        }
+        if (say_is_word_char(normalized_text[i])) {
+            size_t start;
+            char word[128];
+            size_t count;
+            segment_buffer_t temp_segments;
+
+            start = i;
+            while (normalized_text[i] != '\0' && say_is_word_char(normalized_text[i])) {
+                ++i;
+            }
+
+            count = i - start;
+            if (count >= sizeof(word)) {
+                count = sizeof(word) - 1;
+            }
+            memcpy(word, normalized_text + start, count);
+            word[count] = '\0';
+
+            memset(&temp_segments, 0, sizeof(temp_segments));
+            if (!say_append_text_word(word, language, &temp_segments)) {
+                free(temp_segments.data);
+                say_set_error(error, error_size, "failed to debug word token %s", word);
+                return 0;
+            }
+            if (!say_text_buffer_appendf(buffer, "  %s -> ", word) ||
+                !say_text_buffer_append_phoneme_stream(buffer, temp_segments.data, temp_segments.count) ||
+                !say_text_buffer_append(buffer, "\n")) {
+                free(temp_segments.data);
+                return 0;
+            }
+            free(temp_segments.data);
+            continue;
+        }
+        ++i;
+    }
+
+    return 1;
+}
+
+static int say_text_buffer_append_segment_summary(
+    text_buffer_t *buffer,
+    const segment_t *segments,
+    size_t segment_count
+)
+{
+    size_t i;
+
+    for (i = 0; i < segment_count; ++i) {
+        if (segments[i].phoneme == PH_PAUSE) {
+            if (!say_text_buffer_appendf(
+                buffer,
+                "  %02zu  %-10s nominal_ms=%.1f boundary=%s scale=%.2f weak=%d\n",
+                i,
+                "PAUSE",
+                say_pause_duration_ms(segments[i].boundary_type) * segments[i].duration_scale,
+                say_boundary_name(segments[i].boundary_type),
+                segments[i].duration_scale,
+                segments[i].weak_word)) {
+                return 0;
+            }
+        }
+        else {
+            const phoneme_def_t *phoneme;
+
+            phoneme = say_get_phoneme(segments[i].phoneme);
+            if (!say_text_buffer_appendf(
+                buffer,
+                "  %02zu  %-10s nominal_ms=%.1f voiced=%d vowel=%d noise=%.2f scale=%.2f weak=%d\n",
+                i,
+                phoneme->symbol,
+                phoneme->base_ms * segments[i].duration_scale,
+                phoneme->voiced,
+                phoneme->is_vowel,
+                phoneme->noise_mix,
+                segments[i].duration_scale,
+                segments[i].weak_word)) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+static int say_text_buffer_append_frame_stats(
+    text_buffer_t *buffer,
+    const frame_t *frames,
+    size_t frame_count,
+    int frame_ms
+)
+{
+    size_t i;
+    size_t voiced_count;
+    size_t unvoiced_count;
+    size_t pause_count;
+    double pitch_min;
+    double pitch_max;
+    double pitch_sum;
+    double amplitude_min;
+    double amplitude_max;
+    double amplitude_sum;
+    double noise_min;
+    double noise_max;
+    double noise_sum;
+
+    voiced_count = 0;
+    unvoiced_count = 0;
+    pause_count = 0;
+    pitch_min = 1e9;
+    pitch_max = 0.0;
+    pitch_sum = 0.0;
+    amplitude_min = 1e9;
+    amplitude_max = 0.0;
+    amplitude_sum = 0.0;
+    noise_min = 1e9;
+    noise_max = 0.0;
+    noise_sum = 0.0;
+
+    for (i = 0; i < frame_count; ++i) {
+        if (frames[i].is_pause) {
+            ++pause_count;
+            continue;
+        }
+        if (frames[i].voiced) {
+            ++voiced_count;
+            if (frames[i].pitch_hz < pitch_min) {
+                pitch_min = frames[i].pitch_hz;
+            }
+            if (frames[i].pitch_hz > pitch_max) {
+                pitch_max = frames[i].pitch_hz;
+            }
+            pitch_sum += frames[i].pitch_hz;
+        }
+        else {
+            ++unvoiced_count;
+        }
+        if (frames[i].amplitude < amplitude_min) {
+            amplitude_min = frames[i].amplitude;
+        }
+        if (frames[i].amplitude > amplitude_max) {
+            amplitude_max = frames[i].amplitude;
+        }
+        amplitude_sum += frames[i].amplitude;
+        if (frames[i].noise_mix < noise_min) {
+            noise_min = frames[i].noise_mix;
+        }
+        if (frames[i].noise_mix > noise_max) {
+            noise_max = frames[i].noise_mix;
+        }
+        noise_sum += frames[i].noise_mix;
+    }
+
+    if (pitch_min > pitch_max) {
+        pitch_min = 0.0;
+    }
+    if (amplitude_min > amplitude_max) {
+        amplitude_min = 0.0;
+    }
+    if (noise_min > noise_max) {
+        noise_min = 0.0;
+    }
+
+    return say_text_buffer_appendf(
+        buffer,
+        "frame_count: %zu\n"
+        "frame_duration_ms: %d\n"
+        "estimated_duration_ms: %.1f\n"
+        "voiced_frames: %zu\n"
+        "unvoiced_frames: %zu\n"
+        "pause_frames: %zu\n"
+        "pitch_hz: min=%.2f avg=%.2f max=%.2f\n"
+        "amplitude: min=%.3f avg=%.3f max=%.3f\n"
+        "noise_mix: min=%.3f avg=%.3f max=%.3f\n",
+        frame_count,
+        frame_ms,
+        (double) frame_count * (double) frame_ms,
+        voiced_count,
+        unvoiced_count,
+        pause_count,
+        pitch_min,
+        voiced_count > 0 ? pitch_sum / (double) voiced_count : 0.0,
+        pitch_max,
+        amplitude_min,
+        (voiced_count + unvoiced_count) > 0 ? amplitude_sum / (double) (voiced_count + unvoiced_count) : 0.0,
+        amplitude_max,
+        noise_min,
+        (voiced_count + unvoiced_count) > 0 ? noise_sum / (double) (voiced_count + unvoiced_count) : 0.0,
+        noise_max);
+}
+
 void say_default_options(say_options_t *options)
 {
     if (options == NULL) {
@@ -2142,6 +2639,83 @@ say_audio_format_t say_guess_audio_format(const char *path)
     return SAY_FORMAT_RAW;
 }
 
+int say_build_debug_report(
+    const char *input,
+    const say_options_t *options,
+    char **out_report,
+    char *error,
+    size_t error_size
+)
+{
+    say_options_t resolved_options;
+    char *normalized;
+    segment_buffer_t segments;
+    frame_buffer_t frames;
+    text_buffer_t report;
+    int ok;
+
+    if (out_report == NULL) {
+        say_set_error(error, error_size, "debug report output pointer must not be null");
+        return 0;
+    }
+    if (options == NULL) {
+        say_set_error(error, error_size, "options must not be null");
+        return 0;
+    }
+
+    resolved_options = *options;
+    normalized = NULL;
+    ok = 0;
+    memset(&segments, 0, sizeof(segments));
+    memset(&frames, 0, sizeof(frames));
+    memset(&report, 0, sizeof(report));
+    *out_report = NULL;
+
+    if (!say_prepare_pipeline(input, &resolved_options, &normalized, &segments, &frames, error, error_size)) {
+        goto cleanup;
+    }
+
+    if (!say_text_buffer_append(&report, "lib-say debug report\n") ||
+        !say_text_buffer_append(&report, "====================\n") ||
+        !say_text_buffer_appendf(&report, "input_mode: %s\n", resolved_options.phoneme_input ? "phonemes" : "text") ||
+        !say_text_buffer_appendf(&report, "language: %s\n", say_language_name(resolved_options.language)) ||
+        !say_text_buffer_appendf(&report, "sample_rate: %d\n", resolved_options.sample_rate) ||
+        !say_text_buffer_appendf(&report, "frame_ms: %d\n", resolved_options.frame_ms) ||
+        !say_text_buffer_appendf(&report, "raw_input: %s\n", input != NULL ? input : "")) {
+        say_set_error(error, error_size, "out of memory while building debug report header");
+        goto cleanup;
+    }
+
+    if (normalized != NULL) {
+        if (!say_text_buffer_appendf(&report, "normalized_text: %s\n", normalized) ||
+            !say_text_buffer_append(&report, "\nword_to_phoneme:\n") ||
+            !say_text_buffer_append_word_debug(&report, normalized, resolved_options.language, error, error_size)) {
+            say_set_error(error, error_size, "out of memory while building word debug section");
+            goto cleanup;
+        }
+    }
+
+    if (!say_text_buffer_append(&report, "\nphoneme_stream:\n  ") ||
+        !say_text_buffer_append_phoneme_stream(&report, segments.data, segments.count) ||
+        !say_text_buffer_append(&report, "\n\nsegments:\n") ||
+        !say_text_buffer_appendf(&report, "segment_count: %zu\n", segments.count) ||
+        !say_text_buffer_append_segment_summary(&report, segments.data, segments.count) ||
+        !say_text_buffer_append(&report, "\nframes:\n") ||
+        !say_text_buffer_append_frame_stats(&report, frames.data, frames.count, resolved_options.frame_ms)) {
+        say_set_error(error, error_size, "out of memory while building debug report body");
+        goto cleanup;
+    }
+
+    *out_report = report.data;
+    report.data = NULL;
+    ok = 1;
+
+cleanup:
+    free(report.data);
+    say_release_pipeline_buffers(normalized, &segments, &frames);
+    return ok;
+}
+
 int say_synthesize(
     const char *input,
     const say_options_t *options,
@@ -2161,38 +2735,15 @@ int say_synthesize(
         say_set_error(error, error_size, "output pointers must not be null");
         return 0;
     }
-
-    resolved_options = *options;
-    if (resolved_options.sample_rate != 22050 && resolved_options.sample_rate != 44100) {
-        say_set_error(error, error_size, "sample rate must be 22050 or 44100 Hz");
+    if (options == NULL) {
+        say_set_error(error, error_size, "options must not be null");
         return 0;
     }
-    if (resolved_options.frame_ms < 5 || resolved_options.frame_ms > 10) {
-        say_set_error(error, error_size, "frame size must be between 5 and 10 ms");
-        return 0;
-    }
-
-    memset(&segments, 0, sizeof(segments));
-    memset(&frames, 0, sizeof(frames));
 
     normalized = NULL;
     ok = 0;
-    if (resolved_options.phoneme_input) {
-        if (!say_parse_phoneme_input(input, &segments, error, error_size)) {
-            goto cleanup;
-        }
-    }
-    else {
-        normalized = say_normalize_text(input, error, error_size);
-        if (normalized == NULL) {
-            goto cleanup;
-        }
-        if (!say_phonemize_text(normalized, resolved_options.language, &segments, error, error_size)) {
-            goto cleanup;
-        }
-    }
-
-    if (!say_generate_frames(segments.data, segments.count, &resolved_options, &frames, error, error_size)) {
+    resolved_options = *options;
+    if (!say_prepare_pipeline(input, &resolved_options, &normalized, &segments, &frames, error, error_size)) {
         goto cleanup;
     }
     if (!say_synthesize_frames(frames.data, frames.count, resolved_options.sample_rate, resolved_options.frame_ms, out_samples, out_sample_count, error, error_size)) {
@@ -2202,9 +2753,7 @@ int say_synthesize(
     ok = 1;
 
 cleanup:
-    free(normalized);
-    free(segments.data);
-    free(frames.data);
+    say_release_pipeline_buffers(normalized, &segments, &frames);
     return ok;
 }
 

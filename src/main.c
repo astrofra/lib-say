@@ -13,6 +13,7 @@ static void tts_print_usage(FILE *stream)
         "Usage:\n"
         "  tts <text-or-input-file> -o <output.{raw|aiff}> [--lang en|fr] [--rate 22050|44100]\n"
         "  tts --phonemes \"HH EH L O\" -o out.aiff\n"
+        "  tts <text-or-input-file> --debug-report report.txt --dry-run [--lang en|fr]\n"
         "\n"
         "Options:\n"
         "  -o, --output <path>   Output audio file (.raw or .aiff)\n"
@@ -20,6 +21,8 @@ static void tts_print_usage(FILE *stream)
         "  --rate <hz>           Sample rate, 22050 or 44100 (default: 22050)\n"
         "  --frame-ms <5-10>     Frame size in milliseconds (default: 10)\n"
         "  --phonemes            Treat the input as phoneme symbols instead of plain text\n"
+        "  --debug-report <p>    Write a debug report to a file, or use - for stdout\n"
+        "  --dry-run             Build the debug pipeline but skip audio rendering/output\n"
         "  -h, --help            Show this message\n"
         "\n"
         "Phoneme mode accepts symbols like:\n"
@@ -78,24 +81,52 @@ static int tts_read_file(const char *path, char **out_text, char *error, size_t 
     return 1;
 }
 
+static int tts_write_text_file(const char *path, const char *text, char *error, size_t error_size)
+{
+    FILE *file;
+    size_t length;
+
+    file = fopen(path, "wb");
+    if (file == NULL) {
+        snprintf(error, error_size, "unable to open %s: %s", path, strerror(errno));
+        return 0;
+    }
+
+    length = strlen(text);
+    if (length > 0 && fwrite(text, 1, length, file) != length) {
+        fclose(file);
+        snprintf(error, error_size, "failed to write %s", path);
+        return 0;
+    }
+
+    fclose(file);
+    return 1;
+}
+
 int main(int argc, char **argv)
 {
     say_options_t options;
     const char *input_arg;
     const char *output_path;
+    const char *debug_report_path;
     say_audio_format_t format;
     char *input_text;
+    char *debug_report;
     int16_t *samples;
     size_t sample_count;
     char error[256];
+    int dry_run;
     int i;
 
     say_default_options(&options);
     input_arg = NULL;
     output_path = NULL;
+    debug_report_path = NULL;
     input_text = NULL;
+    debug_report = NULL;
     samples = NULL;
     sample_count = 0;
+    dry_run = 0;
     error[0] = '\0';
 
     if (argc <= 1) {
@@ -144,6 +175,18 @@ int main(int argc, char **argv)
             options.phoneme_input = 1;
             continue;
         }
+        if (strcmp(argv[i], "--debug-report") == 0) {
+            if (i + 1 >= argc) {
+                fprintf(stderr, "missing value after --debug-report\n");
+                return 1;
+            }
+            debug_report_path = argv[++i];
+            continue;
+        }
+        if (strcmp(argv[i], "--dry-run") == 0) {
+            dry_run = 1;
+            continue;
+        }
         if (input_arg == NULL) {
             input_arg = argv[i];
             continue;
@@ -157,7 +200,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "missing input text or file path\n");
         return 1;
     }
-    if (output_path == NULL) {
+    if (output_path == NULL && !dry_run) {
         fprintf(stderr, "missing -o / --output path\n");
         return 1;
     }
@@ -187,8 +230,38 @@ int main(int argc, char **argv)
         }
     }
 
+    if (debug_report_path != NULL) {
+        if (!say_build_debug_report(input_text, &options, &debug_report, error, sizeof(error))) {
+            free(input_text);
+            fprintf(stderr, "%s\n", error);
+            return 1;
+        }
+        if (strcmp(debug_report_path, "-") == 0) {
+            fputs(debug_report, stdout);
+            if (debug_report[strlen(debug_report) - 1] != '\n') {
+                fputc('\n', stdout);
+            }
+        }
+        else if (!tts_write_text_file(debug_report_path, debug_report, error, sizeof(error))) {
+            free(input_text);
+            say_free(debug_report);
+            fprintf(stderr, "%s\n", error);
+            return 1;
+        }
+    }
+
+    if (dry_run) {
+        if (debug_report_path != NULL && strcmp(debug_report_path, "-") != 0) {
+            fprintf(stdout, "Wrote debug report to %s\n", debug_report_path);
+        }
+        free(input_text);
+        say_free(debug_report);
+        return 0;
+    }
+
     if (!say_synthesize(input_text, &options, &samples, &sample_count, error, sizeof(error))) {
         free(input_text);
+        say_free(debug_report);
         fprintf(stderr, "%s\n", error);
         return 1;
     }
@@ -196,11 +269,15 @@ int main(int argc, char **argv)
     format = say_guess_audio_format(output_path);
     if (!say_write_audio_file(output_path, format, options.sample_rate, samples, sample_count, error, sizeof(error))) {
         free(input_text);
+        say_free(debug_report);
         say_free(samples);
         fprintf(stderr, "%s\n", error);
         return 1;
     }
 
+    if (debug_report_path != NULL && strcmp(debug_report_path, "-") != 0) {
+        fprintf(stdout, "Wrote debug report to %s\n", debug_report_path);
+    }
     fprintf(stdout, "Wrote %zu samples to %s (%s, %d Hz)\n",
         sample_count,
         output_path,
@@ -208,6 +285,7 @@ int main(int argc, char **argv)
         options.sample_rate);
 
     free(input_text);
+    say_free(debug_report);
     say_free(samples);
     return 0;
 }

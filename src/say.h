@@ -37,6 +37,14 @@ int say_synthesize(
     size_t error_size
 );
 
+int say_build_debug_report(
+    const char *input,
+    const say_options_t *options,
+    char **out_report,
+    char *error,
+    size_t error_size
+);
+
 int say_write_audio_file(
     const char *path,
     say_audio_format_t format,
