@@ -24,9 +24,17 @@ echo Configuring %CONFIG% build...
 cmake -S "%ROOT%" -B "%BUILD_DIR%"
 if errorlevel 1 exit /b 1
 
-echo Building targets...
-cmake --build "%BUILD_DIR%" --config "%CONFIG%" --clean-first
+echo Building tts.exe...
+cmake --build "%BUILD_DIR%" --config "%CONFIG%" --clean-first --target tts
 if errorlevel 1 exit /b 1
+
+if exist "%BUILD_DIR%\say_lua.vcxproj" (
+    echo Building say.dll...
+    cmake --build "%BUILD_DIR%" --config "%CONFIG%" --target say_lua
+    if errorlevel 1 exit /b 1
+) else (
+    echo Lua module target not configured. Skipping say.dll.
+)
 
 echo Done.
 echo Built:
