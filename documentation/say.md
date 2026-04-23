@@ -116,7 +116,7 @@ Text → Phonemizer → Prosody → Frame Generator → DSP Synth → Audio Outp
 ## Audio Engine
 
 ### Requirements
-- Sample rate: 22050 Hz or 44100 Hz
+- Sample rate: 44100 Hz
 - Real-time capable (buffer-based processing)
 - No dynamic allocation in DSP loop
 

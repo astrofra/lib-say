@@ -411,6 +411,7 @@ def main() -> int:
 
     aggregate_counts: collections.Counter[str] = collections.Counter()
     mismatch_examples: dict[str, list[str]] = collections.defaultdict(list)
+    duration_ratios: dict[str, float] = {}
 
     for item in PHRASES:
         sample_id = item["id"]
@@ -500,6 +501,8 @@ def main() -> int:
             f"rms x{(our_metrics['mean_rms'] / mary_metrics['mean_rms']) if mary_metrics['mean_rms'] else 0.0:.2f}, "
             f"zcr x{(our_metrics['zcr_mean'] / mary_metrics['zcr_mean']) if mary_metrics['zcr_mean'] else 0.0:.2f}"
         )
+        if mary_metrics["duration_s"]:
+            duration_ratios[sample_id] = our_metrics["duration_s"] / mary_metrics["duration_s"]
         report_lines.append("  word_diffs:")
         for comparison in comparisons:
             report_lines.append(
@@ -520,17 +523,21 @@ def main() -> int:
     for label, count in sorted(aggregate_counts.items()):
         report_lines.append(f"  {label}: {count}")
 
-    actionable = {
-        label: count
-        for label, count in sorted(aggregate_counts.items())
-        if label not in {"exact", "stress_mismatch"}
-    }
-    if actionable:
+    report_lines.append("")
+    report_lines.append("Actionable Summary")
+    report_lines.append("------------------")
+    for label in ["consonant_mismatch", "length_mismatch", "vowel_mismatch", "mixed_mismatch", "near_mismatch"]:
+        report_lines.append(f"  {label}: {aggregate_counts.get(label, 0)}")
+
+    tracked_ids = ["01-demo", "04-dentals", "08-finals"]
+    if any(sample_id in duration_ratios for sample_id in tracked_ids):
         report_lines.append("")
-        report_lines.append("Actionable Summary")
-        report_lines.append("------------------")
-        for label, count in actionable.items():
-            report_lines.append(f"  {label}: {count}")
+        report_lines.append("Duration Targets")
+        report_lines.append("----------------")
+        for sample_id in tracked_ids:
+            ratio = duration_ratios.get(sample_id)
+            if ratio is not None:
+                report_lines.append(f"  {sample_id}: duration x{ratio:.2f}")
 
     if mismatch_examples:
         report_lines.append("")

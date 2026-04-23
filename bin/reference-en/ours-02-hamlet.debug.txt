@@ -2,7 +2,7 @@ lib-say debug report
 ====================
 input_mode: text
 language: en
-sample_rate: 22050
+sample_rate: 44100
 frame_ms: 10
 raw_input: To be or not to be, that is the question.
 normalized_text: to be or not to be, that is the question.
@@ -58,12 +58,12 @@ segment_count: 30
   29  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 306
+frame_count: 290
 frame_duration_ms: 10
-estimated_duration_ms: 3060.0
-voiced_frames: 174
-unvoiced_frames: 57
-pause_frames: 75
-pitch_hz: min=100.91 avg=117.66 max=135.54
-amplitude: min=0.016 avg=0.616 max=1.020
-noise_mix: min=0.000 avg=0.104 max=0.620
+estimated_duration_ms: 2900.0
+voiced_frames: 171
+unvoiced_frames: 56
+pause_frames: 63
+pitch_hz: min=100.91 avg=117.84 max=135.54
+amplitude: min=0.016 avg=0.602 max=1.020
+noise_mix: min=0.000 avg=0.089 max=0.560

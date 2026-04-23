@@ -11,14 +11,14 @@ static void tts_print_usage(FILE *stream)
 {
     fprintf(stream,
         "Usage:\n"
-        "  tts <text-or-input-file> -o <output.{raw|aiff}> [--lang en|fr] [--rate 22050|44100]\n"
+        "  tts <text-or-input-file> -o <output.{raw|aiff}> [--lang en|fr] [--rate 44100]\n"
         "  tts --phonemes \"HH EH L O\" -o out.aiff\n"
         "  tts <text-or-input-file> --debug-report report.txt --dry-run [--lang en|fr]\n"
         "\n"
         "Options:\n"
         "  -o, --output <path>   Output audio file (.raw or .aiff)\n"
         "  --lang <en|fr>        Language rules for text input (default: en)\n"
-        "  --rate <hz>           Sample rate, 22050 or 44100 (default: 22050)\n"
+        "  --rate <hz>           Sample rate, 44100 only (default: 44100)\n"
         "  --frame-ms <5-10>     Frame size in milliseconds (default: 10)\n"
         "  --phonemes            Treat the input as phoneme symbols instead of plain text\n"
         "  --debug-report <p>    Write a debug report to a file, or use - for stdout\n"

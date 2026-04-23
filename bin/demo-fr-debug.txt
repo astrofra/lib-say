@@ -2,7 +2,7 @@ lib-say debug report
 ====================
 input_mode: text
 language: fr
-sample_rate: 22050
+sample_rate: 44100
 frame_ms: 10
 raw_input: Bonjour depuis lib-say. Ceci est une phrase de demonstration en francais.
 normalized_text: bonjour depuis lib say. ceci est une phrase de demonstration en francais.

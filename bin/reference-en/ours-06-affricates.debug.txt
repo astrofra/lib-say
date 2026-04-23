@@ -2,7 +2,7 @@ lib-say debug report
 ====================
 input_mode: text
 language: en
-sample_rate: 22050
+sample_rate: 44100
 frame_ms: 10
 raw_input: Judge the changing church bells.
 normalized_text: judge the changing church bells.
@@ -11,15 +11,15 @@ word_to_phoneme:
   judge -> JH 'AH JH
   the -> DH SCHWA
   changing -> CH 'E J N JH IH NG
-  church -> CH 'AH R CH
+  church -> CH R CH
   bells -> B 'EH L Z
   [pause:sentence]
 
 phoneme_stream:
-  JH 'AH JH / DH SCHWA / CH 'E J N JH IH NG / CH 'AH R CH / B 'EH L Z [pause x2:sentence]
+  JH 'AH JH / DH SCHWA / CH 'E J N JH IH NG / CH R CH / B 'EH L Z [pause x2:sentence]
 
 segments:
-segment_count: 22
+segment_count: 21
   00  JH         nominal_ms=92.0 voiced=1 vowel=0 noise=0.48 scale=1.00 weak=0 stress=0
   01  AH         nominal_ms=105.0 voiced=1 vowel=1 noise=0.03 scale=1.00 weak=0 stress=2
   02  JH         nominal_ms=92.0 voiced=1 vowel=0 noise=0.48 scale=1.00 weak=0 stress=0
@@ -32,24 +32,23 @@ segment_count: 22
   09  JH         nominal_ms=92.0 voiced=1 vowel=0 noise=0.48 scale=1.00 weak=0 stress=0
   10  IH         nominal_ms=96.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=0
   11  NG         nominal_ms=78.0 voiced=1 vowel=0 noise=0.06 scale=1.00 weak=0 stress=0
-  12  CH         nominal_ms=92.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
-  13  AH         nominal_ms=105.0 voiced=1 vowel=1 noise=0.03 scale=1.00 weak=0 stress=2
-  14  R          nominal_ms=76.0 voiced=1 vowel=0 noise=0.08 scale=1.00 weak=0 stress=0
-  15  CH         nominal_ms=92.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
-  16  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
-  17  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
-  18  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
-  19  Z          nominal_ms=88.0 voiced=1 vowel=0 noise=0.46 scale=1.00 weak=0 stress=0
+  12  CH         nominal_ms=88.3 voiced=0 vowel=0 noise=1.00 scale=0.96 weak=0 stress=0
+  13  R          nominal_ms=73.0 voiced=1 vowel=0 noise=0.08 scale=0.96 weak=0 stress=0
+  14  CH         nominal_ms=88.3 voiced=0 vowel=0 noise=1.00 scale=0.96 weak=0 stress=0
+  15  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
+  16  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  17  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
+  18  Z          nominal_ms=88.0 voiced=1 vowel=0 noise=0.46 scale=1.00 weak=0 stress=0
+  19  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
   20  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
-  21  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 258
+frame_count: 232
 frame_duration_ms: 10
-estimated_duration_ms: 2580.0
-voiced_frames: 164
+estimated_duration_ms: 2320.0
+voiced_frames: 150
 unvoiced_frames: 36
-pause_frames: 58
-pitch_hz: min=109.23 avg=122.42 max=137.16
-amplitude: min=0.017 avg=0.654 max=1.000
-noise_mix: min=0.000 avg=0.172 max=0.560
+pause_frames: 46
+pitch_hz: min=109.04 avg=121.94 max=137.11
+amplitude: min=0.017 avg=0.622 max=1.000
+noise_mix: min=0.000 avg=0.176 max=0.560

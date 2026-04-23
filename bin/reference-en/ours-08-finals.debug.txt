@@ -2,7 +2,7 @@ lib-say debug report
 ====================
 input_mode: text
 language: en
-sample_rate: 22050
+sample_rate: 44100
 frame_ms: 10
 raw_input: Leave these clothes and bags.
 normalized_text: leave these clothes and bags.
@@ -43,12 +43,12 @@ segment_count: 21
   20  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 246
+frame_count: 231
 frame_duration_ms: 10
-estimated_duration_ms: 2460.0
-voiced_frames: 173
+estimated_duration_ms: 2310.0
+voiced_frames: 170
 unvoiced_frames: 15
-pause_frames: 58
-pitch_hz: min=111.20 avg=123.44 max=137.11
-amplitude: min=0.016 avg=0.638 max=1.020
-noise_mix: min=0.000 avg=0.099 max=0.380
+pause_frames: 46
+pitch_hz: min=111.20 avg=123.55 max=137.11
+amplitude: min=0.016 avg=0.606 max=1.020
+noise_mix: min=0.000 avg=0.075 max=0.380
