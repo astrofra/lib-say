@@ -14,7 +14,7 @@ echo Generating English demo...
 if errorlevel 1 exit /b 1
 
 echo Generating French demo...
-"%TTS%" "Bonjour depuis lib-say. Ceci est une phrase de demonstration en francais." -o "%ROOT%demo-fr.aiff" --lang fr
+"%TTS%" "Bonjour Robin. Vive le Club Video Buggai. C'est trop sympa. Ceci est une phrase de demonstration en franssais." -o "%ROOT%demo-fr.aiff" --lang fr
 if errorlevel 1 exit /b 1
 
 echo Done.

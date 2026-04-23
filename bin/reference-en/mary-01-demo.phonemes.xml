@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><maryxml xmlns="http://mary.dfki.de/2002/MaryXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.5" xml:lang="en-US">
+    <p>
+        <voice name="cmu-slt-hsmm">
+            <s>
+                <t g2p_method="lexicon" ph="h @ - ' l @U" pos="UH">
+Hello
+</t>
+                <t g2p_method="lexicon" ph="' f r V m" pos="IN">
+from
+</t>
+                <mtu orig="lib-say">
+                    <t g2p_method="lexicon" ph="' l I b" pos="NN">
+lib
+</t>
+                    <t g2p_method="lexicon" ph="' s EI" pos="NN">
+say
+</t>
+                </mtu>
+                <t pos=".">
+.
+</t>
+            </s>
+            <s>
+                <t g2p_method="lexicon" ph="' D I s" pos="DT">
+This
+</t>
+                <t g2p_method="lexicon" ph="' I z" pos="VBZ">
+is
+</t>
+                <t g2p_method="lexicon" ph="' { n" pos="DT">
+an
+</t>
+                <t g2p_method="lexicon" ph="' I N - g l I S" pos="JJ">
+English
+</t>
+                <t g2p_method="lexicon" ph="' d E - m @U" pos="NN">
+demo
+</t>
+                <t g2p_method="lexicon" ph="' s E n - t @ n s" pos="NN">
+sentence
+</t>
+                <t pos=".">
+.
+</t>
+            </s>
+        </voice>
+    </p>
+</maryxml>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><maryxml xmlns="http://mary.dfki.de/2002/MaryXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.5" xml:lang="en-US">
+    <p>
+        <voice name="cmu-slt-hsmm">
+            <s>
+                <t g2p_method="lexicon" ph="' S i" pos="PRP">
+She
+</t>
+                <t g2p_method="lexicon" ph="' s E l z" pos="VBZ">
+sells
+</t>
+                <t g2p_method="lexicon" ph="' s i - S E l z" pos="NNS">
+seashells
+</t>
+                <t g2p_method="lexicon" ph="' b AI" pos="IN">
+by
+</t>
+                <t g2p_method="lexicon" ph="D @" pos="DT">
+the
+</t>
+                <t g2p_method="lexicon" ph="' s i - S O r" pos="NN">
+seashore
+</t>
+                <t pos=".">
+.
+</t>
+            </s>
+        </voice>
+    </p>
+</maryxml>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><maryxml xmlns="http://mary.dfki.de/2002/MaryXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.5" xml:lang="en-US">
+    <p>
+        <voice name="cmu-slt-hsmm">
+            <s>
+                <t g2p_method="lexicon" ph="' t u" pos="TO">
+To
+</t>
+                <t g2p_method="lexicon" ph="' b i" pos="VB">
+be
+</t>
+                <t g2p_method="lexicon" ph="' O r" pos="CC">
+or
+</t>
+                <t g2p_method="lexicon" ph="' n A t" pos="RB">
+not
+</t>
+                <t g2p_method="lexicon" ph="' t u" pos="TO">
+to
+</t>
+                <t g2p_method="lexicon" ph="' b i" pos="VB">
+be
+</t>
+                <t pos=",">
+,
+</t>
+                <t g2p_method="lexicon" ph="' D { t" pos="DT">
+that
+</t>
+                <t g2p_method="lexicon" ph="' I z" pos="VBZ">
+is
+</t>
+                <t g2p_method="lexicon" ph="D @" pos="DT">
+the
+</t>
+                <t g2p_method="lexicon" ph="' k w E s - tS @ n" pos="NN">
+question
+</t>
+                <t pos=".">
+.
+</t>
+            </s>
+        </voice>
+    </p>
+</maryxml>
