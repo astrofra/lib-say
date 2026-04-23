@@ -84,6 +84,7 @@ typedef struct segment_t {
     int word_end;
     int boundary_type;
     int weak_word;
+    int stress;
 } segment_t;
 
 typedef struct segment_buffer_t {
@@ -131,6 +132,7 @@ typedef struct lexicon_entry_t {
     size_t phoneme_count;
     double duration_scale;
     int weak_word;
+    int primary_stress_vowel;
 } lexicon_entry_t;
 
 static const phoneme_def_t g_phonemes[PH_COUNT] = {
@@ -202,28 +204,28 @@ static const phoneme_id_t g_word_fr_en[] = { PH_AN };
 static const phoneme_id_t g_word_fr_francais[] = { PH_F, PH_R, PH_AN, PH_S, PH_E };
 
 static const lexicon_entry_t g_english_lexicon[] = {
-    { "an", g_word_en_an, sizeof(g_word_en_an) / sizeof(g_word_en_an[0]), 0.74, 1 },
-    { "demo", g_word_en_demo, sizeof(g_word_en_demo) / sizeof(g_word_en_demo[0]), 1.00, 0 },
-    { "english", g_word_en_english, sizeof(g_word_en_english) / sizeof(g_word_en_english[0]), 1.00, 0 },
-    { "from", g_word_en_from, sizeof(g_word_en_from) / sizeof(g_word_en_from[0]), 0.86, 1 },
-    { "hello", g_word_en_hello, sizeof(g_word_en_hello) / sizeof(g_word_en_hello[0]), 1.00, 0 },
-    { "is", g_word_en_is, sizeof(g_word_en_is) / sizeof(g_word_en_is[0]), 0.78, 1 },
-    { "sentence", g_word_en_sentence, sizeof(g_word_en_sentence) / sizeof(g_word_en_sentence[0]), 1.00, 0 },
-    { "the", g_word_en_the, sizeof(g_word_en_the) / sizeof(g_word_en_the[0]), 0.72, 1 },
-    { "this", g_word_en_this, sizeof(g_word_en_this) / sizeof(g_word_en_this[0]), 0.92, 0 }
+    { "an", g_word_en_an, sizeof(g_word_en_an) / sizeof(g_word_en_an[0]), 0.74, 1, 0 },
+    { "demo", g_word_en_demo, sizeof(g_word_en_demo) / sizeof(g_word_en_demo[0]), 1.00, 0, 1 },
+    { "english", g_word_en_english, sizeof(g_word_en_english) / sizeof(g_word_en_english[0]), 1.00, 0, 1 },
+    { "from", g_word_en_from, sizeof(g_word_en_from) / sizeof(g_word_en_from[0]), 0.86, 1, 0 },
+    { "hello", g_word_en_hello, sizeof(g_word_en_hello) / sizeof(g_word_en_hello[0]), 1.00, 0, 1 },
+    { "is", g_word_en_is, sizeof(g_word_en_is) / sizeof(g_word_en_is[0]), 0.78, 1, 0 },
+    { "sentence", g_word_en_sentence, sizeof(g_word_en_sentence) / sizeof(g_word_en_sentence[0]), 1.00, 0, 1 },
+    { "the", g_word_en_the, sizeof(g_word_en_the) / sizeof(g_word_en_the[0]), 0.72, 1, 0 },
+    { "this", g_word_en_this, sizeof(g_word_en_this) / sizeof(g_word_en_this[0]), 0.92, 0, 1 }
 };
 
 static const lexicon_entry_t g_french_lexicon[] = {
-    { "bonjour", g_word_fr_bonjour, sizeof(g_word_fr_bonjour) / sizeof(g_word_fr_bonjour[0]), 1.00, 0 },
-    { "ceci", g_word_fr_ceci, sizeof(g_word_fr_ceci) / sizeof(g_word_fr_ceci[0]), 1.00, 0 },
-    { "demonstration", g_word_fr_demonstration, sizeof(g_word_fr_demonstration) / sizeof(g_word_fr_demonstration[0]), 1.00, 0 },
-    { "de", g_word_fr_de, sizeof(g_word_fr_de) / sizeof(g_word_fr_de[0]), 1.00, 0 },
-    { "depuis", g_word_fr_depuis, sizeof(g_word_fr_depuis) / sizeof(g_word_fr_depuis[0]), 1.00, 0 },
-    { "en", g_word_fr_en, sizeof(g_word_fr_en) / sizeof(g_word_fr_en[0]), 1.00, 0 },
-    { "est", g_word_fr_est, sizeof(g_word_fr_est) / sizeof(g_word_fr_est[0]), 1.00, 0 },
-    { "francais", g_word_fr_francais, sizeof(g_word_fr_francais) / sizeof(g_word_fr_francais[0]), 1.00, 0 },
-    { "phrase", g_word_fr_phrase, sizeof(g_word_fr_phrase) / sizeof(g_word_fr_phrase[0]), 1.00, 0 },
-    { "une", g_word_fr_une, sizeof(g_word_fr_une) / sizeof(g_word_fr_une[0]), 1.00, 0 }
+    { "bonjour", g_word_fr_bonjour, sizeof(g_word_fr_bonjour) / sizeof(g_word_fr_bonjour[0]), 1.00, 0, 0 },
+    { "ceci", g_word_fr_ceci, sizeof(g_word_fr_ceci) / sizeof(g_word_fr_ceci[0]), 1.00, 0, 0 },
+    { "demonstration", g_word_fr_demonstration, sizeof(g_word_fr_demonstration) / sizeof(g_word_fr_demonstration[0]), 1.00, 0, 0 },
+    { "de", g_word_fr_de, sizeof(g_word_fr_de) / sizeof(g_word_fr_de[0]), 1.00, 0, 0 },
+    { "depuis", g_word_fr_depuis, sizeof(g_word_fr_depuis) / sizeof(g_word_fr_depuis[0]), 1.00, 0, 0 },
+    { "en", g_word_fr_en, sizeof(g_word_fr_en) / sizeof(g_word_fr_en[0]), 1.00, 0, 0 },
+    { "est", g_word_fr_est, sizeof(g_word_fr_est) / sizeof(g_word_fr_est[0]), 1.00, 0, 0 },
+    { "francais", g_word_fr_francais, sizeof(g_word_fr_francais) / sizeof(g_word_fr_francais[0]), 1.00, 0, 0 },
+    { "phrase", g_word_fr_phrase, sizeof(g_word_fr_phrase) / sizeof(g_word_fr_phrase[0]), 1.00, 0, 0 },
+    { "une", g_word_fr_une, sizeof(g_word_fr_une) / sizeof(g_word_fr_une[0]), 1.00, 0, 0 }
 };
 
 static void say_set_error(char *error, size_t error_size, const char *fmt, ...)
@@ -320,6 +322,7 @@ static int say_segment_buffer_push(
     segment->word_end = 0;
     segment->boundary_type = boundary_type;
     segment->weak_word = 0;
+    segment->stress = 0;
     return 1;
 }
 
@@ -596,11 +599,13 @@ static int say_append_phone_sequence(
     const phoneme_id_t *phonemes,
     size_t phoneme_count,
     double duration_scale,
-    int weak_word
+    int weak_word,
+    int primary_stress_vowel
 )
 {
     size_t start;
     size_t i;
+    int vowel_rank;
 
     start = segments->count;
     for (i = 0; i < phoneme_count; ++i) {
@@ -612,8 +617,15 @@ static int say_append_phone_sequence(
     if (segments->count > start) {
         segments->data[start].word_start = 1;
         segments->data[segments->count - 1].word_end = 1;
+        vowel_rank = 0;
         for (i = start; i < segments->count; ++i) {
             segments->data[i].weak_word = weak_word;
+            if (say_is_vowel_phone(segments->data[i].phoneme)) {
+                ++vowel_rank;
+                if (primary_stress_vowel > 0 && vowel_rank == primary_stress_vowel) {
+                    segments->data[i].stress = 2;
+                }
+            }
         }
     }
     return 1;
@@ -645,7 +657,8 @@ static int say_try_append_lexicon_word(
                 entries[i].phonemes,
                 entries[i].phoneme_count,
                 entries[i].duration_scale,
-                entries[i].weak_word) ? 1 : -1;
+                entries[i].weak_word,
+                entries[i].primary_stress_vowel) ? 1 : -1;
         }
     }
 
@@ -680,6 +693,94 @@ static int say_has_vowel_after(const char *word, size_t index)
 static int say_is_vowel_char(char c)
 {
     return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y';
+}
+
+static int say_word_has_suffix(const char *word, const char *suffix)
+{
+    size_t word_len;
+    size_t suffix_len;
+
+    word_len = strlen(word);
+    suffix_len = strlen(suffix);
+    if (suffix_len > word_len) {
+        return 0;
+    }
+    return strcmp(word + (word_len - suffix_len), suffix) == 0;
+}
+
+static int say_count_segment_vowels(const segment_buffer_t *segments, size_t start)
+{
+    int vowel_count;
+    size_t i;
+
+    vowel_count = 0;
+    for (i = start; i < segments->count; ++i) {
+        if (say_is_vowel_phone(segments->data[i].phoneme)) {
+            ++vowel_count;
+        }
+        if (segments->data[i].word_end) {
+            break;
+        }
+    }
+    return vowel_count;
+}
+
+static int say_guess_english_primary_stress(
+    const char *word,
+    const segment_buffer_t *segments,
+    size_t start
+)
+{
+    int vowel_count;
+
+    vowel_count = say_count_segment_vowels(segments, start);
+    if (vowel_count <= 1) {
+        return vowel_count;
+    }
+    if (say_word_has_suffix(word, "tion") || say_word_has_suffix(word, "sion") ||
+        say_word_has_suffix(word, "cial") || say_word_has_suffix(word, "tial")) {
+        return vowel_count - 1;
+    }
+    if (say_word_has_suffix(word, "ic") || say_word_has_suffix(word, "ics") ||
+        say_word_has_suffix(word, "ical") || say_word_has_suffix(word, "ian")) {
+        return vowel_count - 1;
+    }
+    if (say_word_has_suffix(word, "ity") || say_word_has_suffix(word, "ify") ||
+        say_word_has_suffix(word, "ety") || say_word_has_suffix(word, "ology") ||
+        say_word_has_suffix(word, "graphy")) {
+        return vowel_count >= 3 ? vowel_count - 2 : 1;
+    }
+    return 1;
+}
+
+static void say_finalize_word_metadata(
+    segment_buffer_t *segments,
+    size_t start,
+    double duration_scale,
+    int weak_word,
+    int primary_stress_vowel
+)
+{
+    int vowel_rank;
+    size_t i;
+
+    if (segments->count <= start) {
+        return;
+    }
+
+    segments->data[start].word_start = 1;
+    segments->data[segments->count - 1].word_end = 1;
+    vowel_rank = 0;
+    for (i = start; i < segments->count; ++i) {
+        segments->data[i].duration_scale *= duration_scale;
+        segments->data[i].weak_word = weak_word;
+        if (say_is_vowel_phone(segments->data[i].phoneme)) {
+            ++vowel_rank;
+            if (primary_stress_vowel > 0 && vowel_rank == primary_stress_vowel) {
+                segments->data[i].stress = 2;
+            }
+        }
+    }
 }
 
 static phoneme_id_t say_english_default_vowel(const char *word, size_t index)
@@ -1027,8 +1128,12 @@ static int say_phonemize_english_word(const char *word, segment_buffer_t *segmen
     }
 
     if (segments->count > start) {
-        segments->data[start].word_start = 1;
-        segments->data[segments->count - 1].word_end = 1;
+        say_finalize_word_metadata(
+            segments,
+            start,
+            1.0,
+            0,
+            say_guess_english_primary_stress(word, segments, start));
     }
     return 1;
 }
@@ -1375,8 +1480,7 @@ static int say_phonemize_french_word(const char *word, segment_buffer_t *segment
     }
 
     if (segments->count > start) {
-        segments->data[start].word_start = 1;
-        segments->data[segments->count - 1].word_end = 1;
+        say_finalize_word_metadata(segments, start, 1.0, 0, 0);
     }
     return 1;
 }
@@ -1690,7 +1794,6 @@ static int say_generate_frames(
         double stress_boost;
         int next_index;
         int vowel_count_in_word;
-        int this_vowel_rank;
         size_t j;
 
         current = say_get_phoneme(segments[i].phoneme);
@@ -1717,21 +1820,14 @@ static int say_generate_frames(
         duration_ms = current->base_ms * segments[i].duration_scale;
 
         vowel_count_in_word = 0;
-        this_vowel_rank = 0;
         if (say_is_vowel_phone(segments[i].phoneme)) {
             for (j = i; j < segment_count && !segments[j].word_end; ++j) {
                 if (say_is_vowel_phone(segments[j].phoneme)) {
                     ++vowel_count_in_word;
-                    if (j == i) {
-                        this_vowel_rank = vowel_count_in_word;
-                    }
                 }
             }
             if (segments[j].word_end && say_is_vowel_phone(segments[j].phoneme)) {
                 ++vowel_count_in_word;
-                if (j == i) {
-                    this_vowel_rank = vowel_count_in_word;
-                }
             }
         }
 
@@ -1751,13 +1847,17 @@ static int say_generate_frames(
                 if (segments[i].weak_word) {
                     stress_boost = -0.45;
                 }
+                else if (segments[i].stress >= 2) {
+                    stress_boost = 1.0;
+                }
+                else if (vowel_count_in_word <= 1) {
+                    stress_boost = 0.72;
+                }
+                else if (segments[i].phoneme == PH_SCHWA) {
+                    stress_boost = -0.35;
+                }
                 else {
-                    if (this_vowel_rank == 1) {
-                        stress_boost = 1.0;
-                    }
-                    if (vowel_count_in_word == 1) {
-                        stress_boost = 0.8;
-                    }
+                    stress_boost = -0.18;
                 }
             }
             else {
@@ -1778,6 +1878,9 @@ static int say_generate_frames(
 
         if (options->language == SAY_LANG_EN && segments[i].weak_word) {
             base_pitch -= 8.0;
+        }
+        else if (options->language == SAY_LANG_EN && say_is_vowel_phone(segments[i].phoneme) && segments[i].stress == 0 && vowel_count_in_word > 1) {
+            base_pitch -= 3.0;
         }
 
         duration_ms *= 1.0 + 0.18 * stress_boost;
@@ -2336,6 +2439,11 @@ static int say_text_buffer_append_phoneme_stream(
                 return 0;
             }
         }
+        if (segments[i].stress > 0) {
+            if (!say_text_buffer_append(buffer, "'")) {
+                return 0;
+            }
+        }
         if (!say_text_buffer_append(buffer, phoneme->symbol)) {
             return 0;
         }
@@ -2462,7 +2570,7 @@ static int say_text_buffer_append_segment_summary(
             phoneme = say_get_phoneme(segments[i].phoneme);
             if (!say_text_buffer_appendf(
                 buffer,
-                "  %02zu  %-10s nominal_ms=%.1f voiced=%d vowel=%d noise=%.2f scale=%.2f weak=%d\n",
+                "  %02zu  %-10s nominal_ms=%.1f voiced=%d vowel=%d noise=%.2f scale=%.2f weak=%d stress=%d\n",
                 i,
                 phoneme->symbol,
                 phoneme->base_ms * segments[i].duration_scale,
@@ -2470,7 +2578,8 @@ static int say_text_buffer_append_segment_summary(
                 phoneme->is_vowel,
                 phoneme->noise_mix,
                 segments[i].duration_scale,
-                segments[i].weak_word)) {
+                segments[i].weak_word,
+                segments[i].stress)) {
                 return 0;
             }
         }

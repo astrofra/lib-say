@@ -8,64 +8,64 @@ raw_input: Hello from lib-say. This is an English demo sentence.
 normalized_text: hello from lib say. this is an english demo sentence.
 
 word_to_phoneme:
-  hello -> H EH L OH
+  hello -> H 'EH L OH
   from -> F R SCHWA M
-  lib -> L IH B
-  say -> S E J
+  lib -> L 'IH B
+  say -> S 'E J
   [pause:sentence]
-  this -> DH IH S
+  this -> DH 'IH S
   is -> IH Z
   an -> SCHWA N
-  english -> IH NG G L IH SH
-  demo -> D EH M OH
-  sentence -> S EH N T AH N S
+  english -> 'IH NG G L IH SH
+  demo -> D 'EH M OH
+  sentence -> S 'EH N T AH N S
   [pause:sentence]
 
 phoneme_stream:
-  H EH L OH / F R SCHWA M / L IH B / S E J [pause x2:sentence] / DH IH S / IH Z / SCHWA N / IH NG G L IH SH / D EH M OH / S EH N T AH N S [pause x2:sentence]
+  H 'EH L OH / F R SCHWA M / L 'IH B / S 'E J [pause x2:sentence] / DH 'IH S / IH Z / SCHWA N / 'IH NG G L IH SH / D 'EH M OH / S 'EH N T AH N S [pause x2:sentence]
 
 segments:
 segment_count: 42
-  00  H          nominal_ms=68.0 voiced=0 vowel=0 noise=0.85 scale=1.00 weak=0
-  01  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0
-  02  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0
-  03  OH         nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0
-  04  F          nominal_ms=70.5 voiced=0 vowel=0 noise=1.00 scale=0.86 weak=1
-  05  R          nominal_ms=65.4 voiced=1 vowel=0 noise=0.08 scale=0.86 weak=1
-  06  SCHWA      nominal_ms=73.1 voiced=1 vowel=1 noise=0.03 scale=0.86 weak=1
-  07  M          nominal_ms=67.1 voiced=1 vowel=0 noise=0.05 scale=0.86 weak=1
-  08  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0
-  09  IH         nominal_ms=96.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0
-  10  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.50 scale=1.00 weak=0
-  11  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0
-  12  E          nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0
-  13  J          nominal_ms=68.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0
+  00  H          nominal_ms=68.0 voiced=0 vowel=0 noise=0.85 scale=1.00 weak=0 stress=0
+  01  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  02  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
+  03  OH         nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=0
+  04  F          nominal_ms=70.5 voiced=0 vowel=0 noise=1.00 scale=0.86 weak=1 stress=0
+  05  R          nominal_ms=65.4 voiced=1 vowel=0 noise=0.08 scale=0.86 weak=1 stress=0
+  06  SCHWA      nominal_ms=73.1 voiced=1 vowel=1 noise=0.03 scale=0.86 weak=1 stress=0
+  07  M          nominal_ms=67.1 voiced=1 vowel=0 noise=0.05 scale=0.86 weak=1 stress=0
+  08  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
+  09  IH         nominal_ms=96.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  10  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.50 scale=1.00 weak=0 stress=0
+  11  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  12  E          nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  13  J          nominal_ms=68.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
   14  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
   15  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
-  16  DH         nominal_ms=79.1 voiced=1 vowel=0 noise=0.65 scale=0.92 weak=0
-  17  IH         nominal_ms=88.3 voiced=1 vowel=1 noise=0.02 scale=0.92 weak=0
-  18  S          nominal_ms=81.0 voiced=0 vowel=0 noise=1.00 scale=0.92 weak=0
-  19  IH         nominal_ms=74.9 voiced=1 vowel=1 noise=0.02 scale=0.78 weak=1
-  20  Z          nominal_ms=68.6 voiced=1 vowel=0 noise=0.65 scale=0.78 weak=1
-  21  SCHWA      nominal_ms=62.9 voiced=1 vowel=1 noise=0.03 scale=0.74 weak=1
-  22  N          nominal_ms=56.2 voiced=1 vowel=0 noise=0.05 scale=0.74 weak=1
-  23  IH         nominal_ms=96.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0
-  24  NG         nominal_ms=78.0 voiced=1 vowel=0 noise=0.06 scale=1.00 weak=0
-  25  G          nominal_ms=72.0 voiced=1 vowel=0 noise=0.50 scale=1.00 weak=0
-  26  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0
-  27  IH         nominal_ms=96.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0
-  28  SH         nominal_ms=90.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0
-  29  D          nominal_ms=68.0 voiced=1 vowel=0 noise=0.45 scale=1.00 weak=0
-  30  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0
-  31  M          nominal_ms=78.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0
-  32  OH         nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0
-  33  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0
-  34  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0
-  35  N          nominal_ms=76.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0
-  36  T          nominal_ms=66.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0
-  37  AH         nominal_ms=105.0 voiced=1 vowel=1 noise=0.03 scale=1.00 weak=0
-  38  N          nominal_ms=76.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0
-  39  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0
+  16  DH         nominal_ms=79.1 voiced=1 vowel=0 noise=0.65 scale=0.92 weak=0 stress=0
+  17  IH         nominal_ms=88.3 voiced=1 vowel=1 noise=0.02 scale=0.92 weak=0 stress=2
+  18  S          nominal_ms=81.0 voiced=0 vowel=0 noise=1.00 scale=0.92 weak=0 stress=0
+  19  IH         nominal_ms=74.9 voiced=1 vowel=1 noise=0.02 scale=0.78 weak=1 stress=0
+  20  Z          nominal_ms=68.6 voiced=1 vowel=0 noise=0.65 scale=0.78 weak=1 stress=0
+  21  SCHWA      nominal_ms=62.9 voiced=1 vowel=1 noise=0.03 scale=0.74 weak=1 stress=0
+  22  N          nominal_ms=56.2 voiced=1 vowel=0 noise=0.05 scale=0.74 weak=1 stress=0
+  23  IH         nominal_ms=96.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  24  NG         nominal_ms=78.0 voiced=1 vowel=0 noise=0.06 scale=1.00 weak=0 stress=0
+  25  G          nominal_ms=72.0 voiced=1 vowel=0 noise=0.50 scale=1.00 weak=0 stress=0
+  26  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
+  27  IH         nominal_ms=96.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=0
+  28  SH         nominal_ms=90.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  29  D          nominal_ms=68.0 voiced=1 vowel=0 noise=0.45 scale=1.00 weak=0 stress=0
+  30  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  31  M          nominal_ms=78.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0 stress=0
+  32  OH         nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=0
+  33  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  34  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  35  N          nominal_ms=76.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0 stress=0
+  36  T          nominal_ms=66.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  37  AH         nominal_ms=105.0 voiced=1 vowel=1 noise=0.03 scale=1.00 weak=0 stress=0
+  38  N          nominal_ms=76.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0 stress=0
+  39  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   40  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
   41  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
@@ -76,6 +76,6 @@ estimated_duration_ms: 4600.0
 voiced_frames: 278
 unvoiced_frames: 66
 pause_frames: 116
-pitch_hz: min=104.38 avg=121.68 max=137.57
-amplitude: min=0.422 avg=0.748 max=1.000
+pitch_hz: min=104.38 avg=121.87 max=137.57
+amplitude: min=0.422 avg=0.749 max=1.000
 noise_mix: min=0.020 avg=0.273 max=1.000
