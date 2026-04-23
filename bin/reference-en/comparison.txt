@@ -1,58 +1,169 @@
-English Reference Comparison
-============================
+English Oracle Comparison
+=========================
 MaryTTS: http://localhost:59125 voice=cmu-slt-hsmm
 
-01-demo: Hello from lib-say. This is an English demo sentence.
-  mary_phonemes:
-    Hello -> h @ - ' l @U
-    from -> ' f r V m
-    lib -> ' l I b
-    say -> ' s EI
-    . -> 
-    This -> ' D I s
-    is -> ' I z
-    an -> ' { n
-    English -> ' I N - g l I S
-    demo -> ' d E - m @U
-    sentence -> ' s E n - t @ n s
-    . -> 
+Corpus:
+  01-demo [baseline] Hello from lib-say. This is an English demo sentence.
+  02-hamlet [function-words] To be or not to be, that is the question.
+  03-sibilants [sibilants] She sells seashells by the seashore.
+  04-dentals [th-dh] This thing is worth the effort.
+  05-voiced-dentals [dh-there] Those feathers gather there.
+  06-affricates [affricates] Judge the changing church bells.
+  07-stress [stress] English fricatives shift sharply.
+  08-finals [word-final-fricatives] Leave these clothes and bags.
+
+01-demo [baseline]: Hello from lib-say. This is an English demo sentence.
   SAM     : sam-01-demo.wav duration=4.194s mean_rms=0.2297 zcr=0.1106 diff_mean=0.0660 diff_max=1.5000
-  MaryTTS : mary-01-demo.wav duration=3.325s mean_rms=0.1031 zcr=0.0911 diff_mean=0.0099 diff_max=0.2844
+  MaryTTS : mary-01-demo.wav duration=3.325s mean_rms=0.1028 zcr=0.0922 diff_mean=0.0098 diff_max=0.3052
   lib-say : ours-01-demo.aiff duration=4.760s mean_rms=0.0904 zcr=0.0553 diff_mean=0.0107 diff_max=0.2709
-  delta vs Mary: duration x1.43, rms x0.88, zcr x0.61
-  delta vs SAM : duration x1.13, rms x0.39, zcr x0.50
+  delta vs Mary: duration x1.43, rms x0.88, zcr x0.60
+  word_diffs:
+    length_mismatch        Hello: ours=H EH L OH | mary=H SCHWA L OH W
+    vowel_mismatch         from: ours=F R SCHWA M | mary=F R AH M
+    stress_mismatch        lib: ours=L IH B | mary=L IH B
+    stress_mismatch        say: ours=S E J | mary=S E J
+    stress_mismatch        This: ours=DH IH S | mary=DH IH S
+    stress_mismatch        is: ours=IH Z | mary=IH Z
+    vowel_mismatch         an: ours=SCHWA N | mary=AE N
+    exact                  English: ours=IH NG G L IH SH | mary=IH NG G L IH SH
+    consonant_mismatch     demo: ours=D EH M OH | mary=D EH M OH W
+    vowel_mismatch         sentence: ours=S EH N T AH N S | mary=S EH N T SCHWA N S
 
-02-hamlet: To be or not to be, that is the question.
-  mary_phonemes:
-    To -> ' t u
-    be -> ' b i
-    or -> ' O r
-    not -> ' n A t
-    to -> ' t u
-    be -> ' b i
-    , -> 
-    that -> ' D { t
-    is -> ' I z
-    the -> D @
-    question -> ' k w E s - tS @ n
-    . -> 
+02-hamlet [function-words]: To be or not to be, that is the question.
   SAM     : sam-02-hamlet.wav duration=2.814s mean_rms=0.1793 zcr=0.0777 diff_mean=0.0440 diff_max=1.5000
-  MaryTTS : mary-02-hamlet.wav duration=2.550s mean_rms=0.1068 zcr=0.0737 diff_mean=0.0087 diff_max=0.2502
+  MaryTTS : mary-02-hamlet.wav duration=2.550s mean_rms=0.1064 zcr=0.0746 diff_mean=0.0086 diff_max=0.2828
   lib-say : ours-02-hamlet.aiff duration=3.060s mean_rms=0.1206 zcr=0.0538 diff_mean=0.0116 diff_max=0.2708
-  delta vs Mary: duration x1.20, rms x1.13, zcr x0.73
-  delta vs SAM : duration x1.09, rms x0.67, zcr x0.69
+  delta vs Mary: duration x1.20, rms x1.13, zcr x0.72
+  word_diffs:
+    vowel_mismatch         To: ours=T O | mary=T U
+    vowel_mismatch         be: ours=B | mary=B I
+    exact                  or: ours=OH R | mary=OH R
+    vowel_mismatch         not: ours=N O T | mary=N A T
+    vowel_mismatch         to: ours=T O | mary=T U
+    vowel_mismatch         be: ours=B | mary=B I
+    stress_mismatch        that: ours=DH AE T | mary=DH AE T
+    stress_mismatch        is: ours=IH Z | mary=IH Z
+    exact                  the: ours=DH SCHWA | mary=DH SCHWA
+    consonant_mismatch     question: ours=K W EH S SH SCHWA N | mary=K W EH S CH SCHWA N
 
-03-sibilants: She sells seashells by the seashore.
-  mary_phonemes:
-    She -> ' S i
-    sells -> ' s E l z
-    seashells -> ' s i - S E l z
-    by -> ' b AI
-    the -> D @
-    seashore -> ' s i - S O r
-    . -> 
-  SAM     : sam-03-sibilants.wav duration=2.403s mean_rms=0.2306 zcr=0.1457 diff_mean=0.0783 diff_max=1.5000
-  MaryTTS : mary-03-sibilants.wav duration=2.210s mean_rms=0.0672 zcr=0.1146 diff_mean=0.0082 diff_max=0.1074
+03-sibilants [sibilants]: She sells seashells by the seashore.
+  SAM     : sam-03-sibilants.wav duration=2.403s mean_rms=0.2305 zcr=0.1457 diff_mean=0.0783 diff_max=1.5000
+  MaryTTS : mary-03-sibilants.wav duration=2.210s mean_rms=0.0674 zcr=0.1164 diff_mean=0.0083 diff_max=0.0989
   lib-say : ours-03-sibilants.aiff duration=2.870s mean_rms=0.1507 zcr=0.0908 diff_mean=0.0287 diff_max=0.3959
-  delta vs Mary: duration x1.30, rms x2.24, zcr x0.79
-  delta vs SAM : duration x1.19, rms x0.65, zcr x0.62
+  delta vs Mary: duration x1.30, rms x2.24, zcr x0.78
+  word_diffs:
+    vowel_mismatch         She: ours=SH | mary=SH I
+    consonant_mismatch     sells: ours=S EH L L S | mary=S EH L Z
+    consonant_mismatch     seashells: ours=S I SH EH L L S | mary=S I SH EH L Z
+    length_mismatch        by: ours=B I | mary=B AH J
+    exact                  the: ours=DH SCHWA | mary=DH SCHWA
+    stress_mismatch        seashore: ours=S I SH OH R | mary=S I SH OH R
+
+04-dentals [th-dh]: This thing is worth the effort.
+  SAM     : sam-04-dentals.wav duration=1.895s mean_rms=0.2097 zcr=0.0845 diff_mean=0.0573 diff_max=1.5000
+  MaryTTS : mary-04-dentals.wav duration=1.535s mean_rms=0.1201 zcr=0.1123 diff_mean=0.0087 diff_max=0.2511
+  lib-say : ours-04-dentals.aiff duration=2.500s mean_rms=0.1147 zcr=0.0767 diff_mean=0.0156 diff_max=0.2966
+  delta vs Mary: duration x1.63, rms x0.95, zcr x0.68
+  word_diffs:
+    stress_mismatch        This: ours=DH IH S | mary=DH IH S
+    consonant_mismatch     thing: ours=DH IH NG | mary=TH IH NG
+    stress_mismatch        is: ours=IH Z | mary=IH Z
+    vowel_mismatch         worth: ours=W OH R TH | mary=W R TH
+    exact                  the: ours=DH SCHWA | mary=DH SCHWA
+    length_mismatch        effort: ours=EH F F OH R T | mary=EH F R T
+
+05-voiced-dentals [dh-there]: Those feathers gather there.
+  SAM     : sam-05-voiced-dentals.wav duration=1.778s mean_rms=0.2148 zcr=0.0723 diff_mean=0.0510 diff_max=1.5000
+  MaryTTS : mary-05-voiced-dentals.wav duration=1.545s mean_rms=0.1100 zcr=0.0750 diff_mean=0.0087 diff_max=0.1523
+  lib-say : ours-05-voiced-dentals.aiff duration=2.420s mean_rms=0.1253 zcr=0.0782 diff_mean=0.0194 diff_max=0.3465
+  delta vs Mary: duration x1.57, rms x1.14, zcr x1.04
+  word_diffs:
+    length_mismatch        Those: ours=DH O S | mary=DH OH W Z
+    length_mismatch        feathers: ours=F I TH EH R S | mary=F EH DH R Z
+    length_mismatch        gather: ours=G AE TH EH R | mary=G AE DH R
+    stress_mismatch        there: ours=DH EH R | mary=DH EH R
+
+06-affricates [affricates]: Judge the changing church bells.
+  SAM     : sam-06-affricates.wav duration=2.405s mean_rms=0.1789 zcr=0.0695 diff_mean=0.0468 diff_max=1.9844
+  MaryTTS : mary-06-affricates.wav duration=1.840s mean_rms=0.0856 zcr=0.1024 diff_mean=0.0084 diff_max=0.1172
+  lib-say : ours-06-affricates.aiff duration=2.490s mean_rms=0.1014 zcr=0.0806 diff_mean=0.0164 diff_max=0.3079
+  delta vs Mary: duration x1.35, rms x1.18, zcr x0.79
+  word_diffs:
+    stress_mismatch        Judge: ours=JH AH JH | mary=JH AH JH
+    exact                  the: ours=DH SCHWA | mary=DH SCHWA
+    length_mismatch        changing: ours=CH AE NG IH NG | mary=CH E J N JH IH NG
+    vowel_mismatch         church: ours=CH AH R CH | mary=CH R CH
+    consonant_mismatch     bells: ours=B EH L L S | mary=B EH L Z
+
+07-stress [stress]: English fricatives shift sharply.
+  SAM     : sam-07-stress.wav duration=2.319s mean_rms=0.2205 zcr=0.0947 diff_mean=0.0669 diff_max=1.5000
+  MaryTTS : mary-07-stress.wav duration=2.090s mean_rms=0.0788 zcr=0.1189 diff_mean=0.0097 diff_max=0.1837
+  lib-say : ours-07-stress.aiff duration=3.160s mean_rms=0.1201 zcr=0.0738 diff_mean=0.0172 diff_max=0.3609
+  delta vs Mary: duration x1.51, rms x1.52, zcr x0.62
+  word_diffs:
+    exact                  English: ours=IH NG G L IH SH | mary=IH NG G L IH SH
+    length_mismatch        fricatives: ours=F R IH K AE T IH V EH S | mary=F R I K SCHWA T IH V Z
+    stress_mismatch        shift: ours=SH IH F T | mary=SH IH F T
+    vowel_mismatch         sharply: ours=SH AH R P L I | mary=SH A R P L I
+
+08-finals [word-final-fricatives]: Leave these clothes and bags.
+  SAM     : sam-08-finals.wav duration=2.000s mean_rms=0.1863 zcr=0.0841 diff_mean=0.0523 diff_max=1.5000
+  MaryTTS : mary-08-finals.wav duration=1.665s mean_rms=0.1179 zcr=0.0895 diff_mean=0.0101 diff_max=0.1730
+  lib-say : ours-08-finals.aiff duration=2.560s mean_rms=0.1024 zcr=0.0767 diff_mean=0.0174 diff_max=0.3254
+  delta vs Mary: duration x1.54, rms x0.87, zcr x0.86
+  word_diffs:
+    stress_mismatch        Leave: ours=L I V | mary=L I V
+    mixed_mismatch         these: ours=DH EH S | mary=DH I Z
+    mixed_mismatch         clothes: ours=K L O TH EH S | mary=K L OH W DH Z
+    exact                  and: ours=AE N D | mary=AE N D
+    consonant_mismatch     bags: ours=B AE G S | mary=B AE G Z
+
+Summary
+-------
+  consonant_mismatch: 7
+  exact: 8
+  length_mismatch: 8
+  mixed_mismatch: 2
+  stress_mismatch: 13
+  vowel_mismatch: 12
+
+Mismatch Samples
+----------------
+  consonant_mismatch:
+    demo: ours=D EH M OH | mary=D EH M OH W
+    question: ours=K W EH S SH SCHWA N | mary=K W EH S CH SCHWA N
+    sells: ours=S EH L L S | mary=S EH L Z
+    seashells: ours=S I SH EH L L S | mary=S I SH EH L Z
+    thing: ours=DH IH NG | mary=TH IH NG
+    bells: ours=B EH L L S | mary=B EH L Z
+    bags: ours=B AE G S | mary=B AE G Z
+  length_mismatch:
+    Hello: ours=H EH L OH | mary=H SCHWA L OH W
+    by: ours=B I | mary=B AH J
+    effort: ours=EH F F OH R T | mary=EH F R T
+    Those: ours=DH O S | mary=DH OH W Z
+    feathers: ours=F I TH EH R S | mary=F EH DH R Z
+    gather: ours=G AE TH EH R | mary=G AE DH R
+    changing: ours=CH AE NG IH NG | mary=CH E J N JH IH NG
+    fricatives: ours=F R IH K AE T IH V EH S | mary=F R I K SCHWA T IH V Z
+  mixed_mismatch:
+    these: ours=DH EH S | mary=DH I Z
+    clothes: ours=K L O TH EH S | mary=K L OH W DH Z
+  stress_mismatch:
+    lib: ours=L IH B | mary=L IH B
+    say: ours=S E J | mary=S E J
+    This: ours=DH IH S | mary=DH IH S
+    is: ours=IH Z | mary=IH Z
+    that: ours=DH AE T | mary=DH AE T
+    is: ours=IH Z | mary=IH Z
+    seashore: ours=S I SH OH R | mary=S I SH OH R
+    This: ours=DH IH S | mary=DH IH S
+  vowel_mismatch:
+    from: ours=F R SCHWA M | mary=F R AH M
+    an: ours=SCHWA N | mary=AE N
+    sentence: ours=S EH N T AH N S | mary=S EH N T SCHWA N S
+    To: ours=T O | mary=T U
+    be: ours=B | mary=B I
+    not: ours=N O T | mary=N A T
+    to: ours=T O | mary=T U
+    be: ours=B | mary=B I

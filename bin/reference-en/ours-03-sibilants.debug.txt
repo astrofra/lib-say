@@ -1,0 +1,58 @@
+lib-say debug report
+====================
+input_mode: text
+language: en
+sample_rate: 22050
+frame_ms: 10
+raw_input: She sells seashells by the seashore.
+normalized_text: she sells seashells by the seashore.
+
+word_to_phoneme:
+  she -> SH
+  sells -> S 'EH L L S
+  seashells -> S 'I SH EH L L S
+  by -> B 'I
+  the -> DH SCHWA
+  seashore -> S 'I SH OH R
+  [pause:sentence]
+
+phoneme_stream:
+  SH / S 'EH L L S / S 'I SH EH L L S / B 'I / DH SCHWA / S 'I SH OH R [pause x2:sentence]
+
+segments:
+segment_count: 24
+  00  SH         nominal_ms=90.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  01  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  02  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  03  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
+  04  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
+  05  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  06  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  07  I          nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  08  SH         nominal_ms=90.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  09  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=0
+  10  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
+  11  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
+  12  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  13  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
+  14  I          nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  15  DH         nominal_ms=61.9 voiced=1 vowel=0 noise=0.44 scale=0.72 weak=1 stress=0
+  16  SCHWA      nominal_ms=61.2 voiced=1 vowel=1 noise=0.03 scale=0.72 weak=1 stress=0
+  17  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  18  I          nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  19  SH         nominal_ms=90.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  20  OH         nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=0
+  21  R          nominal_ms=76.0 voiced=1 vowel=0 noise=0.08 scale=1.00 weak=0 stress=0
+  22  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
+  23  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
+
+frames:
+frame_count: 287
+frame_duration_ms: 10
+estimated_duration_ms: 2870.0
+voiced_frames: 135
+unvoiced_frames: 94
+pause_frames: 58
+pitch_hz: min=100.41 avg=122.74 max=136.48
+amplitude: min=0.017 avg=0.682 max=1.000
+noise_mix: min=0.000 avg=0.262 max=0.670

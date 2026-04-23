@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><maryxml xmlns="http://mary.dfki.de/2002/MaryXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.5" xml:lang="en-US">
+    <p>
+        <voice name="cmu-slt-hsmm">
+            <s>
+                <t g2p_method="lexicon" ph="' D @U z" pos="DT">
+Those
+</t>
+                <t g2p_method="lexicon" ph="' f E - D r= z" pos="NNS">
+feathers
+</t>
+                <t g2p_method="lexicon" ph="' g { - D r=" pos="VBP">
+gather
+</t>
+                <t g2p_method="lexicon" ph="' D E r" pos="RB">
+there
+</t>
+                <t pos=".">
+.
+</t>
+            </s>
+        </voice>
+    </p>
+</maryxml>

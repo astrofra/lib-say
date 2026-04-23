@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><maryxml xmlns="http://mary.dfki.de/2002/MaryXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.5" xml:lang="en-US">
+    <p>
+        <voice name="cmu-slt-hsmm">
+            <s>
+                <t g2p_method="lexicon" ph="' I N - g l I S" pos="NNP">
+English
+</t>
+                <t g2p_method="rules" ph="' f r i - k @ - t I v z" pos="NNS">
+fricatives
+</t>
+                <t g2p_method="lexicon" ph="' S I f t" pos="VBP">
+shift
+</t>
+                <t g2p_method="lexicon" ph="' S A r - p l i" pos="RB">
+sharply
+</t>
+                <t pos=".">
+.
+</t>
+            </s>
+        </voice>
+    </p>
+</maryxml>

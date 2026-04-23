@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?><maryxml xmlns="http://mary.dfki.de/2002/MaryXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.5" xml:lang="en-US">
+    <p>
+        <voice name="cmu-slt-hsmm">
+            <s>
+                <t g2p_method="lexicon" ph="' l i v" pos="VB">
+Leave
+</t>
+                <t g2p_method="lexicon" ph="' D i z" pos="DT">
+these
+</t>
+                <t g2p_method="lexicon" ph="' k l @U D z" pos="NNS">
+clothes
+</t>
+                <t g2p_method="lexicon" ph="' { n d" pos="CC">
+and
+</t>
+                <t g2p_method="lexicon" ph="' b { g z" pos="NNS">
+bags
+</t>
+                <t pos=".">
+.
+</t>
+            </s>
+        </voice>
+    </p>
+</maryxml>

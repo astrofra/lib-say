@@ -1,0 +1,67 @@
+lib-say debug report
+====================
+input_mode: text
+language: en
+sample_rate: 22050
+frame_ms: 10
+raw_input: To be or not to be, that is the question.
+normalized_text: to be or not to be, that is the question.
+
+word_to_phoneme:
+  to -> T 'O
+  be -> B
+  or -> 'OH R
+  not -> N 'O T
+  to -> T 'O
+  be -> B
+  [pause:clause]
+  that -> DH 'AE T
+  is -> IH Z
+  the -> DH SCHWA
+  question -> K W 'EH S SH SCHWA N
+  [pause:sentence]
+
+phoneme_stream:
+  T 'O / B / 'OH R / N 'O T / T 'O / B [pause x1:clause] / DH 'AE T / IH Z / DH SCHWA / K W 'EH S SH SCHWA N [pause x2:sentence]
+
+segments:
+segment_count: 28
+  00  T          nominal_ms=66.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  01  O          nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  02  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
+  03  OH         nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  04  R          nominal_ms=76.0 voiced=1 vowel=0 noise=0.08 scale=1.00 weak=0 stress=0
+  05  N          nominal_ms=76.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0 stress=0
+  06  O          nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  07  T          nominal_ms=66.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  08  T          nominal_ms=66.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  09  O          nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  10  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
+  11  PAUSE      nominal_ms=162.0 boundary=clause scale=1.35 weak=0
+  12  DH         nominal_ms=86.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
+  13  AE         nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  14  T          nominal_ms=66.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  15  IH         nominal_ms=74.9 voiced=1 vowel=1 noise=0.02 scale=0.78 weak=1 stress=0
+  16  Z          nominal_ms=68.6 voiced=1 vowel=0 noise=0.46 scale=0.78 weak=1 stress=0
+  17  DH         nominal_ms=61.9 voiced=1 vowel=0 noise=0.44 scale=0.72 weak=1 stress=0
+  18  SCHWA      nominal_ms=61.2 voiced=1 vowel=1 noise=0.03 scale=0.72 weak=1 stress=0
+  19  K          nominal_ms=70.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  20  W          nominal_ms=72.0 voiced=1 vowel=0 noise=0.03 scale=1.00 weak=0 stress=0
+  21  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  22  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  23  SH         nominal_ms=90.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  24  SCHWA      nominal_ms=85.0 voiced=1 vowel=1 noise=0.03 scale=1.00 weak=0 stress=0
+  25  N          nominal_ms=76.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0 stress=0
+  26  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
+  27  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
+
+frames:
+frame_count: 306
+frame_duration_ms: 10
+estimated_duration_ms: 3060.0
+voiced_frames: 168
+unvoiced_frames: 63
+pause_frames: 75
+pitch_hz: min=101.27 avg=122.99 max=137.33
+amplitude: min=0.016 avg=0.621 max=1.020
+noise_mix: min=0.000 avg=0.110 max=0.620
