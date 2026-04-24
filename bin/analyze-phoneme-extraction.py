@@ -115,6 +115,13 @@ MARY_PHONE_MAP = {
 }
 
 VOWELS = {"A", "AE", "AH", "E", "EH", "I", "IH", "O", "OH", "U", "SCHWA"}
+PHONE_FAMILIES = [
+    ("sibilants", "Sibilantes", {"S", "Z", "SH", "ZH"}),
+    ("dentals", "Dentales TH/DH", {"TH", "DH"}),
+    ("affricates", "Affriquées", {"CH", "JH", "TS", "DZ"}),
+    ("voiced_fricatives", "Fricatives voisées", {"V", "DH", "Z", "ZH"}),
+    ("vowels", "Voyelles", VOWELS),
+]
 
 
 def repo_root() -> pathlib.Path:
@@ -219,6 +226,15 @@ def score_alignment(expected: list[str], actual: list[str]) -> tuple[int, float]
     return distance, max(0.0, score)
 
 
+def classify_tokens(tokens: list[str]) -> collections.Counter[str]:
+    counts: collections.Counter[str] = collections.Counter()
+    for token in tokens:
+        for family_id, _label, family_tokens in PHONE_FAMILIES:
+            if token in family_tokens:
+                counts[family_id] += 1
+    return counts
+
+
 def classify_missing(tokens: list[str]) -> collections.Counter[str]:
     counts: collections.Counter[str] = collections.Counter()
     for token in tokens:
@@ -233,6 +249,66 @@ def classify_missing(tokens: list[str]) -> collections.Counter[str]:
         elif token != "PAUSE":
             counts["consonants"] += 1
     return counts
+
+
+def family_ratio(expected_counts: collections.Counter[str], observed_counts: collections.Counter[str], family_id: str) -> float | None:
+    expected_count = expected_counts[family_id]
+    if expected_count == 0:
+        return None
+    return min(observed_counts[family_id], expected_count) / expected_count
+
+
+def extract_family_rows(rows: list[dict[str, object]]) -> list[dict[str, object]]:
+    diagnostics: list[dict[str, object]] = []
+    for row in rows:
+        expected_counts = row["expected_family_counts"]
+        extracted_counts = row["extracted_family_counts"]
+        mary_counts = row["mary_family_counts"]
+        for family_id, label, _tokens in PHONE_FAMILIES:
+            expected_count = expected_counts[family_id]
+            if expected_count == 0:
+                continue
+            diagnostics.append(
+                {
+                    "id": row["id"],
+                    "focus": row["focus"],
+                    "family_id": family_id,
+                    "label": label,
+                    "expected": expected_count,
+                    "extracted": extracted_counts[family_id],
+                    "coverage": family_ratio(expected_counts, extracted_counts, family_id),
+                    "mary": mary_counts[family_id] if row["mary_tokens"] else None,
+                    "mary_coverage": family_ratio(expected_counts, mary_counts, family_id) if row["mary_tokens"] else None,
+                }
+            )
+    return diagnostics
+
+
+def recommendation_for_row(row: dict[str, object]) -> str:
+    focus = str(row["focus"])
+    score = float(row["score"])
+    expected_counts = row["expected_family_counts"]
+    extracted_counts = row["extracted_family_counts"]
+
+    if focus == "sibilants":
+        coverage = family_ratio(expected_counts, extracted_counts, "sibilants")
+        if coverage is not None and coverage < 0.5:
+            return "Renforcer l'identité spectrale S/SH/Z avant d'augmenter encore la durée : le corpus contient beaucoup de sibilantes, mais l'extracteur en retrouve peu."
+        return "Comparer surtout S vs SH/Z : la famille est perçue, mais l'identité exacte reste instable."
+    if focus in {"th-dh", "dh-there"}:
+        coverage = family_ratio(expected_counts, extracted_counts, "dentals")
+        voiced_coverage = family_ratio(expected_counts, extracted_counts, "voiced_fricatives")
+        if voiced_coverage is not None and voiced_coverage < 0.5:
+            return "Travailler les fricatives voisées séparément de TH : DH/Z/V doivent rester voisées sans devenir de simples occlusives."
+        if coverage is not None and coverage < 0.5:
+            return "Isoler TH/DH dans un micro-corpus : le score bas vient probablement d'une confusion de lieu d'articulation, pas seulement de voisement."
+    if focus == "affricates":
+        return "Éviter les changements acoustiques agressifs sur CH/JH tant que le diagnostic famille ne progresse pas ; le dernier essai a dégradé le score strict."
+    if focus == "word-final-fricatives":
+        return "Tester les fins de mot avec paires minimales courtes : les fricatives finales semblent se mélanger avec des consonnes non voisées."
+    if score < 0.25:
+        return "Créer une phrase de test plus courte pour séparer erreur de reconnaissance lexicale et erreur phonétique."
+    return "Surveiller en régression ; ce cas sert surtout de contrôle de stabilité."
 
 
 def load_wav(path: pathlib.Path) -> tuple[int, list[float]]:
@@ -352,6 +428,8 @@ def analyze(args: argparse.Namespace) -> tuple[pathlib.Path, pathlib.Path | None
         distance, extraction_score = score_alignment(expected, extracted)
         missing_counts = classify_missing(expected)
         aggregate_missing.update(missing_counts)
+        expected_family_counts = classify_tokens(expected)
+        extracted_family_counts = classify_tokens(extracted)
         our_metrics = audio_metrics(wav_path)
 
         mary_tokens: list[str] = []
@@ -365,6 +443,7 @@ def analyze(args: argparse.Namespace) -> tuple[pathlib.Path, pathlib.Path | None
         if mary_xml.exists():
             mary_tokens, mary_unknown = parse_mary_phonemes(mary_xml)
             mary_distance, mary_score = score_alignment(expected, mary_tokens)
+        mary_family_counts = classify_tokens(mary_tokens)
         if mary_wav.exists():
             mary_metrics = audio_metrics(mary_wav)
 
@@ -375,11 +454,14 @@ def analyze(args: argparse.Namespace) -> tuple[pathlib.Path, pathlib.Path | None
                 "text": text,
                 "expected": expected,
                 "extracted": extracted,
+                "expected_family_counts": expected_family_counts,
+                "extracted_family_counts": extracted_family_counts,
                 "distance": distance,
                 "score": extraction_score,
                 "extractor_unknown": extractor_unknown,
                 "our_metrics": our_metrics,
                 "mary_tokens": mary_tokens,
+                "mary_family_counts": mary_family_counts,
                 "mary_distance": mary_distance,
                 "mary_score": mary_score,
                 "mary_unknown": mary_unknown,
@@ -425,6 +507,33 @@ def analyze(args: argparse.Namespace) -> tuple[pathlib.Path, pathlib.Path | None
             f"{mary_duration} |"
         )
 
+    family_rows = extract_family_rows(rows)
+    lines.extend(
+        [
+            "",
+            "## Diagnostic par familles phonétiques",
+            "",
+            "Ces couvertures comparent des familles larges de phonèmes, sans alignement temporel. Elles ne remplacent pas le score strict, mais indiquent si l'extracteur entend au moins la bonne classe acoustique.",
+            "",
+            "| Échantillon | Focus | Famille | Attendus | Reconnus | Couverture | Mary | Couverture Mary |",
+            "|---|---|---|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for family_row in family_rows:
+        coverage = family_row["coverage"]
+        mary_coverage = family_row["mary_coverage"]
+        lines.append(
+            "| "
+            f"`{family_row['id']}` | "
+            f"{family_row['focus']} | "
+            f"{family_row['label']} | "
+            f"{family_row['expected']} | "
+            f"{family_row['extracted'] or '-'} | "
+            f"{percent(coverage) if coverage is not None else '-'} | "
+            f"{family_row['mary'] if family_row['mary'] is not None else '-'} | "
+            f"{percent(mary_coverage) if mary_coverage is not None else '-'} |"
+        )
+
     lines.extend(
         [
             "",
@@ -442,6 +551,7 @@ def analyze(args: argparse.Namespace) -> tuple[pathlib.Path, pathlib.Path | None
                 f"- Distance d'édition : `{row['distance']}`",
                 f"- Attendu : `{format_tokens(row['expected'])}`",
                 f"- Reconnu : `{format_tokens(row['extracted'])}`",
+                f"- Piste d'itération : {recommendation_for_row(row)}",
                 "",
             ]
         )
