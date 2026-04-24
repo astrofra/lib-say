@@ -370,23 +370,46 @@ bin\tts.exe "Those feathers gather there." --lang en --debug-report - --dry-run
 - Rejeter les réglages qui améliorent une famille mais dégradent trop les autres.
 - Ajouter progressivement des phrases de référence dédiées à chaque famille phonétique.
 
-## Prochaine étape recommandée
+## Automatisation du rapport
 
-Le workflow est maintenant assez utile pour automatiser un rapport récurrent.
+Le workflow est automatisé par le script :
 
-Une prochaine amélioration serait d'ajouter un script dédié, par exemple :
-
-```text
+```bat
 bin/analyze-phoneme-extraction.py
 ```
 
-Ce script pourrait :
+Usage par défaut :
+
+```bat
+python bin\analyze-phoneme-extraction.py
+```
+
+Le script :
 
 - générer les WAV `ours-*`,
 - lancer `phonemes_extractor`,
 - parser les rapports debug,
 - calculer les scores,
-- produire un rapport Markdown ou texte,
-- conserver un historique par commit.
+- intégrer MaryTTS comme vérité terrain lorsque les fichiers `mary-*.wav` et `mary-*.phonemes.xml` existent,
+- produire un rapport Markdown,
+- conserver un historique par commit dans `history/`.
 
-Cela transformerait l'outil en test de régression perceptif léger pour l'élocution.
+Par défaut, les sorties sont écrites dans :
+
+```text
+bin/reference-en/phoneme-extraction/
+```
+
+Le rapport courant est :
+
+```text
+bin/reference-en/phoneme-extraction/report.md
+```
+
+Les artefacts du dernier run sont dans :
+
+```text
+bin/reference-en/phoneme-extraction/latest/
+```
+
+Cela transforme l'outil en test de régression perceptif léger pour l'élocution.
