@@ -71,12 +71,12 @@ segment_count: 44
   43  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 858
+frame_count: 862
 frame_duration_ms: 5
-estimated_duration_ms: 4290.0
-voiced_frames: 521
+estimated_duration_ms: 4310.0
+voiced_frames: 525
 unvoiced_frames: 153
 pause_frames: 184
-pitch_hz: min=104.39 avg=120.93 max=136.77
-amplitude: min=0.016 avg=0.632 max=1.000
-noise_mix: min=0.000 avg=0.095 max=0.520
+pitch_hz: min=108.84 avg=130.89 max=150.80
+amplitude: min=0.016 avg=0.622 max=1.024
+noise_mix: min=0.000 avg=0.094 max=0.520
