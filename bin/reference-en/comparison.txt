@@ -14,26 +14,35 @@ Corpus:
 
 01-demo [baseline]: Hello from lib-say. This is an English demo sentence.
   SAM     : sam-01-demo.wav duration=4.194s mean_rms=0.2297 zcr=0.1106 diff_mean=0.0660 diff_max=1.5000
-  MaryTTS : mary-01-demo.wav duration=3.325s mean_rms=0.1032 zcr=0.0921 diff_mean=0.0098 diff_max=0.3103
-  lib-say : ours-01-demo.aiff duration=4.370s mean_rms=0.0947 zcr=0.0332 diff_mean=0.0054 diff_max=0.0943
-  delta vs Mary: duration x1.31, rms x0.92, zcr x0.36
+  MaryTTS : mary-01-demo.wav duration=3.325s mean_rms=0.1028 zcr=0.0918 diff_mean=0.0097 diff_max=0.3212
+  lib-say : ours-01-demo.wav duration=4.375s mean_rms=0.0638 zcr=0.0637 diff_mean=0.0197 diff_max=0.7272
+  delta vs Mary: duration x1.32, rms x0.62, zcr x0.69
   word_diffs:
     stress_mismatch        Hello: ours=H SCHWA L OH W | mary=H SCHWA L OH W
     exact                  from: ours=F R AH M | mary=F R AH M
-    exact                  lib: ours=L IH B | mary=L IH B
-    exact                  say: ours=S E J | mary=S E J
-    exact                  This: ours=DH IH S | mary=DH IH S
-    exact                  is: ours=IH Z | mary=IH Z
-    exact                  an: ours=AE N | mary=AE N
-    exact                  English: ours=IH NG G L IH SH | mary=IH NG G L IH SH
-    stress_mismatch        demo: ours=D EH M OH W | mary=D EH M OH W
-    stress_mismatch        sentence: ours=S EH N T SCHWA N S | mary=S EH N T SCHWA N S
+    word_alignment_mismatch lib: ours=L IH B / S E J | mary=L IH B
+    word_alignment_mismatch say: ours=DH IH S | mary=S E J
+    word_alignment_mismatch This: ours=IH Z | mary=DH IH S
+    word_alignment_mismatch is: ours=AE N | mary=IH Z
+    word_alignment_mismatch an: ours=IH NG G L IH SH | mary=AE N
+    word_alignment_mismatch English: ours=D EH M OH W | mary=IH NG G L IH SH
+    word_alignment_mismatch demo: ours=S EH N T SCHWA N S | mary=D EH M OH W
+  issues:
+    word_count_mismatch ours=9 mary=10
+    word_alignment_mismatch index=2 ours=lib-say mary=lib
+    word_alignment_mismatch index=3 ours=this mary=say
+    word_alignment_mismatch index=4 ours=is mary=This
+    word_alignment_mismatch index=5 ours=an mary=is
+    word_alignment_mismatch index=6 ours=english mary=an
+    word_alignment_mismatch index=7 ours=demo mary=English
+    word_alignment_mismatch index=8 ours=sentence mary=demo
+    extra_mary_word sentence
 
 02-hamlet [function-words]: To be or not to be, that is the question.
   SAM     : sam-02-hamlet.wav duration=2.814s mean_rms=0.1793 zcr=0.0777 diff_mean=0.0440 diff_max=1.5000
-  MaryTTS : mary-02-hamlet.wav duration=2.550s mean_rms=0.1066 zcr=0.0753 diff_mean=0.0086 diff_max=0.2585
-  lib-say : ours-02-hamlet.aiff duration=2.900s mean_rms=0.1130 zcr=0.0349 diff_mean=0.0073 diff_max=0.1852
-  delta vs Mary: duration x1.14, rms x1.06, zcr x0.46
+  MaryTTS : mary-02-hamlet.wav duration=2.550s mean_rms=0.1064 zcr=0.0743 diff_mean=0.0086 diff_max=0.2802
+  lib-say : ours-02-hamlet.wav duration=2.875s mean_rms=0.0482 zcr=0.0621 diff_mean=0.0111 diff_max=0.7295
+  delta vs Mary: duration x1.13, rms x0.45, zcr x0.84
   word_diffs:
     exact                  To: ours=T U | mary=T U
     exact                  be: ours=B I | mary=B I
@@ -47,10 +56,10 @@ Corpus:
     stress_mismatch        question: ours=K W EH S CH SCHWA N | mary=K W EH S CH SCHWA N
 
 03-sibilants [sibilants]: She sells seashells by the seashore.
-  SAM     : sam-03-sibilants.wav duration=2.403s mean_rms=0.2306 zcr=0.1457 diff_mean=0.0783 diff_max=1.5000
-  MaryTTS : mary-03-sibilants.wav duration=2.210s mean_rms=0.0674 zcr=0.1143 diff_mean=0.0083 diff_max=0.1074
-  lib-say : ours-03-sibilants.aiff duration=2.620s mean_rms=0.1273 zcr=0.0497 diff_mean=0.0091 diff_max=0.1183
-  delta vs Mary: duration x1.19, rms x1.89, zcr x0.44
+  SAM     : sam-03-sibilants.wav duration=2.403s mean_rms=0.2305 zcr=0.1457 diff_mean=0.0783 diff_max=1.5000
+  MaryTTS : mary-03-sibilants.wav duration=2.210s mean_rms=0.0674 zcr=0.1130 diff_mean=0.0083 diff_max=0.1189
+  lib-say : ours-03-sibilants.wav duration=2.675s mean_rms=0.0975 zcr=0.0993 diff_mean=0.0361 diff_max=0.7794
+  delta vs Mary: duration x1.21, rms x1.45, zcr x0.88
   word_diffs:
     exact                  She: ours=SH I | mary=SH I
     exact                  sells: ours=S EH L Z | mary=S EH L Z
@@ -61,9 +70,9 @@ Corpus:
 
 04-dentals [th-dh]: This thing is worth the effort.
   SAM     : sam-04-dentals.wav duration=1.895s mean_rms=0.2097 zcr=0.0845 diff_mean=0.0573 diff_max=1.5000
-  MaryTTS : mary-04-dentals.wav duration=1.535s mean_rms=0.1196 zcr=0.1092 diff_mean=0.0088 diff_max=0.2659
-  lib-say : ours-04-dentals.aiff duration=1.990s mean_rms=0.1013 zcr=0.0487 diff_mean=0.0090 diff_max=0.1373
-  delta vs Mary: duration x1.30, rms x0.85, zcr x0.45
+  MaryTTS : mary-04-dentals.wav duration=1.535s mean_rms=0.1198 zcr=0.1031 diff_mean=0.0088 diff_max=0.2497
+  lib-say : ours-04-dentals.wav duration=2.010s mean_rms=0.0729 zcr=0.0955 diff_mean=0.0262 diff_max=0.8211
+  delta vs Mary: duration x1.31, rms x0.61, zcr x0.93
   word_diffs:
     exact                  This: ours=DH IH S | mary=DH IH S
     exact                  thing: ours=TH IH NG | mary=TH IH NG
@@ -74,9 +83,9 @@ Corpus:
 
 05-voiced-dentals [dh-there]: Those feathers gather there.
   SAM     : sam-05-voiced-dentals.wav duration=1.778s mean_rms=0.2147 zcr=0.0723 diff_mean=0.0510 diff_max=1.5000
-  MaryTTS : mary-05-voiced-dentals.wav duration=1.545s mean_rms=0.1100 zcr=0.0770 diff_mean=0.0087 diff_max=0.1771
-  lib-say : ours-05-voiced-dentals.aiff duration=2.050s mean_rms=0.1107 zcr=0.0467 diff_mean=0.0095 diff_max=0.3009
-  delta vs Mary: duration x1.33, rms x1.01, zcr x0.61
+  MaryTTS : mary-05-voiced-dentals.wav duration=1.545s mean_rms=0.1099 zcr=0.0740 diff_mean=0.0087 diff_max=0.1730
+  lib-say : ours-05-voiced-dentals.wav duration=2.110s mean_rms=0.1321 zcr=0.0918 diff_mean=0.0387 diff_max=0.7508
+  delta vs Mary: duration x1.37, rms x1.20, zcr x1.24
   word_diffs:
     exact                  Those: ours=DH OH W Z | mary=DH OH W Z
     exact                  feathers: ours=F EH DH R Z | mary=F EH DH R Z
@@ -84,10 +93,10 @@ Corpus:
     exact                  there: ours=DH EH R | mary=DH EH R
 
 06-affricates [affricates]: Judge the changing church bells.
-  SAM     : sam-06-affricates.wav duration=2.405s mean_rms=0.1788 zcr=0.0695 diff_mean=0.0468 diff_max=1.5000
-  MaryTTS : mary-06-affricates.wav duration=1.840s mean_rms=0.0858 zcr=0.1054 diff_mean=0.0084 diff_max=0.1252
-  lib-say : ours-06-affricates.aiff duration=2.320s mean_rms=0.1223 zcr=0.0535 diff_mean=0.0142 diff_max=0.2422
-  delta vs Mary: duration x1.26, rms x1.43, zcr x0.51
+  SAM     : sam-06-affricates.wav duration=2.405s mean_rms=0.1789 zcr=0.0695 diff_mean=0.0468 diff_max=1.5000
+  MaryTTS : mary-06-affricates.wav duration=1.840s mean_rms=0.0855 zcr=0.1062 diff_mean=0.0084 diff_max=0.1327
+  lib-say : ours-06-affricates.wav duration=2.285s mean_rms=0.1214 zcr=0.0938 diff_mean=0.0328 diff_max=0.7834
+  delta vs Mary: duration x1.24, rms x1.42, zcr x0.88
   word_diffs:
     exact                  Judge: ours=JH AH JH | mary=JH AH JH
     exact                  the: ours=DH SCHWA | mary=DH SCHWA
@@ -96,10 +105,10 @@ Corpus:
     exact                  bells: ours=B EH L Z | mary=B EH L Z
 
 07-stress [stress]: English fricatives shift sharply.
-  SAM     : sam-07-stress.wav duration=2.319s mean_rms=0.2204 zcr=0.0947 diff_mean=0.0669 diff_max=1.5000
-  MaryTTS : mary-07-stress.wav duration=2.090s mean_rms=0.0791 zcr=0.1167 diff_mean=0.0097 diff_max=0.2000
-  lib-say : ours-07-stress.aiff duration=2.830s mean_rms=0.1172 zcr=0.0442 diff_mean=0.0077 diff_max=0.1491
-  delta vs Mary: duration x1.35, rms x1.48, zcr x0.38
+  SAM     : sam-07-stress.wav duration=2.319s mean_rms=0.2205 zcr=0.0947 diff_mean=0.0669 diff_max=1.5000
+  MaryTTS : mary-07-stress.wav duration=2.090s mean_rms=0.0786 zcr=0.1191 diff_mean=0.0097 diff_max=0.1921
+  lib-say : ours-07-stress.wav duration=2.810s mean_rms=0.0854 zcr=0.0827 diff_mean=0.0230 diff_max=0.7046
+  delta vs Mary: duration x1.34, rms x1.09, zcr x0.69
   word_diffs:
     exact                  English: ours=IH NG G L IH SH | mary=IH NG G L IH SH
     stress_mismatch        fricatives: ours=F R I K SCHWA T IH V Z | mary=F R I K SCHWA T IH V Z
@@ -108,9 +117,9 @@ Corpus:
 
 08-finals [word-final-fricatives]: Leave these clothes and bags.
   SAM     : sam-08-finals.wav duration=2.000s mean_rms=0.1863 zcr=0.0841 diff_mean=0.0523 diff_max=1.5000
-  MaryTTS : mary-08-finals.wav duration=1.665s mean_rms=0.1175 zcr=0.0869 diff_mean=0.0100 diff_max=0.1812
-  lib-say : ours-08-finals.aiff duration=2.310s mean_rms=0.1117 zcr=0.0418 diff_mean=0.0069 diff_max=0.0768
-  delta vs Mary: duration x1.39, rms x0.95, zcr x0.48
+  MaryTTS : mary-08-finals.wav duration=1.665s mean_rms=0.1181 zcr=0.0887 diff_mean=0.0101 diff_max=0.1595
+  lib-say : ours-08-finals.wav duration=2.365s mean_rms=0.1097 zcr=0.0844 diff_mean=0.0255 diff_max=0.5505
+  delta vs Mary: duration x1.42, rms x0.93, zcr x0.95
   word_diffs:
     exact                  Leave: ours=L I V | mary=L I V
     exact                  these: ours=DH I Z | mary=DH I Z
@@ -120,8 +129,10 @@ Corpus:
 
 Summary
 -------
-  exact: 41
-  stress_mismatch: 9
+  exact: 35
+  extra_mary_word: 1
+  stress_mismatch: 7
+  word_alignment_mismatch: 7
 
 Actionable Summary
 ------------------
@@ -133,18 +144,25 @@ Actionable Summary
 
 Duration Targets
 ----------------
-  01-demo: duration x1.31
-  04-dentals: duration x1.30
-  08-finals: duration x1.39
+  01-demo: duration x1.32
+  04-dentals: duration x1.31
+  08-finals: duration x1.42
 
 Mismatch Samples
 ----------------
   stress_mismatch:
     Hello: ours=H SCHWA L OH W | mary=H SCHWA L OH W
-    demo: ours=D EH M OH W | mary=D EH M OH W
-    sentence: ours=S EH N T SCHWA N S | mary=S EH N T SCHWA N S
     question: ours=K W EH S CH SCHWA N | mary=K W EH S CH SCHWA N
     seashells: ours=S I SH EH L Z | mary=S I SH EH L Z
     seashore: ours=S I SH OH R | mary=S I SH OH R
     changing: ours=CH E J N JH IH NG | mary=CH E J N JH IH NG
     fricatives: ours=F R I K SCHWA T IH V Z | mary=F R I K SCHWA T IH V Z
+    sharply: ours=SH A R P L I | mary=SH A R P L I
+  word_alignment_mismatch:
+    lib: ours=L IH B / S E J | mary=L IH B
+    say: ours=DH IH S | mary=S E J
+    This: ours=IH Z | mary=DH IH S
+    is: ours=AE N | mary=IH Z
+    an: ours=IH NG G L IH SH | mary=AE N
+    English: ours=D EH M OH W | mary=IH NG G L IH SH
+    demo: ours=S EH N T SCHWA N S | mary=D EH M OH W

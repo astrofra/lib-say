@@ -3,7 +3,7 @@ lib-say debug report
 input_mode: text
 language: en
 sample_rate: 44100
-frame_ms: 10
+frame_ms: 5
 raw_input: Those feathers gather there.
 normalized_text: those feathers gather there.
 
@@ -19,32 +19,32 @@ phoneme_stream:
 
 segments:
 segment_count: 18
-  00  DH         nominal_ms=80.8 voiced=1 vowel=0 noise=0.44 scale=0.94 weak=0 stress=0
+  00  DH         nominal_ms=84.6 voiced=1 vowel=0 noise=0.54 scale=0.94 weak=0 stress=0
   01  OH         nominal_ms=101.5 voiced=1 vowel=1 noise=0.02 scale=0.94 weak=0 stress=2
   02  W          nominal_ms=67.7 voiced=1 vowel=0 noise=0.03 scale=0.94 weak=0 stress=0
-  03  Z          nominal_ms=82.7 voiced=1 vowel=0 noise=0.46 scale=0.94 weak=0 stress=0
+  03  Z          nominal_ms=84.6 voiced=1 vowel=0 noise=0.52 scale=0.94 weak=0 stress=0
   04  F          nominal_ms=82.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   05  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
-  06  DH         nominal_ms=86.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
+  06  DH         nominal_ms=90.0 voiced=1 vowel=0 noise=0.54 scale=1.00 weak=0 stress=0
   07  R          nominal_ms=76.0 voiced=1 vowel=0 noise=0.08 scale=1.00 weak=0 stress=0
-  08  Z          nominal_ms=88.0 voiced=1 vowel=0 noise=0.46 scale=1.00 weak=0 stress=0
+  08  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.52 scale=1.00 weak=0 stress=0
   09  G          nominal_ms=72.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
   10  AE         nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
-  11  DH         nominal_ms=86.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
+  11  DH         nominal_ms=90.0 voiced=1 vowel=0 noise=0.54 scale=1.00 weak=0 stress=0
   12  R          nominal_ms=76.0 voiced=1 vowel=0 noise=0.08 scale=1.00 weak=0 stress=0
-  13  DH         nominal_ms=86.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
+  13  DH         nominal_ms=90.0 voiced=1 vowel=0 noise=0.54 scale=1.00 weak=0 stress=0
   14  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
   15  R          nominal_ms=76.0 voiced=1 vowel=0 noise=0.08 scale=1.00 weak=0 stress=0
   16  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
   17  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 205
-frame_duration_ms: 10
-estimated_duration_ms: 2050.0
-voiced_frames: 146
-unvoiced_frames: 13
-pause_frames: 46
-pitch_hz: min=111.20 avg=122.74 max=136.93
-amplitude: min=0.017 avg=0.638 max=1.020
-noise_mix: min=0.000 avg=0.107 max=0.520
+frame_count: 422
+frame_duration_ms: 5
+estimated_duration_ms: 2110.0
+voiced_frames: 306
+unvoiced_frames: 24
+pause_frames: 92
+pitch_hz: min=110.80 avg=133.92 max=150.80
+amplitude: min=0.017 avg=0.672 max=1.024
+noise_mix: min=0.000 avg=0.148 max=0.520

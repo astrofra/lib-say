@@ -397,6 +397,8 @@ def main() -> int:
         raise RuntimeError(f"Missing executable: {sam_exe}")
 
     out_dir.mkdir(parents=True, exist_ok=True)
+    for stale_our_aiff in out_dir.glob("ours-*.aiff"):
+        stale_our_aiff.unlink()
 
     report_lines = [
         "English Oracle Comparison",
@@ -421,7 +423,7 @@ def main() -> int:
         mary_audio_path = out_dir / f"mary-{sample_id}.wav"
         mary_phoneme_path = out_dir / f"mary-{sample_id}.phonemes.xml"
         mary_feature_path = out_dir / f"mary-{sample_id}.features.txt"
-        our_path = out_dir / f"ours-{sample_id}.aiff"
+        our_path = out_dir / f"ours-{sample_id}.wav"
         our_debug_path = out_dir / f"ours-{sample_id}.debug.txt"
 
         run_command([str(sam_exe), "-wav", str(sam_path), text], f"SAM synthesis for {sample_id}")

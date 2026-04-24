@@ -3,15 +3,14 @@ lib-say debug report
 input_mode: text
 language: en
 sample_rate: 44100
-frame_ms: 10
+frame_ms: 5
 raw_input: Hello from lib-say. This is an English demo sentence.
-normalized_text: hello from lib say. this is an english demo sentence.
+normalized_text: hello from lib-say. this is an english demo sentence.
 
 word_to_phoneme:
   hello -> H SCHWA L 'OH W
   from -> F R AH M
-  lib -> L 'IH B
-  say -> S 'E J
+  lib-say -> L 'IH B / S 'E J
   [pause:sentence]
   this -> DH 'IH S
   is -> IH Z
@@ -38,16 +37,16 @@ segment_count: 44
   09  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
   10  IH         nominal_ms=96.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
   11  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
-  12  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  12  S          nominal_ms=92.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   13  E          nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
   14  J          nominal_ms=68.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
   15  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
   16  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
-  17  DH         nominal_ms=79.1 voiced=1 vowel=0 noise=0.44 scale=0.92 weak=0 stress=0
+  17  DH         nominal_ms=82.8 voiced=1 vowel=0 noise=0.54 scale=0.92 weak=0 stress=0
   18  IH         nominal_ms=88.3 voiced=1 vowel=1 noise=0.02 scale=0.92 weak=0 stress=2
-  19  S          nominal_ms=81.0 voiced=0 vowel=0 noise=1.00 scale=0.92 weak=0 stress=0
+  19  S          nominal_ms=84.6 voiced=0 vowel=0 noise=1.00 scale=0.92 weak=0 stress=0
   20  IH         nominal_ms=74.9 voiced=1 vowel=1 noise=0.02 scale=0.78 weak=1 stress=0
-  21  Z          nominal_ms=68.6 voiced=1 vowel=0 noise=0.46 scale=0.78 weak=1 stress=0
+  21  Z          nominal_ms=70.2 voiced=1 vowel=0 noise=0.52 scale=0.78 weak=1 stress=0
   22  AE         nominal_ms=81.4 voiced=1 vowel=1 noise=0.02 scale=0.74 weak=1 stress=0
   23  N          nominal_ms=56.2 voiced=1 vowel=0 noise=0.05 scale=0.74 weak=1 stress=0
   24  IH         nominal_ms=96.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
@@ -55,29 +54,29 @@ segment_count: 44
   26  G          nominal_ms=72.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
   27  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
   28  IH         nominal_ms=96.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=0
-  29  SH         nominal_ms=90.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  29  SH         nominal_ms=94.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   30  D          nominal_ms=59.8 voiced=1 vowel=0 noise=0.34 scale=0.88 weak=0 stress=0
   31  EH         nominal_ms=91.5 voiced=1 vowel=1 noise=0.02 scale=0.88 weak=0 stress=2
   32  M          nominal_ms=68.6 voiced=1 vowel=0 noise=0.05 scale=0.88 weak=0 stress=0
   33  OH         nominal_ms=95.0 voiced=1 vowel=1 noise=0.02 scale=0.88 weak=0 stress=0
   34  W          nominal_ms=63.4 voiced=1 vowel=0 noise=0.03 scale=0.88 weak=0 stress=0
-  35  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  35  S          nominal_ms=92.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   36  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
   37  N          nominal_ms=76.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0 stress=0
   38  T          nominal_ms=66.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   39  SCHWA      nominal_ms=85.0 voiced=1 vowel=1 noise=0.03 scale=1.00 weak=0 stress=0
   40  N          nominal_ms=76.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0 stress=0
-  41  S          nominal_ms=88.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
+  41  S          nominal_ms=92.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   42  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
   43  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 437
-frame_duration_ms: 10
-estimated_duration_ms: 4370.0
-voiced_frames: 266
-unvoiced_frames: 79
-pause_frames: 92
-pitch_hz: min=104.39 avg=120.87 max=136.77
-amplitude: min=0.016 avg=0.627 max=1.000
-noise_mix: min=0.000 avg=0.095 max=0.520
+frame_count: 875
+frame_duration_ms: 5
+estimated_duration_ms: 4375.0
+voiced_frames: 527
+unvoiced_frames: 164
+pause_frames: 184
+pitch_hz: min=108.84 avg=130.87 max=150.80
+amplitude: min=0.016 avg=0.643 max=1.024
+noise_mix: min=0.000 avg=0.136 max=0.606
