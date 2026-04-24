@@ -3549,6 +3549,40 @@ static void say_store_u32_be(unsigned char *bytes, unsigned int value)
     bytes[3] = (unsigned char) (value & 0xFFu);
 }
 
+static void say_write_u16_le(FILE *file, unsigned int value)
+{
+    unsigned char bytes[2];
+
+    bytes[0] = (unsigned char) (value & 0xFFu);
+    bytes[1] = (unsigned char) ((value >> 8) & 0xFFu);
+    fwrite(bytes, sizeof(bytes), 1, file);
+}
+
+static void say_store_u16_le(unsigned char *bytes, unsigned int value)
+{
+    bytes[0] = (unsigned char) (value & 0xFFu);
+    bytes[1] = (unsigned char) ((value >> 8) & 0xFFu);
+}
+
+static void say_write_u32_le(FILE *file, unsigned int value)
+{
+    unsigned char bytes[4];
+
+    bytes[0] = (unsigned char) (value & 0xFFu);
+    bytes[1] = (unsigned char) ((value >> 8) & 0xFFu);
+    bytes[2] = (unsigned char) ((value >> 16) & 0xFFu);
+    bytes[3] = (unsigned char) ((value >> 24) & 0xFFu);
+    fwrite(bytes, sizeof(bytes), 1, file);
+}
+
+static void say_store_u32_le(unsigned char *bytes, unsigned int value)
+{
+    bytes[0] = (unsigned char) (value & 0xFFu);
+    bytes[1] = (unsigned char) ((value >> 8) & 0xFFu);
+    bytes[2] = (unsigned char) ((value >> 16) & 0xFFu);
+    bytes[3] = (unsigned char) ((value >> 24) & 0xFFu);
+}
+
 static void say_write_ieee_extended(FILE *file, double value)
 {
     unsigned char bytes[10];
@@ -3686,6 +3720,64 @@ static int say_write_aiff(
         unsigned char bytes[2];
         bytes[0] = (unsigned char) ((value >> 8) & 0xFFu);
         bytes[1] = (unsigned char) (value & 0xFFu);
+        fwrite(bytes, sizeof(bytes), 1, file);
+    }
+
+    fclose(file);
+    return 1;
+}
+
+static int say_write_wav(
+    const char *path,
+    int sample_rate,
+    const int16_t *samples,
+    size_t sample_count,
+    char *error,
+    size_t error_size
+)
+{
+    FILE *file;
+    unsigned int data_bytes;
+    size_t i;
+
+    if (sample_count > 0xFFFFFFFFu / 2u) {
+        say_set_error(error, error_size, "sample buffer is too large for WAV");
+        return 0;
+    }
+
+    data_bytes = (unsigned int) (sample_count * 2u);
+    if (data_bytes > 0xFFFFFFFFu - 36u) {
+        say_set_error(error, error_size, "sample buffer is too large for WAV");
+        return 0;
+    }
+
+    file = fopen(path, "wb");
+    if (file == NULL) {
+        say_set_error(error, error_size, "unable to open %s: %s", path, strerror(errno));
+        return 0;
+    }
+
+    fwrite("RIFF", 4, 1, file);
+    say_write_u32_le(file, 36u + data_bytes);
+    fwrite("WAVE", 4, 1, file);
+
+    fwrite("fmt ", 4, 1, file);
+    say_write_u32_le(file, 16u);
+    say_write_u16_le(file, 1u);
+    say_write_u16_le(file, 1u);
+    say_write_u32_le(file, (unsigned int) sample_rate);
+    say_write_u32_le(file, (unsigned int) sample_rate * 2u);
+    say_write_u16_le(file, 2u);
+    say_write_u16_le(file, 16u);
+
+    fwrite("data", 4, 1, file);
+    say_write_u32_le(file, data_bytes);
+
+    for (i = 0; i < sample_count; ++i) {
+        unsigned short value = (unsigned short) samples[i];
+        unsigned char bytes[2];
+        bytes[0] = (unsigned char) (value & 0xFFu);
+        bytes[1] = (unsigned char) ((value >> 8) & 0xFFu);
         fwrite(bytes, sizeof(bytes), 1, file);
     }
 
@@ -4109,6 +4201,8 @@ const char *say_audio_format_name(say_audio_format_t format)
     switch (format) {
         case SAY_FORMAT_AIFF:
             return "aiff";
+        case SAY_FORMAT_WAV:
+            return "wav";
         case SAY_FORMAT_RAW:
         default:
             return "raw";
@@ -4144,6 +4238,10 @@ int say_parse_audio_format(const char *name, say_audio_format_t *out_format)
         *out_format = SAY_FORMAT_AIFF;
         return 1;
     }
+    if (say_equals_icase(name, "wav") || say_equals_icase(name, "wave")) {
+        *out_format = SAY_FORMAT_WAV;
+        return 1;
+    }
     return 0;
 }
 
@@ -4159,6 +4257,9 @@ say_audio_format_t say_guess_audio_format(const char *path)
     if (dot != NULL) {
         if (say_equals_icase(dot, ".aiff") || say_equals_icase(dot, ".aif")) {
             return SAY_FORMAT_AIFF;
+        }
+        if (say_equals_icase(dot, ".wav") || say_equals_icase(dot, ".wave")) {
+            return SAY_FORMAT_WAV;
         }
     }
     return SAY_FORMAT_RAW;
@@ -4308,6 +4409,9 @@ int say_write_audio_file(
     if (format == SAY_FORMAT_AIFF) {
         return say_write_aiff(path, sample_rate, samples, sample_count, error, error_size);
     }
+    if (format == SAY_FORMAT_WAV) {
+        return say_write_wav(path, sample_rate, samples, sample_count, error, error_size);
+    }
     return say_write_raw(path, samples, sample_count, error, error_size);
 }
 
@@ -4378,6 +4482,53 @@ int say_encode_audio(
             unsigned short value = (unsigned short) samples[i];
             data[54u + i * 2u + 0u] = (uint8_t) ((value >> 8) & 0xFFu);
             data[54u + i * 2u + 1u] = (uint8_t) (value & 0xFFu);
+        }
+    }
+    else if (format == SAY_FORMAT_WAV) {
+        unsigned int data_bytes;
+
+        if (sample_count > 0xFFFFFFFFu / 2u) {
+            say_set_error(error, error_size, "sample buffer is too large for WAV");
+            return 0;
+        }
+        if (sample_count > (SIZE_MAX - 44u) / 2u) {
+            say_set_error(error, error_size, "sample buffer is too large to encode");
+            return 0;
+        }
+
+        data_bytes = (unsigned int) (sample_count * 2u);
+        if (data_bytes > 0xFFFFFFFFu - 36u) {
+            say_set_error(error, error_size, "sample buffer is too large for WAV");
+            return 0;
+        }
+
+        byte_count = 44u + (size_t) data_bytes;
+        data = (uint8_t *) malloc(byte_count);
+        if (data == NULL) {
+            say_set_error(error, error_size, "out of memory while encoding WAV blob");
+            return 0;
+        }
+
+        memcpy(data + 0, "RIFF", 4);
+        say_store_u32_le(data + 4, 36u + data_bytes);
+        memcpy(data + 8, "WAVE", 4);
+
+        memcpy(data + 12, "fmt ", 4);
+        say_store_u32_le(data + 16, 16u);
+        say_store_u16_le(data + 20, 1u);
+        say_store_u16_le(data + 22, 1u);
+        say_store_u32_le(data + 24, (unsigned int) sample_rate);
+        say_store_u32_le(data + 28, (unsigned int) sample_rate * 2u);
+        say_store_u16_le(data + 32, 2u);
+        say_store_u16_le(data + 34, 16u);
+
+        memcpy(data + 36, "data", 4);
+        say_store_u32_le(data + 40, data_bytes);
+
+        for (i = 0; i < sample_count; ++i) {
+            unsigned short value = (unsigned short) samples[i];
+            data[44u + i * 2u + 0u] = (uint8_t) (value & 0xFFu);
+            data[44u + i * 2u + 1u] = (uint8_t) ((value >> 8) & 0xFFu);
         }
     }
     else {

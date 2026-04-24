@@ -29,7 +29,7 @@ Supported options:
 - `sample_rate` or `rate`: currently `44100` only
 - `frame_ms`: integer between `5` and `10`
 - `phonemes`: boolean, interpret `input` as phoneme symbols
-- `format`: `"raw"` or `"aiff"` (`"raw"` by default)
+- `format`: `"raw"`, `"aiff"`, or `"wav"` (`"raw"` by default)
 
 Example:
 ```lua
@@ -52,6 +52,8 @@ Blob methods:
 For `format = "raw"`, the blob contains mono 16-bit PCM little-endian samples (`info.pcm_encoding == "s16le"`).
 
 For `format = "aiff"`, the blob contains a complete AIFF file payload.
+
+For `format = "wav"`, the blob contains a complete WAV/RIFF mono 16-bit PCM payload.
 
 ### `say.debug_report(input, options?) -> report`
 

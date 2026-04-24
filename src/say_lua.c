@@ -180,12 +180,12 @@ static void saylua_push_info(
     lua_pushnumber(L, options->sample_rate > 0 ? (lua_Number) sample_count / (lua_Number) options->sample_rate : 0.0);
     lua_setfield(L, -2, "duration_seconds");
 
-    if (format == SAY_FORMAT_RAW) {
-        lua_pushstring(L, "s16le");
+    if (format == SAY_FORMAT_AIFF) {
+        lua_pushstring(L, "s16be");
         lua_setfield(L, -2, "pcm_encoding");
     }
     else {
-        lua_pushstring(L, "s16be");
+        lua_pushstring(L, "s16le");
         lua_setfield(L, -2, "pcm_encoding");
     }
 }
@@ -339,6 +339,9 @@ SAY_LUA_API int luaopen_say(lua_State *L)
 
     lua_pushstring(L, "aiff");
     lua_setfield(L, -2, "FORMAT_AIFF");
+
+    lua_pushstring(L, "wav");
+    lua_setfield(L, -2, "FORMAT_WAV");
 
     return 1;
 }

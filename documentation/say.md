@@ -7,7 +7,7 @@ Goals:
 - Deterministic, low-latency synthesis
 - No external dependencies
 - Command-line interface
-- Output to RAW or AIFF audio files
+- Output to RAW, AIFF, or WAV audio files
 - Support for English and French
 - Improved quality over classic 8-bit systems (target: Amiga-level or better)
 
@@ -24,10 +24,12 @@ Goals:
 - Formats:
   - RAW (headerless)
   - AIFF
+  - WAV
 
 ### CLI Usage
 ```
 tts input.txt -o output.aiff --lang en
+tts input.txt -o output.wav --lang en
 tts "Hello world" -o out.raw --lang fr
 ```
 

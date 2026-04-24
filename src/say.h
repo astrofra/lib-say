@@ -11,7 +11,8 @@ typedef enum say_language_t {
 
 typedef enum say_audio_format_t {
     SAY_FORMAT_RAW = 0,
-    SAY_FORMAT_AIFF = 1
+    SAY_FORMAT_AIFF = 1,
+    SAY_FORMAT_WAV = 2
 } say_audio_format_t;
 
 typedef struct say_options_t {

@@ -11,12 +11,12 @@ static void tts_print_usage(FILE *stream)
 {
     fprintf(stream,
         "Usage:\n"
-        "  tts <text-or-input-file> -o <output.{raw|aiff}> [--lang en|fr] [--rate 44100]\n"
+        "  tts <text-or-input-file> -o <output.{raw|aiff|wav}> [--lang en|fr] [--rate 44100]\n"
         "  tts --phonemes \"HH EH L O\" -o out.aiff\n"
         "  tts <text-or-input-file> --debug-report report.txt --dry-run [--lang en|fr]\n"
         "\n"
         "Options:\n"
-        "  -o, --output <path>   Output audio file (.raw or .aiff)\n"
+        "  -o, --output <path>   Output audio file (.raw, .aiff, or .wav)\n"
         "  --lang <en|fr>        Language rules for text input (default: en)\n"
         "  --rate <hz>           Sample rate, 44100 only (default: 44100)\n"
         "  --frame-ms <5-10>     Frame size in milliseconds (default: 5)\n"
@@ -101,6 +101,19 @@ static int tts_write_text_file(const char *path, const char *text, char *error, 
 
     fclose(file);
     return 1;
+}
+
+static const char *tts_format_label(say_audio_format_t format)
+{
+    switch (format) {
+        case SAY_FORMAT_AIFF:
+            return "AIFF";
+        case SAY_FORMAT_WAV:
+            return "WAV";
+        case SAY_FORMAT_RAW:
+        default:
+            return "RAW";
+    }
 }
 
 int main(int argc, char **argv)
@@ -281,7 +294,7 @@ int main(int argc, char **argv)
     fprintf(stdout, "Wrote %zu samples to %s (%s, %d Hz)\n",
         sample_count,
         output_path,
-        format == SAY_FORMAT_AIFF ? "AIFF" : "RAW",
+        tts_format_label(format),
         options.sample_rate);
 
     free(input_text);

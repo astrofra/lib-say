@@ -42,7 +42,7 @@ package.cpath = package.cpath .. ";./bin/lua/?.dll"
 local say = require("say")
 local blob, info = say.synthesize("Bonjour depuis Lua", {
     lang = "fr",
-    format = "raw"
+    format = "wav"
 })
 
 print(info.sample_rate, info.byte_count, blob:GetSize())
