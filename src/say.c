@@ -225,8 +225,8 @@ static const phoneme_def_t g_phonemes[PH_COUNT] = {
     { PH_H, "H", 0, 0, 68.0, 0.48, 0.68, { 1000, 1700, 2600, 3500, 4400 }, { 260, 310, 360, 410, 470 }, { 0.34, 0.26, 0.20, 0.16, 0.12 } },
     { PH_TH, "TH", 0, 0, 90.0, 0.72, 1.00, { 900, 2000, 3800, 6000, 8000 }, { 280, 360, 460, 580, 700 }, { 0.12, 0.22, 0.32, 0.46, 0.62 } },
     { PH_DH, "DH", 0, 1, 90.0, 0.60, 0.44, { 950, 2200, 3300, 4400, 5600 }, { 250, 320, 400, 500, 620 }, { 0.30, 0.34, 0.34, 0.28, 0.16 } },
-    { PH_CH, "CH", 0, 0, 92.0, 0.68, 1.00, { 1300, 2600, 3700, 4800, 5900 }, { 220, 270, 320, 370, 420 }, { 0.46, 0.38, 0.30, 0.24, 0.18 } },
-    { PH_JH, "JH", 0, 1, 92.0, 0.70, 0.48, { 1300, 2600, 3700, 4800, 5900 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } },
+    { PH_CH, "CH", 0, 0, 92.0, 0.68, 1.00, { 1300, 2600, 3700, 4800, 5900 }, { 220, 270, 320, 370, 420 }, { 0.20, 0.36, 0.54, 0.42, 0.24 } },
+    { PH_JH, "JH", 0, 1, 92.0, 0.70, 0.48, { 1300, 2600, 3700, 4800, 5900 }, { 220, 270, 320, 370, 420 }, { 0.22, 0.34, 0.52, 0.40, 0.22 } },
     { PH_TS, "TS", 0, 0, 90.0, 0.66, 1.00, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.46, 0.38, 0.30, 0.24, 0.18 } },
     { PH_DZ, "DZ", 0, 1, 90.0, 0.68, 0.48, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } }
 };
@@ -2960,17 +2960,19 @@ static int say_generate_frames(
                     (0.52 + 0.12 * sin(alpha * M_PI)) :
                     (0.56 + 0.16 * sin(alpha * M_PI));
                 if (options->language == SAY_LANG_EN) {
-                    double aff_closure = 0.26;
-                    double fric_onset = say_smoothstep01((alpha - aff_closure) / 0.14);
+                    double aff_closure = 0.34;
+                    double target_nm = current->voiced ? 0.34 : 0.24;
+                    double target_env = current->voiced ? 0.60 : 0.62;
                     if (alpha < aff_closure) {
-                        local_noise_mix = 0.0;
-                        segment_envelope = 0.04;
+                        double burst_t = say_smoothstep01((alpha / aff_closure - 0.70) / 0.30);
+                        local_noise_mix = burst_t * target_nm;
+                        segment_envelope = 0.04 + burst_t * target_env;
                     } else {
                         double fric_alpha = (alpha - aff_closure) / (1.0 - aff_closure);
-                        local_noise_mix = current->voiced ? 0.30 : 0.56;
+                        local_noise_mix = target_nm;
                         segment_envelope = current->voiced ?
-                            ((0.64 + 0.12 * sin(fric_alpha * M_PI)) * fric_onset) :
-                            ((0.60 + 0.18 * sin(fric_alpha * M_PI)) * fric_onset);
+                            (0.64 + 0.12 * sin(fric_alpha * M_PI)) :
+                            (0.62 + 0.18 * sin(fric_alpha * M_PI));
                     }
                 }
             }
@@ -2997,11 +2999,13 @@ static int say_generate_frames(
                     }
                     else {
                         if (dental_fricative) {
-                            local_noise_mix = current->voiced ? 0.18 : 0.22;
-                            segment_envelope = current->voiced ? 0.60 : 0.94;
+                            int strong_dh = current->voiced && !segments[i].weak_word;
+                            local_noise_mix = strong_dh ? 0.22 : (current->voiced ? 0.18 : 0.22);
+                            segment_envelope = strong_dh ? 0.70 : (current->voiced ? 0.60 : 0.94);
                         }
                         else if (say_is_sibilant_phone(segments[i].phoneme)) {
-                            local_noise_mix = current->voiced ? 0.20 : 0.44;
+                            double voiced_z_nm = segments[i].weak_word ? 0.20 : 0.26;
+                            local_noise_mix = current->voiced ? voiced_z_nm : 0.44;
                             if (segments[i].phoneme == PH_ZH) {
                                 local_noise_mix *= 0.88;
                             }
@@ -3013,7 +3017,7 @@ static int say_generate_frames(
                                 (0.50 + 0.10 * sin(alpha * M_PI));
                         }
                         else {
-                            local_noise_mix = current->voiced ? 0.20 : 0.42;
+                            local_noise_mix = current->voiced ? 0.28 : 0.42;
                             segment_envelope = current->voiced ? 0.66 : 0.58;
                         }
                         if (word_final_fricative) {
@@ -3119,11 +3123,11 @@ static int say_generate_frames(
                 frame.bandwidth[2] *= 0.96;
                 frame.bandwidth[3] *= 0.92;
                 frame.bandwidth[4] *= 0.90;
-                frame.gain[0] *= 0.78;
-                frame.gain[1] *= 0.86;
-                frame.gain[2] *= current->voiced ? 1.06 : 1.12;
-                frame.gain[3] *= current->voiced ? 1.12 : 1.20;
-                frame.gain[4] *= current->voiced ? 1.16 : 1.24;
+                frame.gain[0] *= current->voiced ? 0.62 : 0.78;
+                frame.gain[1] *= current->voiced ? 0.74 : 0.86;
+                frame.gain[2] *= current->voiced ? 1.12 : 1.12;
+                frame.gain[3] *= current->voiced ? 1.24 : 1.20;
+                frame.gain[4] *= current->voiced ? 1.36 : 1.24;
             }
             else if (options->language == SAY_LANG_EN && dental_fricative && !current->voiced) {
                 frame.bandwidth[0] *= 1.14;

@@ -29,7 +29,7 @@ segments:
 segment_count: 50
   00  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
   01  ON         nominal_ms=116.0 voiced=1 vowel=1 noise=0.04 scale=1.00 weak=0 stress=0
-  02  ZH         nominal_ms=92.0 voiced=1 vowel=0 noise=0.52 scale=1.00 weak=0 stress=0
+  02  ZH         nominal_ms=92.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
   03  U          nominal_ms=112.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=0
   04  R          nominal_ms=76.0 voiced=1 vowel=0 noise=0.08 scale=1.00 weak=0 stress=0
   05  D          nominal_ms=62.6 voiced=1 vowel=0 noise=0.34 scale=0.92 weak=0 stress=0
@@ -55,7 +55,7 @@ segment_count: 50
   25  F          nominal_ms=82.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   26  R          nominal_ms=76.0 voiced=1 vowel=0 noise=0.08 scale=1.00 weak=0 stress=0
   27  A          nominal_ms=115.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=0
-  28  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.52 scale=1.00 weak=0 stress=0
+  28  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
   29  D          nominal_ms=46.2 voiced=1 vowel=0 noise=0.34 scale=0.68 weak=1 stress=0
   30  SCHWA      nominal_ms=57.8 voiced=1 vowel=1 noise=0.03 scale=0.68 weak=1 stress=0
   31  D          nominal_ms=68.0 voiced=1 vowel=0 noise=0.34 scale=1.00 weak=0 stress=0
@@ -86,5 +86,5 @@ voiced_frames: 594
 unvoiced_frames: 176
 pause_frames: 232
 pitch_hz: min=110.30 avg=118.13 max=130.35
-amplitude: min=0.017 avg=0.580 max=0.939
+amplitude: min=0.017 avg=0.574 max=0.939
 noise_mix: min=0.000 avg=0.057 max=0.340

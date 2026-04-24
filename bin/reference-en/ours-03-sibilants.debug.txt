@@ -26,17 +26,17 @@ segment_count: 24
   02  S          nominal_ms=92.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   03  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
   04  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
-  05  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.52 scale=1.00 weak=0 stress=0
+  05  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
   06  S          nominal_ms=92.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   07  I          nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
   08  SH         nominal_ms=94.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   09  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=0
   10  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
-  11  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.52 scale=1.00 weak=0 stress=0
+  11  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
   12  B          nominal_ms=65.8 voiced=1 vowel=0 noise=0.36 scale=0.94 weak=0 stress=0
   13  AH         nominal_ms=98.7 voiced=1 vowel=1 noise=0.03 scale=0.94 weak=0 stress=2
   14  J          nominal_ms=63.9 voiced=1 vowel=0 noise=0.04 scale=0.94 weak=0 stress=0
-  15  DH         nominal_ms=64.8 voiced=1 vowel=0 noise=0.54 scale=0.72 weak=1 stress=0
+  15  DH         nominal_ms=64.8 voiced=1 vowel=0 noise=0.44 scale=0.72 weak=1 stress=0
   16  SCHWA      nominal_ms=61.2 voiced=1 vowel=1 noise=0.03 scale=0.72 weak=1 stress=0
   17  S          nominal_ms=92.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   18  I          nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
@@ -54,5 +54,5 @@ voiced_frames: 311
 unvoiced_frames: 132
 pause_frames: 92
 pitch_hz: min=108.80 avg=133.82 max=150.80
-amplitude: min=0.017 avg=0.674 max=1.024
-noise_mix: min=0.000 avg=0.208 max=0.600
+amplitude: min=0.017 avg=0.582 max=1.024
+noise_mix: min=0.000 avg=0.157 max=0.440
