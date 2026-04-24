@@ -2956,8 +2956,18 @@ static int say_generate_frames(
                     (0.52 + 0.12 * sin(alpha * M_PI)) :
                     (0.56 + 0.16 * sin(alpha * M_PI));
                 if (options->language == SAY_LANG_EN) {
-                    local_noise_mix = current->voiced ? 0.30 : 0.56;
-                    segment_envelope = current->voiced ? (0.64 + 0.12 * sin(alpha * M_PI)) : (0.58 + 0.18 * sin(alpha * M_PI));
+                    double aff_closure = 0.26;
+                    double fric_onset = say_smoothstep01((alpha - aff_closure) / 0.14);
+                    if (alpha < aff_closure) {
+                        local_noise_mix = 0.0;
+                        segment_envelope = 0.04;
+                    } else {
+                        double fric_alpha = (alpha - aff_closure) / (1.0 - aff_closure);
+                        local_noise_mix = current->voiced ? 0.30 : 0.56;
+                        segment_envelope = current->voiced ?
+                            ((0.64 + 0.12 * sin(fric_alpha * M_PI)) * fric_onset) :
+                            ((0.60 + 0.18 * sin(fric_alpha * M_PI)) * fric_onset);
+                    }
                 }
             }
             else if (say_is_fricative_phone(segments[i].phoneme)) {
@@ -3112,16 +3122,16 @@ static int say_generate_frames(
                 frame.gain[4] *= current->voiced ? 1.16 : 1.24;
             }
             else if (options->language == SAY_LANG_EN && dental_fricative) {
-                frame.bandwidth[0] *= 1.06;
-                frame.bandwidth[1] *= 1.04;
-                frame.bandwidth[2] *= 1.00;
-                frame.bandwidth[3] *= 0.98;
-                frame.bandwidth[4] *= 1.00;
-                frame.gain[0] *= 0.74;
-                frame.gain[1] *= 0.88;
-                frame.gain[2] *= current->voiced ? 1.00 : 1.06;
-                frame.gain[3] *= current->voiced ? 0.98 : 1.04;
-                frame.gain[4] *= current->voiced ? 0.88 : 0.94;
+                frame.bandwidth[0] *= 1.08;
+                frame.bandwidth[1] *= 1.06;
+                frame.bandwidth[2] *= 1.02;
+                frame.bandwidth[3] *= 0.96;
+                frame.bandwidth[4] *= 0.94;
+                frame.gain[0] *= 0.60;
+                frame.gain[1] *= 0.78;
+                frame.gain[2] *= current->voiced ? 1.06 : 1.08;
+                frame.gain[3] *= current->voiced ? 1.12 : 1.14;
+                frame.gain[4] *= current->voiced ? 1.02 : 1.04;
             }
             else if (options->language == SAY_LANG_EN && say_is_fricative_phone(segments[i].phoneme)) {
                 frame.bandwidth[0] *= 1.04;
