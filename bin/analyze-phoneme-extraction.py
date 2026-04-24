@@ -24,6 +24,7 @@ PHRASES = [
     {"id": "06-affricates", "focus": "affricates", "text": "Judge the changing church bells."},
     {"id": "07-stress", "focus": "stress", "text": "English fricatives shift sharply."},
     {"id": "08-finals", "focus": "word-final-fricatives", "text": "Leave these clothes and bags."},
+    {"id": "09-th-only", "focus": "th-unvoiced-only", "text": "Three thick thin things worth both teeth."},
 ]
 
 EXTRACTOR_PHONE_MAP = {

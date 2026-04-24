@@ -223,7 +223,7 @@ static const phoneme_def_t g_phonemes[PH_COUNT] = {
     { PH_SH, "SH", 0, 0, 94.0, 0.62, 1.00, { 1050, 2400, 3500, 4650, 5900 }, { 230, 300, 380, 470, 560 }, { 0.24, 0.42, 0.54, 0.44, 0.26 } },
     { PH_ZH, "ZH", 0, 1, 92.0, 0.62, 0.44, { 1050, 2400, 3500, 4650, 5900 }, { 230, 300, 380, 470, 560 }, { 0.26, 0.40, 0.50, 0.40, 0.24 } },
     { PH_H, "H", 0, 0, 68.0, 0.48, 0.68, { 1000, 1700, 2600, 3500, 4400 }, { 260, 310, 360, 410, 470 }, { 0.34, 0.26, 0.20, 0.16, 0.12 } },
-    { PH_TH, "TH", 0, 0, 90.0, 0.58, 1.00, { 950, 2200, 3300, 4400, 5600 }, { 250, 320, 400, 500, 620 }, { 0.28, 0.34, 0.36, 0.30, 0.18 } },
+    { PH_TH, "TH", 0, 0, 90.0, 0.72, 1.00, { 900, 2000, 3800, 6000, 8000 }, { 280, 360, 460, 580, 700 }, { 0.12, 0.22, 0.32, 0.46, 0.62 } },
     { PH_DH, "DH", 0, 1, 90.0, 0.60, 0.44, { 950, 2200, 3300, 4400, 5600 }, { 250, 320, 400, 500, 620 }, { 0.30, 0.34, 0.34, 0.28, 0.16 } },
     { PH_CH, "CH", 0, 0, 92.0, 0.68, 1.00, { 1300, 2600, 3700, 4800, 5900 }, { 220, 270, 320, 370, 420 }, { 0.46, 0.38, 0.30, 0.24, 0.18 } },
     { PH_JH, "JH", 0, 1, 92.0, 0.70, 0.48, { 1300, 2600, 3700, 4800, 5900 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } },
@@ -257,6 +257,8 @@ static const phoneme_id_t g_word_en_these[] = { PH_DH, PH_I, PH_Z };
 static const phoneme_id_t g_word_en_those[] = { PH_DH, PH_OH, PH_W, PH_Z };
 static const phoneme_id_t g_word_en_to[] = { PH_T, PH_U };
 static const phoneme_id_t g_word_en_worth[] = { PH_W, PH_R, PH_TH };
+static const phoneme_id_t g_word_en_both[] = { PH_B, PH_OH, PH_TH };
+static const phoneme_id_t g_word_en_teeth[] = { PH_T, PH_I, PH_TH };
 static const phoneme_id_t g_word_en_i[] = { PH_AH, PH_J };
 static const phoneme_id_t g_word_en_you[] = { PH_J, PH_U };
 static const phoneme_id_t g_word_en_we[] = { PH_W, PH_I };
@@ -368,6 +370,7 @@ static const phoneme_id_t g_elision_fr_t[] = { PH_T };
 static const lexicon_entry_t g_english_lexicon[] = {
     { "an", g_word_en_an, sizeof(g_word_en_an) / sizeof(g_word_en_an[0]), 0.74, 1, 0 },
     { "be", g_word_en_be, sizeof(g_word_en_be) / sizeof(g_word_en_be[0]), 0.82, 1, 0 },
+    { "both", g_word_en_both, sizeof(g_word_en_both) / sizeof(g_word_en_both[0]), 0.94, 0, 1 },
     { "by", g_word_en_by, sizeof(g_word_en_by) / sizeof(g_word_en_by[0]), 0.94, 0, 1 },
     { "can't", g_word_en_cant, sizeof(g_word_en_cant) / sizeof(g_word_en_cant[0]), 0.96, 0, 1 },
     { "changing", g_word_en_changing, sizeof(g_word_en_changing) / sizeof(g_word_en_changing[0]), 1.00, 0, 1 },
@@ -405,6 +408,7 @@ static const lexicon_entry_t g_english_lexicon[] = {
     { "sentence", g_word_en_sentence, sizeof(g_word_en_sentence) / sizeof(g_word_en_sentence[0]), 1.00, 0, 1 },
     { "she", g_word_en_she, sizeof(g_word_en_she) / sizeof(g_word_en_she[0]), 0.94, 0, 1 },
     { "sharply", g_word_en_sharply, sizeof(g_word_en_sharply) / sizeof(g_word_en_sharply[0]), 0.96, 0, 1 },
+    { "teeth", g_word_en_teeth, sizeof(g_word_en_teeth) / sizeof(g_word_en_teeth[0]), 0.96, 0, 1 },
     { "that's", g_word_en_thats, sizeof(g_word_en_thats) / sizeof(g_word_en_thats[0]), 0.90, 0, 1 },
     { "the", g_word_en_the, sizeof(g_word_en_the) / sizeof(g_word_en_the[0]), 0.72, 1, 0 },
     { "there's", g_word_en_theres, sizeof(g_word_en_theres) / sizeof(g_word_en_theres[0]), 0.84, 0, 1 },
@@ -2993,8 +2997,8 @@ static int say_generate_frames(
                     }
                     else {
                         if (dental_fricative) {
-                            local_noise_mix = current->voiced ? 0.18 : 0.34;
-                            segment_envelope = current->voiced ? 0.60 : 0.54;
+                            local_noise_mix = current->voiced ? 0.18 : 0.22;
+                            segment_envelope = current->voiced ? 0.60 : 0.94;
                         }
                         else if (say_is_sibilant_phone(segments[i].phoneme)) {
                             local_noise_mix = current->voiced ? 0.20 : 0.44;
@@ -3002,7 +3006,7 @@ static int say_generate_frames(
                                 local_noise_mix *= 0.88;
                             }
                             else if (segments[i].phoneme == PH_SH) {
-                                local_noise_mix *= 0.84;
+                                local_noise_mix *= 0.92;
                             }
                             segment_envelope = current->voiced ?
                                 (0.56 + 0.08 * sin(alpha * M_PI)) :
@@ -3045,7 +3049,7 @@ static int say_generate_frames(
             if (options->language == SAY_LANG_EN && say_is_sibilant_phone(segments[i].phoneme)) {
                 frame.amplitude *= current->voiced ? 0.92 : 0.94;
                 if (segments[i].phoneme == PH_SH || segments[i].phoneme == PH_ZH) {
-                    frame.amplitude *= 0.90;
+                    frame.amplitude *= 0.96;
                 }
             }
             else if (options->language == SAY_LANG_EN && say_is_fricative_phone(segments[i].phoneme)) {
@@ -3104,7 +3108,7 @@ static int say_generate_frames(
                 if (segments[i].phoneme == PH_SH || segments[i].phoneme == PH_ZH) {
                     frame.gain[2] *= 1.02;
                     frame.gain[3] *= 0.94;
-                    frame.gain[4] *= 0.82;
+                    frame.gain[4] *= 0.88;
                     frame.bandwidth[3] *= 1.02;
                     frame.bandwidth[4] *= 1.04;
                 }
@@ -3121,7 +3125,19 @@ static int say_generate_frames(
                 frame.gain[3] *= current->voiced ? 1.12 : 1.20;
                 frame.gain[4] *= current->voiced ? 1.16 : 1.24;
             }
-            else if (options->language == SAY_LANG_EN && dental_fricative) {
+            else if (options->language == SAY_LANG_EN && dental_fricative && !current->voiced) {
+                frame.bandwidth[0] *= 1.14;
+                frame.bandwidth[1] *= 1.10;
+                frame.bandwidth[2] *= 1.06;
+                frame.bandwidth[3] *= 1.00;
+                frame.bandwidth[4] *= 0.92;
+                frame.gain[0] *= 1.00;
+                frame.gain[1] *= 1.00;
+                frame.gain[2] *= 0.80;
+                frame.gain[3] *= 1.00;
+                frame.gain[4] *= 1.00;
+            }
+            else if (options->language == SAY_LANG_EN && dental_fricative && current->voiced) {
                 frame.bandwidth[0] *= 1.08;
                 frame.bandwidth[1] *= 1.06;
                 frame.bandwidth[2] *= 1.02;
@@ -3129,9 +3145,9 @@ static int say_generate_frames(
                 frame.bandwidth[4] *= 0.94;
                 frame.gain[0] *= 0.60;
                 frame.gain[1] *= 0.78;
-                frame.gain[2] *= current->voiced ? 1.06 : 1.08;
-                frame.gain[3] *= current->voiced ? 1.12 : 1.14;
-                frame.gain[4] *= current->voiced ? 1.02 : 1.04;
+                frame.gain[2] *= 1.06;
+                frame.gain[3] *= 1.12;
+                frame.gain[4] *= 1.02;
             }
             else if (options->language == SAY_LANG_EN && say_is_fricative_phone(segments[i].phoneme)) {
                 frame.bandwidth[0] *= 1.04;
