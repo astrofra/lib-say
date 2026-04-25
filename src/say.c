@@ -103,6 +103,11 @@ typedef struct frame_t {
     double formant_freq[SAY_MAX_FORMANTS];
     double bandwidth[SAY_MAX_FORMANTS];
     double gain[SAY_MAX_FORMANTS];
+    double noise_path_mix;
+    double noise_path_f_low;
+    double noise_path_f_high;
+    double noise_path_gain;
+    double voicing_bar_amp;
 } frame_t;
 
 typedef struct frame_buffer_t {
@@ -230,6 +235,22 @@ static const phoneme_def_t g_phonemes[PH_COUNT] = {
     { PH_TS, "TS", 0, 0, 90.0, 0.66, 1.00, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.46, 0.38, 0.30, 0.24, 0.18 } },
     { PH_DZ, "DZ", 0, 1, 90.0, 0.68, 0.48, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } }
 };
+
+typedef struct phoneme_noise_path_t {
+    double noise_path_mix;
+    double f_low;
+    double f_high;
+    double gain;
+    double voicing_bar_amp;
+} phoneme_noise_path_t;
+
+static phoneme_noise_path_t say_get_noise_path_en(phoneme_id_t id)
+{
+    phoneme_noise_path_t p;
+    memset(&p, 0, sizeof(p));
+    (void) id;
+    return p;
+}
 
 static const phoneme_id_t g_word_en_changing[] = { PH_CH, PH_E, PH_J, PH_N, PH_JH, PH_IH, PH_NG };
 static const phoneme_id_t g_word_en_church[] = { PH_CH, PH_R, PH_CH };
@@ -2889,7 +2910,9 @@ static int say_generate_frames(
             double transition_alpha;
             double segment_envelope;
             double local_noise_mix;
+            int aff_fric_phase;
 
+            aff_fric_phase = 0;
             alpha = frame_count == 1 ? 0.0 : (double) frame_index / (double) (frame_count - 1);
             steady_ratio = say_is_vowel_phone(segments[i].phoneme) ?
                 (options->language == SAY_LANG_FR ? 0.68 : 0.62) :
@@ -2960,19 +2983,25 @@ static int say_generate_frames(
                     (0.52 + 0.12 * sin(alpha * M_PI)) :
                     (0.56 + 0.16 * sin(alpha * M_PI));
                 if (options->language == SAY_LANG_EN) {
-                    double aff_closure = 0.34;
-                    double target_nm = current->voiced ? 0.34 : 0.24;
-                    double target_env = current->voiced ? 0.60 : 0.62;
-                    if (alpha < aff_closure) {
-                        double burst_t = say_smoothstep01((alpha / aff_closure - 0.70) / 0.30);
-                        local_noise_mix = burst_t * target_nm;
-                        segment_envelope = 0.04 + burst_t * target_env;
+                    const double aff_closure_end = 0.30;
+                    const double aff_burst_end   = 0.48;
+                    if (alpha < aff_closure_end) {
+                        /* Phase 1: closure — near-silence like a plosive */
+                        local_noise_mix = 0.0;
+                        segment_envelope = 0.03;
+                    } else if (alpha < aff_burst_end) {
+                        /* Phase 2: burst — broadband noise transient */
+                        double burst_t = say_smoothstep01((alpha - aff_closure_end) / (aff_burst_end - aff_closure_end));
+                        local_noise_mix = burst_t * 0.60;
+                        segment_envelope = 0.04 + burst_t * (current->voiced ? 1.28 : 1.32);
                     } else {
-                        double fric_alpha = (alpha - aff_closure) / (1.0 - aff_closure);
-                        local_noise_mix = target_nm;
+                        /* Phase 3: fricative — SH character for CH, ZH for JH */
+                        double fric_alpha = (alpha - aff_burst_end) / (1.0 - aff_burst_end);
+                        local_noise_mix = current->voiced ? 0.38 : 0.44;
                         segment_envelope = current->voiced ?
-                            (0.64 + 0.12 * sin(fric_alpha * M_PI)) :
-                            (0.62 + 0.18 * sin(fric_alpha * M_PI));
+                            (0.62 + 0.14 * sin(fric_alpha * M_PI)) :
+                            (0.58 + 0.18 * sin(fric_alpha * M_PI));
+                        aff_fric_phase = 1;
                     }
                 }
             }
@@ -3034,6 +3063,9 @@ static int say_generate_frames(
             if (say_is_plosive_phone(segments[i].phoneme) && alpha < 0.30) {
                 frame.voiced = 0;
             }
+            if (options->language == SAY_LANG_EN && say_is_affricate_phone(segments[i].phoneme) && alpha < 0.30) {
+                frame.voiced = 0;
+            }
             frame.pitch_hz = base_pitch +
                 say_clause_pitch_offset(segments, segment_count, options->language, &clause, &tune, i, alpha) +
                 (options->language == SAY_LANG_FR ? 7.5 : 10.0) * stress_boost;
@@ -3044,6 +3076,14 @@ static int say_generate_frames(
                 (options->language == SAY_LANG_FR ? (0.90 + 0.10 * stress_boost) : (0.88 + 0.14 * stress_boost)) *
                 segment_envelope;
             frame.noise_mix = local_noise_mix;
+            if (options->language == SAY_LANG_EN) {
+                phoneme_noise_path_t np = say_get_noise_path_en(segments[i].phoneme);
+                frame.noise_path_mix  = np.noise_path_mix;
+                frame.noise_path_f_low  = np.f_low;
+                frame.noise_path_f_high = np.f_high;
+                frame.noise_path_gain = np.gain;
+                frame.voicing_bar_amp = np.voicing_bar_amp;
+            }
             if (options->language == SAY_LANG_FR && say_is_nasal_vowel_phone(segments[i].phoneme)) {
                 frame.amplitude *= 0.95;
             }
@@ -3073,6 +3113,16 @@ static int say_generate_frames(
                 frame.formant_freq[j] = current->formant_freq[j] + (target->formant_freq[j] - current->formant_freq[j]) * transition_alpha;
                 frame.bandwidth[j] = current->bandwidth[j] + (target->bandwidth[j] - current->bandwidth[j]) * transition_alpha;
                 frame.gain[j] = current->gain[j] + (target->gain[j] - current->gain[j]) * transition_alpha;
+            }
+            if (options->language == SAY_LANG_EN && aff_fric_phase) {
+                /* Blend toward SH (CH) or ZH (JH) formants in the fricative phase */
+                const phoneme_def_t *fric_ph = say_get_phoneme(current->voiced ? PH_ZH : PH_SH);
+                double fric_t = say_smoothstep01((alpha - 0.48) / 0.20);
+                for (j = 0; j < SAY_MAX_FORMANTS; ++j) {
+                    frame.formant_freq[j] = frame.formant_freq[j] * (1.0 - fric_t) + fric_ph->formant_freq[j] * fric_t;
+                    frame.bandwidth[j]    = frame.bandwidth[j]    * (1.0 - fric_t) + fric_ph->bandwidth[j]    * fric_t;
+                    frame.gain[j]         = frame.gain[j]         * (1.0 - fric_t) + fric_ph->gain[j]         * fric_t;
+                }
             }
             if (options->language == SAY_LANG_FR && say_is_nasal_vowel_phone(segments[i].phoneme)) {
                 frame.bandwidth[0] *= 1.12;
@@ -3118,16 +3168,31 @@ static int say_generate_frames(
                 }
             }
             else if (options->language == SAY_LANG_EN && say_is_affricate_phone(segments[i].phoneme)) {
-                frame.bandwidth[0] *= 1.04;
-                frame.bandwidth[1] *= 1.00;
-                frame.bandwidth[2] *= 0.96;
-                frame.bandwidth[3] *= 0.92;
-                frame.bandwidth[4] *= 0.90;
-                frame.gain[0] *= current->voiced ? 0.62 : 0.78;
-                frame.gain[1] *= current->voiced ? 0.74 : 0.86;
-                frame.gain[2] *= current->voiced ? 1.12 : 1.12;
-                frame.gain[3] *= current->voiced ? 1.24 : 1.20;
-                frame.gain[4] *= current->voiced ? 1.36 : 1.24;
+                if (aff_fric_phase) {
+                    /* Fricative phase: use SH/ZH-like spectral shaping */
+                    frame.bandwidth[0] *= 1.08;
+                    frame.bandwidth[1] *= 1.02;
+                    frame.bandwidth[2] *= 0.96;
+                    frame.bandwidth[3] *= 0.92;
+                    frame.bandwidth[4] *= 0.90;
+                    frame.gain[0] *= current->voiced ? 0.60 : 0.58;
+                    frame.gain[1] *= current->voiced ? 0.72 : 0.72;
+                    frame.gain[2] *= current->voiced ? 1.00 : 1.06;
+                    frame.gain[3] *= current->voiced ? 1.02 : 1.10;
+                    frame.gain[4] *= current->voiced ? 0.96 : 1.04;
+                } else {
+                    /* Closure/burst phases: broadband emphasis */
+                    frame.bandwidth[0] *= 1.04;
+                    frame.bandwidth[1] *= 1.00;
+                    frame.bandwidth[2] *= 0.96;
+                    frame.bandwidth[3] *= 0.92;
+                    frame.bandwidth[4] *= 0.90;
+                    frame.gain[0] *= current->voiced ? 0.62 : 0.78;
+                    frame.gain[1] *= current->voiced ? 0.74 : 0.86;
+                    frame.gain[2] *= current->voiced ? 1.12 : 1.12;
+                    frame.gain[3] *= current->voiced ? 1.24 : 1.20;
+                    frame.gain[4] *= current->voiced ? 1.36 : 1.24;
+                }
             }
             else if (options->language == SAY_LANG_EN && dental_fricative && !current->voiced) {
                 frame.bandwidth[0] *= 1.14;
@@ -3275,6 +3340,13 @@ static int say_synthesize_frames(
     double jitter_target;
     int jitter_countdown;
     int state_ready;
+    biquad_t noise_path_biquad;
+    double np_mix_state;
+    double np_f_low_state;
+    double np_f_high_state;
+    double np_gain_state;
+    double vbar_lp_state;
+    double vbar_amp_state;
 
     memset(voiced_filters, 0, sizeof(voiced_filters));
     memset(noise_filters, 0, sizeof(noise_filters));
@@ -3321,6 +3393,13 @@ static int say_synthesize_frames(
     memset(formant_freq_state, 0, sizeof(formant_freq_state));
     memset(bandwidth_state, 0, sizeof(bandwidth_state));
     memset(gain_state, 0, sizeof(gain_state));
+    memset(&noise_path_biquad, 0, sizeof(noise_path_biquad));
+    np_mix_state  = 0.0;
+    np_f_low_state  = 1000.0;
+    np_f_high_state = 4000.0;
+    np_gain_state = 0.0;
+    vbar_lp_state = 0.0;
+    vbar_amp_state = 0.0;
 
     for (i = 0; i < frame_count; ++i) {
         size_t j;
@@ -3347,6 +3426,11 @@ static int say_synthesize_frames(
             pitch_state = target_pitch;
             noise_mix_state = target_noise_mix;
             voicing_state = target_voicing;
+            np_mix_state  = frames[i].noise_path_mix;
+            if (frames[i].noise_path_f_low  > 0.0) np_f_low_state  = frames[i].noise_path_f_low;
+            if (frames[i].noise_path_f_high > np_f_low_state) np_f_high_state = frames[i].noise_path_f_high;
+            np_gain_state = frames[i].noise_path_gain;
+            vbar_amp_state = frames[i].voicing_bar_amp;
             state_ready = 1;
         }
 
@@ -3360,9 +3444,12 @@ static int say_synthesize_frames(
             double excitation;
             double voiced_excitation;
             double noise_excitation;
+            double noise_raw;
             double voiced_mix;
             double voiced_output;
             double noise_output;
+            double noise_path_out;
+            double voicing_bar_out;
             double output;
             double source_hp;
             double noise_hp1;
@@ -3381,6 +3468,14 @@ static int say_synthesize_frames(
             pitch_state += 0.012 * (target_pitch - pitch_state);
             noise_mix_state += noise_rate * (target_noise_mix - noise_mix_state);
             voicing_state += voicing_rate * (target_voicing - voicing_state);
+
+            np_mix_state += 0.012 * (frames[i].noise_path_mix - np_mix_state);
+            np_gain_state += 0.020 * (frames[i].noise_path_gain - np_gain_state);
+            vbar_amp_state += 0.020 * (frames[i].voicing_bar_amp - vbar_amp_state);
+            if (frames[i].noise_path_f_low > 0.0) {
+                np_f_low_state  += 0.020 * (frames[i].noise_path_f_low  - np_f_low_state);
+                np_f_high_state += 0.020 * (frames[i].noise_path_f_high - np_f_high_state);
+            }
 
             for (k = 0; k < SAY_MAX_FORMANTS; ++k) {
                 double noise_focus;
@@ -3429,6 +3524,11 @@ static int say_synthesize_frames(
                 say_biquad_set_bandpass(&voiced_filters[k], (double) sample_rate, formant_freq_state[k], bandwidth_state[k], gain_state[k]);
                 say_biquad_set_bandpass(&noise_filters[k], (double) sample_rate, formant_freq_state[k], noise_bandwidth, gain_state[k] * noise_gain_mul);
             }
+            if (np_mix_state > 0.001) {
+                double np_center = sqrt(np_f_low_state * np_f_high_state);
+                double np_bw = np_f_high_state - np_f_low_state;
+                say_biquad_set_bandpass(&noise_path_biquad, (double) sample_rate, np_center, np_bw, 1.0);
+            }
 
             if (voicing_state > 0.02 && pitch_state > 1.0) {
                 if (jitter_countdown <= 0) {
@@ -3471,7 +3571,8 @@ static int say_synthesize_frames(
             noise_hp2_y1 = noise_hp2;
             noise_soft_state += 0.18 * (noise_hp2 - noise_soft_state);
             noise_soft = noise_soft_state;
-            noise_excitation = noise_mix_state * (0.44 * noise_hp1 + 0.26 * noise_hp2 + 0.30 * noise_soft);
+            noise_raw = 0.44 * noise_hp1 + 0.26 * noise_hp2 + 0.30 * noise_soft;
+            noise_excitation = noise_mix_state * noise_raw;
 
             voiced_output = 0.0;
             noise_output = 0.0;
@@ -3479,8 +3580,23 @@ static int say_synthesize_frames(
                 voiced_output += say_biquad_process(&voiced_filters[k], voiced_excitation);
                 noise_output += say_biquad_process(&noise_filters[k], noise_excitation);
             }
+
+            /* Dedicated noise path: bandpass-shaped white noise bypassing formant filters */
+            if (np_mix_state > 0.001) {
+                noise_path_out = say_biquad_process(&noise_path_biquad, noise_raw) * np_gain_state;
+            } else {
+                noise_path_out = 0.0;
+            }
+
+            /* Voicing bar: LP-filtered glottal source below ~250 Hz */
+            vbar_lp_state += 0.072 * (glottal * voicing_state - vbar_lp_state);
+            voicing_bar_out = vbar_lp_state * vbar_amp_state;
+
             excitation = voiced_excitation + noise_excitation;
-            output = voiced_output + noise_output;
+            output = voiced_output
+                   + (1.0 - np_mix_state) * noise_output
+                   + np_mix_state * noise_path_out
+                   + voicing_bar_out;
 
             if (frames[i].is_pause) {
                 output *= 0.08;
@@ -3490,6 +3606,9 @@ static int say_synthesize_frames(
                     noise_filters[k].z1 *= 0.84;
                     noise_filters[k].z2 *= 0.84;
                 }
+                noise_path_biquad.z1 *= 0.84;
+                noise_path_biquad.z2 *= 0.84;
+                vbar_lp_state *= 0.84;
             }
 
             output *= amplitude_state * 0.86;

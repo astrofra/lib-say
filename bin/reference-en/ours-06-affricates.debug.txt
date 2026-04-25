@@ -46,9 +46,9 @@ frames:
 frame_count: 457
 frame_duration_ms: 5
 estimated_duration_ms: 2285.0
-voiced_frames: 297
-unvoiced_frames: 68
+voiced_frames: 279
+unvoiced_frames: 86
 pause_frames: 92
-pitch_hz: min=110.80 avg=130.81 max=150.80
-amplitude: min=0.017 avg=0.557 max=1.024
-noise_mix: min=0.000 avg=0.098 max=0.340
+pitch_hz: min=110.80 avg=130.96 max=150.80
+amplitude: min=0.017 avg=0.551 max=1.024
+noise_mix: min=0.000 avg=0.119 max=0.556
