@@ -375,11 +375,16 @@ def analyze(args: argparse.Namespace) -> tuple[pathlib.Path, pathlib.Path | None
     tts_exe = root / "bin" / "tts.exe"
     extractor_dir = root / "reference" / "phonemes_extractor"
     extractor_exe = extractor_dir / "phonemes.exe"
+    vosk_script = root / "bin" / "vosk-extract.py"
+
+    use_vosk = getattr(args, "extractor", "legacy") == "vosk"
 
     if not tts_exe.exists():
         raise RuntimeError(f"Missing executable: {tts_exe}")
-    if not extractor_exe.exists():
+    if not use_vosk and not extractor_exe.exists():
         raise RuntimeError(f"Missing executable: {extractor_exe}")
+    if use_vosk and not vosk_script.exists():
+        raise RuntimeError(f"Missing script: {vosk_script}")
 
     latest_dir.mkdir(parents=True, exist_ok=True)
     if args.history:
@@ -412,17 +417,22 @@ def analyze(args: argparse.Namespace) -> tuple[pathlib.Path, pathlib.Path | None
             f"lib-say synthesis for {sample_id}",
         )
 
-        run_command([str(extractor_exe), str(wav_path)], f"phoneme extraction for {sample_id}", cwd=latest_dir)
-        fixed_output = latest_dir / "phonemes.txt"
-        for _ in range(10):
-            try:
-                shutil.copy2(fixed_output, extractor_output_path)
-                break
-            except OSError:
-                time.sleep(0.1)
+        if use_vosk:
+            vosk_cmd = [sys.executable, str(vosk_script), str(wav_path), str(extractor_output_path),
+                        "--grammar", text]
+            run_command(vosk_cmd, f"vosk phoneme extraction for {sample_id}")
         else:
-            shutil.copy2(fixed_output, extractor_output_path)
-        fixed_output.unlink(missing_ok=True)
+            run_command([str(extractor_exe), str(wav_path)], f"phoneme extraction for {sample_id}", cwd=latest_dir)
+            fixed_output = latest_dir / "phonemes.txt"
+            for _ in range(10):
+                try:
+                    shutil.copy2(fixed_output, extractor_output_path)
+                    break
+                except OSError:
+                    time.sleep(0.1)
+            else:
+                shutil.copy2(fixed_output, extractor_output_path)
+            fixed_output.unlink(missing_ok=True)
 
         expected = parse_expected_debug_report(debug_path)
         extracted, extractor_unknown = parse_extractor_output(extractor_output_path)
@@ -479,7 +489,7 @@ def analyze(args: argparse.Namespace) -> tuple[pathlib.Path, pathlib.Path | None
         f"- Généré le : `{generated_at.isoformat(timespec='seconds')}`",
         f"- Commit Git : `{git_commit}`",
         f"- Worktree modifié : `{'oui' if git_dirty else 'non'}`",
-        f"- Extracteur : `{extractor_exe.relative_to(root)}`",
+        f"- Extracteur : `{'vosk (word+CMUdict, grammar-constrained)' if use_vosk else extractor_exe.relative_to(root)}`",
         f"- Dossier de sortie : `{out_dir.relative_to(root) if out_dir.is_relative_to(root) else out_dir}`",
         f"- Score moyen d'extraction : `{percent(average_score)}`",
         "",
@@ -629,6 +639,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Analyse les WAV lib-say avec phonemes_extractor.")
     parser.add_argument("--out-dir", default="bin/reference-en/phoneme-extraction", help="Dossier de sortie du rapport et des artefacts.")
     parser.add_argument("--lang", default="en", choices=["en"], help="Corpus de langue à analyser.")
+    parser.add_argument("--extractor", default="legacy", choices=["legacy", "vosk"],
+                        help="Extracteur phonétique : legacy=phonemes.exe (CTC acoustique), vosk=Vosk ASR + CMUdict.")
     parser.add_argument("--no-history", dest="history", action="store_false", help="Ne copie pas le rapport dans history/.")
     parser.set_defaults(history=True)
     args = parser.parse_args()
