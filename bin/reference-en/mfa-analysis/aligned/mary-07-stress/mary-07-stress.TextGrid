@@ -18,10 +18,10 @@ item []:
             text = "english" 
         intervals [2]:
             xmin = 0.44 
-            xmax = 1.02 
+            xmax = 1.01 
             text = "fricatives" 
         intervals [3]:
-            xmin = 1.02 
+            xmin = 1.01 
             xmax = 1.32 
             text = "shift" 
         intervals [4]:
@@ -64,10 +64,10 @@ item []:
             text = "ʃ" 
         intervals [7]:
             xmin = 0.44 
-            xmax = 0.54 
+            xmax = 0.55 
             text = "f" 
         intervals [8]:
-            xmin = 0.54 
+            xmin = 0.55 
             xmax = 0.59 
             text = "ɹ" 
         intervals [9]:
@@ -96,10 +96,10 @@ item []:
             text = "v" 
         intervals [15]:
             xmin = 0.95 
-            xmax = 1.02 
+            xmax = 1.01 
             text = "z" 
         intervals [16]:
-            xmin = 1.02 
+            xmin = 1.01 
             xmax = 1.13 
             text = "ʃ" 
         intervals [17]:
@@ -120,10 +120,10 @@ item []:
             text = "ʃ" 
         intervals [21]:
             xmin = 1.45 
-            xmax = 1.6 
+            xmax = 1.59 
             text = "a" 
         intervals [22]:
-            xmin = 1.6 
+            xmin = 1.59 
             xmax = 1.69 
             text = "p" 
         intervals [23]:

@@ -22,14 +22,14 @@ item []:
             text = "these" 
         intervals [3]:
             xmin = 0.45 
-            xmax = 0.87 
+            xmax = 0.84 
             text = "clothes" 
         intervals [4]:
-            xmin = 0.87 
-            xmax = 0.9 
+            xmin = 0.84 
+            xmax = 0.89 
             text = "" 
         intervals [5]:
-            xmin = 0.9 
+            xmin = 0.89 
             xmax = 1.06 
             text = "and" 
         intervals [6]:
@@ -60,10 +60,10 @@ item []:
             text = "d̪" 
         intervals [5]:
             xmin = 0.25 
-            xmax = 0.37 
+            xmax = 0.38 
             text = "iː" 
         intervals [6]:
-            xmin = 0.37 
+            xmin = 0.38 
             xmax = 0.45 
             text = "z" 
         intervals [7]:
@@ -76,22 +76,22 @@ item []:
             text = "l" 
         intervals [9]:
             xmin = 0.59 
-            xmax = 0.73 
+            xmax = 0.72 
             text = "əw" 
         intervals [10]:
-            xmin = 0.73 
+            xmin = 0.72 
             xmax = 0.79 
             text = "ð" 
         intervals [11]:
             xmin = 0.79 
-            xmax = 0.87 
+            xmax = 0.84 
             text = "z" 
         intervals [12]:
-            xmin = 0.87 
-            xmax = 0.9 
+            xmin = 0.84 
+            xmax = 0.89 
             text = "" 
         intervals [13]:
-            xmin = 0.9 
+            xmin = 0.89 
             xmax = 0.98 
             text = "a" 
         intervals [14]:
@@ -108,9 +108,9 @@ item []:
             text = "a" 
         intervals [17]:
             xmin = 1.36 
-            xmax = 1.45 
+            xmax = 1.46 
             text = "ɡ" 
         intervals [18]:
-            xmin = 1.45 
+            xmin = 1.46 
             xmax = 1.665 
             text = "z" 

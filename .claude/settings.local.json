@@ -32,7 +32,20 @@
       "Bash(python3)",
       "Bash(/c/tools/miniforge3/Scripts/conda.exe run *)",
       "Bash(\"/c/tools/miniforge3/envs/mfa/python.exe\" C:/tmp/dump_phones.py)",
-      "Bash(\"/c/tools/miniforge3/envs/mfa/python.exe\" C:/tmp/dump_vcands.py)"
+      "Bash(\"/c/tools/miniforge3/envs/mfa/python.exe\" C:/tmp/dump_vcands.py)",
+      "Bash(git stash *)",
+      "Bash(grep \"Score moyen\\\\|Échantillon\\\\|| \\\\`0\" bin/reference-en/phoneme-extraction/report.md)",
+      "Bash(git commit -m ' *)",
+      "Bash(git tag *)",
+      "Bash(python3 -)",
+      "Bash(C:/tools/miniforge3/envs/mfa/python.exe -)",
+      "Bash(C:/tools/miniforge3/envs/mfa/python.exe bin/analyze-mfa-score.py)",
+      "Bash(bin/tts.exe --language en --text \"She sells seashells by the seashore.\" --debug)",
+      "Bash(bin/tts.exe --help)",
+      "Bash(bin/tts.exe \"She sells seashells by the seashore.\" --debug-report - --dry-run --lang en)",
+      "Bash(bin/tts.exe \"English fricatives shift sharply.\" --debug-report - --dry-run --lang en)",
+      "Bash(C:/tools/miniforge3/envs/mfa/python.exe bin/run-mfa-analysis.py)",
+      "Bash(dir \"bin\\\\reference-en\\\\mfa-analysis\\\\aligned\\\\ours-07-stress\\\\\" 2>&1 | tail -5)"
     ]
   }
 }
