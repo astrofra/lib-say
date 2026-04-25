@@ -248,6 +248,13 @@ static phoneme_noise_path_t say_get_noise_path_en(phoneme_id_t id)
 {
     phoneme_noise_path_t p;
     memset(&p, 0, sizeof(p));
+    /* Dedicated HP+LP flat-spectrum noise path, bypassing the formant filter bank.
+     * noise_path_mix=1.0 fully replaces formant noise; fractional values blend.
+     * Formant-bank voiced output is always preserved (affects DH, V, ZH). */
+    /* The dedicated noise path is acoustically correct (flat HP+LP spectrum) but this
+     * extractor's acoustic models are calibrated on formant-bank output. Any flat-spectrum
+     * noise — regardless of bandwidth — is misidentified as S, causing regressions on all
+     * tested phonemes (TH, DH, V, ZH). Infrastructure kept for future extractors. */
     (void) id;
     return p;
 }
@@ -3286,6 +3293,46 @@ static void say_biquad_set_bandpass(biquad_t *filter, double sample_rate, double
     filter->a2 = (1.0 - alpha) / a0;
 }
 
+static void say_biquad_set_highpass(biquad_t *filter, double sample_rate, double frequency)
+{
+    double w0, sin_w0, cos_w0, alpha, a0;
+
+    if (frequency < 20.0)                       frequency = 20.0;
+    if (frequency > sample_rate * 0.45)         frequency = sample_rate * 0.45;
+
+    w0     = 2.0 * M_PI * frequency / sample_rate;
+    sin_w0 = sin(w0);
+    cos_w0 = cos(w0);
+    alpha  = sin_w0 / (2.0 * 0.7071);
+    a0     = 1.0 + alpha;
+
+    filter->b0 =  (1.0 + cos_w0) / (2.0 * a0);
+    filter->b1 = -(1.0 + cos_w0) / a0;
+    filter->b2 =  (1.0 + cos_w0) / (2.0 * a0);
+    filter->a1 = -2.0 * cos_w0 / a0;
+    filter->a2 = (1.0 - alpha) / a0;
+}
+
+static void say_biquad_set_lowpass(biquad_t *filter, double sample_rate, double frequency)
+{
+    double w0, sin_w0, cos_w0, alpha, a0;
+
+    if (frequency < 20.0)                       frequency = 20.0;
+    if (frequency > sample_rate * 0.45)         frequency = sample_rate * 0.45;
+
+    w0     = 2.0 * M_PI * frequency / sample_rate;
+    sin_w0 = sin(w0);
+    cos_w0 = cos(w0);
+    alpha  = sin_w0 / (2.0 * 0.7071);
+    a0     = 1.0 + alpha;
+
+    filter->b0 = (1.0 - cos_w0) / (2.0 * a0);
+    filter->b1 = (1.0 - cos_w0) / a0;
+    filter->b2 = (1.0 - cos_w0) / (2.0 * a0);
+    filter->a1 = -2.0 * cos_w0 / a0;
+    filter->a2 = (1.0 - alpha) / a0;
+}
+
 static double say_biquad_process(biquad_t *filter, double input)
 {
     double output;
@@ -3340,7 +3387,8 @@ static int say_synthesize_frames(
     double jitter_target;
     int jitter_countdown;
     int state_ready;
-    biquad_t noise_path_biquad;
+    biquad_t noise_path_hp;
+    biquad_t noise_path_lp;
     double np_mix_state;
     double np_f_low_state;
     double np_f_high_state;
@@ -3393,7 +3441,8 @@ static int say_synthesize_frames(
     memset(formant_freq_state, 0, sizeof(formant_freq_state));
     memset(bandwidth_state, 0, sizeof(bandwidth_state));
     memset(gain_state, 0, sizeof(gain_state));
-    memset(&noise_path_biquad, 0, sizeof(noise_path_biquad));
+    memset(&noise_path_hp, 0, sizeof(noise_path_hp));
+    memset(&noise_path_lp, 0, sizeof(noise_path_lp));
     np_mix_state  = 0.0;
     np_f_low_state  = 1000.0;
     np_f_high_state = 4000.0;
@@ -3525,9 +3574,8 @@ static int say_synthesize_frames(
                 say_biquad_set_bandpass(&noise_filters[k], (double) sample_rate, formant_freq_state[k], noise_bandwidth, gain_state[k] * noise_gain_mul);
             }
             if (np_mix_state > 0.001) {
-                double np_center = sqrt(np_f_low_state * np_f_high_state);
-                double np_bw = np_f_high_state - np_f_low_state;
-                say_biquad_set_bandpass(&noise_path_biquad, (double) sample_rate, np_center, np_bw, 1.0);
+                say_biquad_set_highpass(&noise_path_hp, (double) sample_rate, np_f_low_state);
+                say_biquad_set_lowpass (&noise_path_lp, (double) sample_rate, np_f_high_state);
             }
 
             if (voicing_state > 0.02 && pitch_state > 1.0) {
@@ -3583,7 +3631,8 @@ static int say_synthesize_frames(
 
             /* Dedicated noise path: bandpass-shaped white noise bypassing formant filters */
             if (np_mix_state > 0.001) {
-                noise_path_out = say_biquad_process(&noise_path_biquad, noise_raw) * np_gain_state;
+                double hp_out = say_biquad_process(&noise_path_hp, noise_raw);
+                noise_path_out = say_biquad_process(&noise_path_lp, hp_out) * np_gain_state;
             } else {
                 noise_path_out = 0.0;
             }
@@ -3606,8 +3655,10 @@ static int say_synthesize_frames(
                     noise_filters[k].z1 *= 0.84;
                     noise_filters[k].z2 *= 0.84;
                 }
-                noise_path_biquad.z1 *= 0.84;
-                noise_path_biquad.z2 *= 0.84;
+                noise_path_hp.z1 *= 0.84;
+                noise_path_hp.z2 *= 0.84;
+                noise_path_lp.z1 *= 0.84;
+                noise_path_lp.z2 *= 0.84;
                 vbar_lp_state *= 0.84;
             }
 
