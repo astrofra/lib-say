@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip --version)",
+      "Bash(python -m venv C:/tools/mfa-env)",
+      "Bash(C:/tools/mfa-env/Scripts/pip install *)",
+      "Bash(C:/tools/mfa-env/Scripts/mfa --version)",
+      "Bash(conda --version)",
+      "Bash(micromamba --version)",
+      "Bash(mamba --version)",
+      "Bash(curl -L -o /tmp/miniforge.exe \"https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe\")",
+      "Bash(cmd /c \"start /wait /tmp/miniforge.exe /InstallationType=JustMe /RegisterPython=0 /S /D=C:\\\\tools\\\\miniforge3\")",
+      "Bash(echo \"exit: $?\")",
+      "PowerShell(Start-Process -FilePath \"C:\\\\tmp\\\\miniforge.exe\" -ArgumentList @\\(\"/InstallationType=JustMe\", \"/RegisterPython=0\", \"/S\", \"/D=C:\\\\tools\\\\miniforge3\"\\) -Wait -PassThru | Select-Object ExitCode)",
+      "Bash(/c/tools/miniforge3/Scripts/conda --version)",
+      "Bash(/c/tools/miniforge3/Scripts/conda create *)",
+      "Bash(/c/tools/miniforge3/envs/mfa/Scripts/mfa --version)",
+      "PowerShell(& \"C:\\\\tools\\\\miniforge3\\\\envs\\\\mfa\\\\Scripts\\\\mfa.exe\" --version)",
+      "PowerShell(& \"C:\\\\tools\\\\miniforge3\\\\envs\\\\mfa\\\\Scripts\\\\mfa.exe\" --version 2>&1)",
+      "Bash(cmd.exe /c \"C:\\\\\\\\tools\\\\\\\\miniforge3\\\\\\\\envs\\\\\\\\mfa\\\\\\\\python.exe -c \\\\\"import sys; print\\(sys.version\\)\\\\\"\")",
+      "Bash(\"/c/tools/miniforge3/envs/mfa/python.exe\" -c \"import sys; print\\(sys.version\\)\")",
+      "Bash(\"/c/tools/miniforge3/envs/mfa/python.exe\" -c \"import montreal_forced_aligner; print\\(montreal_forced_aligner.__version__\\)\")",
+      "Bash(\"/c/tools/miniforge3/envs/mfa/python.exe\" -c \"import montreal_forced_aligner\")",
+      "Bash(\"/c/tools/miniforge3/Scripts/conda.exe\" run *)",
+      "Bash(mkdir -p /tmp/mfa_test/corpus)",
+      "Bash(cp bin/reference-en/mary-01-demo.wav /tmp/mfa_test/corpus/mary-01-demo.wav)",
+      "Bash(echo \"Hello from lib-say. This is an English demo sentence.\")",
+      "Bash(/c/tools/miniforge3/envs/mfa/python.exe -c ' *)",
+      "Bash(/c/tools/miniforge3/Scripts/conda.exe run -n mfa python -c ' *)",
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"C:\\\\Users\\\\fra\\\\AppData\\\\Local\\\\Temp\\\\mfa_test\\\\output\\\\mary-01-demo.TextGrid\"\\); $bytes[0..3] | ForEach-Object { \"0x{0:X2}\" -f $_ })",
+      "Bash(python bin/run-mfa-analysis.py)",
+      "Bash(python3)",
+      "Bash(/c/tools/miniforge3/Scripts/conda.exe run *)",
+      "Bash(\"/c/tools/miniforge3/envs/mfa/python.exe\" C:/tmp/dump_phones.py)",
+      "Bash(\"/c/tools/miniforge3/envs/mfa/python.exe\" C:/tmp/dump_vcands.py)"
+    ]
+  }
+}
