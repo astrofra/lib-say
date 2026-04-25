@@ -1,0 +1,2 @@
+file,begin,end,speaker,overall_log_likelihood,speech_log_likelihood,phone_duration_deviation,snr
+mary-04-dentals,0.0,1.535,mary-04-dentals,-56.47212357954545,-59.078142166137695,0.7071067811865476,18.397028695410462

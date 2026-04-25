@@ -1,0 +1,2 @@
+file,begin,end,speaker,overall_log_likelihood,speech_log_likelihood,phone_duration_deviation,snr
+ours-08-finals,0.0,2.3649886621315193,ours-08-finals,-51.18667589662447,-49.08441162109375,1.1547005383792515,11.75151267041442

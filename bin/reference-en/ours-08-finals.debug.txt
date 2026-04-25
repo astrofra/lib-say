@@ -22,7 +22,7 @@ segments:
 segment_count: 21
   00  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
   01  I          nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
-  02  V          nominal_ms=84.0 voiced=1 vowel=0 noise=0.42 scale=1.00 weak=0 stress=0
+  02  V          nominal_ms=84.0 voiced=1 vowel=0 noise=0.18 scale=1.00 weak=0 stress=0
   03  DH         nominal_ms=84.6 voiced=1 vowel=0 noise=0.44 scale=0.94 weak=0 stress=0
   04  I          nominal_ms=101.5 voiced=1 vowel=1 noise=0.02 scale=0.94 weak=0 stress=2
   05  Z          nominal_ms=84.6 voiced=1 vowel=0 noise=0.44 scale=0.94 weak=0 stress=0

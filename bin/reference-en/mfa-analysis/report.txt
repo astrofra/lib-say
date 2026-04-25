@@ -1,0 +1,194 @@
+==========================================================================================
+MFA FORCED-ALIGNMENT ANALYSIS — lib-say vs MaryTTS
+==========================================================================================
+
+Phoneme durations in milliseconds (mean when multiple occurrences).
+Ratio = ours / mary.  < 0.5 flagged with ▒, >= 0.5 flagged with █
+
+──────────────────────────────────────────────────────────────────────────────────────────
+  [01-demo]  "Hello from lib-say. This is an English demo sentence."
+  Phoneme count: ours=34  mary=34
+
+  ARPA    ours(ms)  mary(ms)  ratio  bar          note
+  IH          50.0      80.0   0.62  ██             [Vowels]
+  S           87.5     125.0   0.70  ██             [Sibilants]
+  EH         112.5     150.0   0.75  ██             [Vowels]
+  F           90.0     120.0   0.75  ███          
+  Z           50.0      60.0   0.83  ███            [Sibilants]
+  D           70.0      80.0   0.87  ███            [Stops]
+  DH          30.0      30.0   1.00  ████           [Dentals]
+  OW         140.0     140.0   1.00  ████           [Vowels]
+  IY          70.0      65.0   1.08  ████           [Vowels]
+  L           75.0      65.0   1.15  ████           [Liquids]
+  AH          65.0      52.5   1.24  ████           [Vowels]
+  N          100.0      80.0   1.25  █████          [Nasals]
+  R           40.0      30.0   1.33  █████          [Liquids]
+  T           80.0      60.0   1.33  █████          [Stops]
+  M           95.0      65.0   1.46  █████          [Nasals]
+  SH         110.0      70.0   1.57  ██████         [Sibilants]
+  HH          80.0      30.0   2.67  ██████████   ↑ too long
+  JH          90.0      30.0   3.00  ███████████  ↑ too long  [Affricates]
+
+──────────────────────────────────────────────────────────────────────────────────────────
+  [02-hamlet]  "To be or not to be, that is the question."
+  Phoneme count: ours=23  mary=23
+
+  ARPA    ours(ms)  mary(ms)  ratio  bar          note
+  IY          76.7     156.7   0.49  ▒▒▒            [Vowels]
+  T           55.0      90.0   0.61  ██             [Stops]
+  DH          60.0      90.0   0.67  ██             [Dentals]
+  Cʷ          80.0     110.0   0.73  ██           
+  Ʈ          120.0     130.0   0.92  ███          
+  AH          74.0      80.0   0.92  ███            [Vowels]
+  R           60.0      60.0   1.00  ████           [Liquids]
+  Ɒ           90.0      80.0   1.13  ████         
+  N          125.0     110.0   1.14  ████           [Nasals]
+  Bʲ          65.0      55.0   1.18  ████         
+  AE         150.0     120.0   1.25  █████          [Vowels]
+  S          120.0      90.0   1.33  █████          [Sibilants]
+  EH         210.0     110.0   1.91  ███████        [Vowels]
+  Z           70.0      30.0   2.33  █████████      [Sibilants]
+
+──────────────────────────────────────────────────────────────────────────────────────────
+  [03-sibilants]  "She sells seashells by the seashore."
+  Phoneme count: ours=15  mary=15
+
+  ARPA    ours(ms)  mary(ms)  ratio  bar          note
+  EH          30.0     110.0   0.27  ▒▒           ⚠ < 40% of reference  [Vowels]
+  Z           30.0     100.0   0.30  ▒▒           ⚠ < 40% of reference  [Sibilants]
+  AJ          40.0     130.0   0.31  ▒▒           ⚠ < 40% of reference
+  IY          30.0      95.0   0.32  ▒▒           ⚠ < 40% of reference  [Vowels]
+  SH          45.0     130.0   0.35  ▒▒           ⚠ < 40% of reference  [Sibilants]
+  S           40.0     115.0   0.35  ▒▒           ⚠ < 40% of reference  [Sibilants]
+  R          110.0     220.0   0.50  ▒▒▒            [Liquids]
+  B           40.0      80.0   0.50  ██             [Stops]
+  Ɒ           70.0     110.0   0.64  ██           
+  AH          30.0      40.0   0.75  ███            [Vowels]
+  L           70.0      70.0   1.00  ███            [Liquids]
+  DH          60.0      40.0   1.50  █████          [Dentals]
+
+──────────────────────────────────────────────────────────────────────────────────────────
+  [04-dentals]  "This thing is worth the effort."
+  Phoneme count: ours=17  mary=17
+
+  ARPA    ours(ms)  mary(ms)  ratio  bar          note
+  S           30.0      80.0   0.38  ▒▒▒          ⚠ < 40% of reference  [Sibilants]
+  IH          40.0      80.0   0.50  ██             [Vowels]
+  Ɜː          70.0     130.0   0.54  ██           
+  AH          30.0      40.0   0.75  ███            [Vowels]
+  Z           30.0      40.0   0.75  ███            [Sibilants]
+  EH         130.0     150.0   0.87  ███            [Vowels]
+  DH          45.0      45.0   1.00  ███            [Dentals]
+  F          120.0     120.0   1.00  ███          
+  AO          40.0      40.0   1.00  ████           [Vowels]
+  Ʋ           70.0      70.0   1.00  ████         
+  NG         140.0      90.0   1.56  ██████         [Nasals]
+  IY         110.0      70.0   1.57  ██████         [Vowels]
+  T           80.0      30.0   2.67  ██████████   ↑ too long  [Stops]
+  T̪         215.0      65.0   3.31  ████████████ ↑ too long
+
+──────────────────────────────────────────────────────────────────────────────────────────
+  [05-voiced-dentals]  "Those feathers gather there."
+  Phoneme count: ours=14  mary=14
+
+  ARPA    ours(ms)  mary(ms)  ratio  bar          note
+  ɚ          110.0     320.0   0.34  ▒▒           ⚠ < 40% of reference
+  AH          56.7      96.7   0.59  ██             [Vowels]
+  Z           60.0      85.0   0.71  ██             [Sibilants]
+  G           70.0      80.0   0.87  ███            [Stops]
+  EH         100.0     110.0   0.91  ███            [Vowels]
+  OW         160.0     120.0   1.33  █████          [Vowels]
+  F          180.0     110.0   1.64  ██████       
+  DH         150.0      50.0   3.00  ███████████  ↑ too long  [Dentals]
+
+──────────────────────────────────────────────────────────────────────────────────────────
+  [06-affricates]  "Judge the changing church bells."
+  Phoneme count: ours=19  mary=19
+
+  ARPA    ours(ms)  mary(ms)  ratio  bar          note
+  IY          30.0      80.0   0.38  ▒▒▒          ⚠ < 40% of reference  [Vowels]
+  B           30.0      70.0   0.43  ▒▒▒            [Stops]
+  EH          90.0     130.0   0.69  ██             [Vowels]
+  L           90.0     120.0   0.75  ██             [Liquids]
+  N           60.0      80.0   0.75  ██             [Nasals]
+  AH          60.0      80.0   0.75  ███            [Vowels]
+  Z          120.0     150.0   0.80  ███            [Sibilants]
+  CH         116.7     130.0   0.90  ███            [Affricates]
+  JH          80.0      83.3   0.96  ███            [Affricates]
+  DH          50.0      50.0   1.00  ███            [Dentals]
+  G           80.0      80.0   1.00  ████           [Stops]
+  NG          10.0      10.0   1.00  ████         ⚠ very short  [Nasals]
+  Aː         130.0     110.0   1.18  ████         
+
+──────────────────────────────────────────────────────────────────────────────────────────
+  [07-stress]  "English fricatives shift sharply."
+  Phoneme count: ours=24  mary=24
+
+  ARPA    ours(ms)  mary(ms)  ratio  bar          note
+  EH          30.0     110.0   0.27  ▒▒           ⚠ < 40% of reference  [Vowels]
+  Z           40.0      70.0   0.57  ██             [Sibilants]
+  V           50.0      70.0   0.71  ██             [VoicedFric]
+  IY          86.0      96.0   0.90  ███            [Vowels]
+  K           70.0      60.0   1.17  ████           [Stops]
+  SH         126.7     106.7   1.19  ████           [Sibilants]
+  L           75.0      60.0   1.25  █████          [Liquids]
+  AH         120.0      95.0   1.26  █████          [Vowels]
+  N          140.0     110.0   1.27  █████          [Nasals]
+  P          130.0      90.0   1.44  █████          [Stops]
+  F          155.0      95.0   1.63  ██████       
+  T           70.0      40.0   1.75  ██████         [Stops]
+  Tʲ          80.0      40.0   2.00  ████████     
+  R          140.0      50.0   2.80  ███████████  ↑ too long  [Liquids]
+  JH          90.0      30.0   3.00  ████████████ ↑ too long  [Affricates]
+
+──────────────────────────────────────────────────────────────────────────────────────────
+  [08-finals]  "Leave these clothes and bags."
+  Phoneme count: ours=17  mary=17
+
+  ARPA    ours(ms)  mary(ms)  ratio  bar          note
+  K           30.0     110.0   0.27  ▒▒           ⚠ < 40% of reference  [Stops]
+  IY          55.0     105.0   0.52  ██             [Vowels]
+  AH         120.0     145.0   0.83  ███            [Vowels]
+  G           80.0      90.0   0.89  ███            [Stops]
+  Z          126.7     125.0   1.01  ████           [Sibilants]
+  N           90.0      80.0   1.12  ████           [Nasals]
+  DH          70.0      50.0   1.40  █████          [Dentals]
+  OW         210.0     140.0   1.50  █████          [Vowels]
+  B          170.0      90.0   1.89  ███████        [Stops]
+  L          105.0      50.0   2.10  ████████       [Liquids]
+  V          180.0      50.0   3.60  ████████████ ↑ too long  [VoicedFric]
+
+==========================================================================================
+  PHONEME FAMILY SUMMARY  (mean ratio ours/mary across all samples)
+==========================================================================================
+
+  Family              N  mean ratio  bar
+  Vowels             29        0.87  ███
+  Sibilants          15        0.88  ███
+  Stops              14        1.12  ████
+  Nasals              8        1.19  ████
+  Liquids             9        1.32  █████
+  Dentals             7        1.37  █████
+  VoicedFric          9        1.54  ██████
+  Affricates          4        1.96  ███████
+
+==========================================================================================
+  IMPROVEMENT LEADS
+==========================================================================================
+
+  [K] ratio=0.27  ours=30ms  mary=110ms  first seen in [08-finals]  family=Stops
+      → too short: extractor likely misses it below ~55ms threshold
+  [EH] ratio=0.27  ours=30ms  mary=110ms  first seen in [03-sibilants]  family=Vowels
+      → too short: extractor likely misses it below ~55ms threshold
+  [Z] ratio=0.30  ours=30ms  mary=100ms  first seen in [03-sibilants]  family=Sibilants
+      → too short: extractor likely misses it below ~50ms threshold
+  [AJ] ratio=0.31  ours=40ms  mary=130ms  first seen in [03-sibilants]  family=—
+      → too short: extractor likely misses it below ~65ms threshold
+  [IY] ratio=0.32  ours=30ms  mary=95ms  first seen in [03-sibilants]  family=Vowels
+      → too short: extractor likely misses it below ~48ms threshold
+  [ɚ] ratio=0.34  ours=110ms  mary=320ms  first seen in [05-voiced-dentals]  family=—
+      → too short: extractor likely misses it below ~160ms threshold
+  [SH] ratio=0.35  ours=45ms  mary=130ms  first seen in [03-sibilants]  family=Sibilants
+      → too short: extractor likely misses it below ~65ms threshold
+  [S] ratio=0.35  ours=40ms  mary=115ms  first seen in [03-sibilants]  family=Sibilants
+      → too short: extractor likely misses it below ~58ms threshold

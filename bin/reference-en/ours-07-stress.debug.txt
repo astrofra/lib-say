@@ -32,7 +32,7 @@ segment_count: 27
   10  SCHWA      nominal_ms=81.6 voiced=1 vowel=1 noise=0.03 scale=0.96 weak=0 stress=0
   11  T          nominal_ms=63.4 voiced=0 vowel=0 noise=1.00 scale=0.96 weak=0 stress=0
   12  IH         nominal_ms=92.2 voiced=1 vowel=1 noise=0.02 scale=0.96 weak=0 stress=0
-  13  V          nominal_ms=80.6 voiced=1 vowel=0 noise=0.42 scale=0.96 weak=0 stress=0
+  13  V          nominal_ms=80.6 voiced=1 vowel=0 noise=0.18 scale=0.96 weak=0 stress=0
   14  Z          nominal_ms=86.4 voiced=1 vowel=0 noise=0.44 scale=0.96 weak=0 stress=0
   15  SH         nominal_ms=94.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   16  IH         nominal_ms=96.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
