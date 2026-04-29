@@ -64,6 +64,18 @@ typedef enum phoneme_id_t {
     PH_JH,
     PH_TS,
     PH_DZ,
+    /* P4 — allophones introduced by the phonological-rule pass. The base
+     * phonemes above are emitted by NRL / lexicon; PHONOL turns them into
+     * the allophones below depending on context. The biquad synth treats
+     * each allophone like its closest base phoneme; the Amiga substrate
+     * (P5+) renders them distinctly via the bridge layer's PC_* mapping. */
+    PH_TQ,    /* unreleased T (e.g. "button" first T) */
+    PH_Q,     /* glottal stop ("uh-oh", glottalised T) */
+    PH_DX,    /* flap (intervocalic /t/ or /d/ in "letter", "ladder") */
+    PH_LX,    /* dark L (postvocalic /l/ in "feel") */
+    PH_RX,    /* alternate R (postvocalic /r/ when not followed by stressed vowel) */
+    PH_AXP,   /* paragogic schwa (released after final voiceless plosive) */
+    PH_IX,    /* very-reduced /ɪ/ (unstressed "the" /ðɪ/ → /ðɨ/) */
     PH_COUNT
 } phoneme_id_t;
 

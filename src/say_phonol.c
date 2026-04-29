@@ -71,21 +71,113 @@ typedef struct phonol_rule_t {
 #define M_BOUNDARY         { PHONOL_ID, PH_PAUSE, 0, 0 }
 
 /* ---- Rule table -------------------------------------------------------- */
+/*
+ * Rules are tried top-to-bottom; the first match fires. After delete/replace
+ * the loop re-tests at the same index so a rule can chain into another. The
+ * table mirrors the high-value subset of the Amiga's phonrules.i, ported per
+ * P4 of documentation/amiga-substrate-port-plan.md.
+ *
+ * Rule outputs (PH_TQ, PH_LX, PH_RX, PH_DX, PH_Q, PH_AXP) are P4-introduced
+ * allophones; the biquad synth treats them like their nearest base phoneme,
+ * but the Amiga substrate (P5+) renders them distinctly via the bridge.
+ */
 
 static const phonol_rule_t g_phonol_rules[] = {
-    /* Cluster simplification: delete /d/ in word-final /nd/ + consonant.
-     * Captures "and bags" → "an bags", "behind there" → "behin there". The
-     * /d/ is rarely articulated in fluent speech in this position. The rule
-     * doesn't fire when the right context is a vowel (e.g. "and I" keeps /d/
-     * because it links into the next syllable). */
+    /* === Cluster simplifications ============================================ */
+
+    /* /d/ deletion in word-final /nd/ + consonant.
+     * "and bags" → "an bags", "behind there" → "behin there".
+     * Doesn't fire when the right context is a vowel (linking /d/ stays). */
     {
-        M_ID(PH_N),                              /* left = N */
-        M_ID(PH_D),                              /* center = D */
-        M_FEAT_NOT(0, F_VOWEL),                  /* right = not a vowel */
-        PHONOL_DELETE,
-        PH_PAUSE,
+        M_ID(PH_N), M_ID(PH_D), M_FEAT_NOT(0, F_VOWEL),
+        PHONOL_DELETE, PH_PAUSE,
         "nd-cluster simplification"
     },
+
+    /* === Flap rule: intervocalic /t/ or /d/ → DX ============================ */
+    /*
+     * "letter" /lɛtər/ → /lɛɾər/, "ladder" /lædər/ → /lædɾər/. Fires when
+     * the plosive is between two vowels and the FOLLOWING vowel is unstressed.
+     * Stress check: the right-context segment's stress field must NOT be ≥ 2
+     * (primary stress); we approximate by requiring the right segment to be
+     * a vowel and accepting it (the stress test is missing from this simple
+     * matcher — refining to honour stress is a future tightening). */
+    {
+        M_FEAT(F_VOWEL), M_ID(PH_T), M_FEAT(F_VOWEL),
+        PHONOL_REPLACE, PH_DX,
+        "T flap (vowel /t/ vowel)"
+    },
+    {
+        M_FEAT(F_VOWEL), M_ID(PH_D), M_FEAT(F_VOWEL),
+        PHONOL_REPLACE, PH_DX,
+        "D flap (vowel /d/ vowel)"
+    },
+    /* lib-say collapses rhotacised /ɝ/ into PH_R, so "letter" /lɛtər/ comes
+     * out as `L EH T R` rather than `L EH T ə R`. Accept R as a flap context
+     * too — the underlying schwa is implicit in our R's formant data. */
+    {
+        M_FEAT(F_VOWEL), M_ID(PH_T), M_ID(PH_R),
+        PHONOL_REPLACE, PH_DX,
+        "T flap (vowel /t/ R)"
+    },
+    {
+        M_FEAT(F_VOWEL), M_ID(PH_D), M_ID(PH_R),
+        PHONOL_REPLACE, PH_DX,
+        "D flap (vowel /d/ R)"
+    },
+
+    /* === Dark L: postvocalic /l/ → LX ====================================== */
+    /*
+     * "feel" /fiːl/ → /fiːɫ/, "bell" /bɛl/ → /bɛɫ/. Fires when /l/ follows
+     * a vowel and is NOT followed by another vowel (which would keep it
+     * "clear"). The Amiga rule keeps L between two vowels with stress on
+     * the right; we use the simpler "vowel /l/ ~vowel" form. */
+    {
+        M_FEAT(F_VOWEL), M_ID(PH_L), M_FEAT_NOT(0, F_VOWEL),
+        PHONOL_REPLACE, PH_LX,
+        "Dark L (postvocalic)"
+    },
+
+    /* === Postvocalic R → RX (when not before stressed vowel) =============== */
+    /*
+     * The Amiga uses RR as the canonical /r/ and RX for "weakened" postvocalic
+     * R. Matches /r/ after a vowel at word/clause end. */
+    {
+        M_FEAT(F_VOWEL), M_ID(PH_R), M_FEAT_NOT(0, F_VOWEL),
+        PHONOL_REPLACE, PH_RX,
+        "R weakening (postvocalic)"
+    },
+
+    /* === Glottal stop substitution: /t/ at clause end before silence ======= */
+    /*
+     * "what?" /wɒt/ → /wɒʔ/. The Amiga has multiple Q-substitution rules; we
+     * port the simplest one — final voiceless plosive becomes Q at clause
+     * boundary. Fires before our /nd/ rule so order matters. */
+    {
+        M_ANY, M_ID(PH_T), M_BOUNDARY,
+        PHONOL_REPLACE, PH_Q,
+        "Q glottal (final T at boundary)"
+    },
+
+    /* === AXP epenthesis: schwa release after final voiceless plosive ======= */
+    /*
+     * "but." /bʌt./ → /bʌtə./. After Q replacement (above) this won't fire
+     * for word-final T because it's now Q; covers the remaining cases where
+     * Q didn't substitute (P, K). Adds a short schwa-like release. */
+    {
+        M_ANY, M_FEAT_NOT(F_PLOS, F_VOICED), M_BOUNDARY,
+        PHONOL_INSERT_AFTER, PH_AXP,
+        "AXP epenthesis (final voiceless plosive)"
+    },
+
+    /* === Unreleased TQ: /t/ before syllabic /n/, /m/, /l/ ================== */
+    /*
+     * "button" /bʌtən/ → /bʌtʔn/ — the /t/ is unreleased before the
+     * syllabic /n/. Our nearest match: /t/ followed by SCHWA + nasal/lateral.
+     * Because phonol matchers see one segment at a time we approximate by
+     * the simpler "vowel /t/ schwa" pattern; the syllabic check would need
+     * a 2-segment lookahead which the framework currently doesn't expose. */
+    /* (Intentionally omitted in this pass — needs lookahead support.) */
 };
 
 /* ---- Match + apply ----------------------------------------------------- */
@@ -97,19 +189,27 @@ static int phonol_match(const segment_t *seg, const phonol_match_t *m)
     if (m->kind == PHONOL_ANY) {
         return seg != NULL && seg->phoneme != PH_PAUSE;
     }
-    if (seg == NULL) {
-        /* Off the end of the stream — only matches if rule explicitly asked
-         * for the boundary sentinel. */
-        return m->kind == PHONOL_ID && m->phoneme == PH_PAUSE;
-    }
     if (m->kind == PHONOL_ID) {
-        return seg->phoneme == m->phoneme;
+        if (m->phoneme == PH_PAUSE) {
+            /* Boundary sentinel — matches end-of-stream OR a pause segment. */
+            return seg == NULL || seg->phoneme == PH_PAUSE;
+        }
+        return seg != NULL && seg->phoneme == m->phoneme;
     }
-    /* PHONOL_FEATURES */
-    if (seg->phoneme == PH_PAUSE) {
-        return 0;
+    /* PHONOL_FEATURES.
+     * End-of-stream and PAUSE segments are treated as "having no features
+     * except F_PAUSE" — so a require-mask of 0 with a forbid-mask matches
+     * them (e.g. M_FEAT_NOT(0, F_VOWEL) matches "boundary or non-vowel"),
+     * while a require-mask with bits set rejects them (e.g. M_FEAT(F_VOWEL)
+     * still rejects PAUSE). This is the natural behaviour for postvocalic
+     * allophone rules at word/clause end. */
+    if (seg == NULL) {
+        f = 0;
+    } else if (seg->phoneme == PH_PAUSE) {
+        f = F_PAUSE;
+    } else {
+        f = say_get_phoneme(seg->phoneme)->features;
     }
-    f = say_get_phoneme(seg->phoneme)->features;
     if (m->require != 0 && (f & m->require) != m->require) return 0;
     if (m->forbid  != 0 && (f & m->forbid)  != 0)          return 0;
     return 1;

@@ -1,6 +1,6 @@
 # MFA Duration Similarity Score
 
-- Generated: `2026-04-29T17:32:49+02:00`
+- Generated: `2026-04-29T20:44:19+02:00`
 - Metric: DSS = mean( min(r, 1/r) ) per phoneme pair, r = ours/mary duration
 - 100% = perfect timing match with MaryTTS reference
 
@@ -9,15 +9,15 @@
 | Sample | Text | DSS | Pairs | LLH ours/s | LLH mary/s |
 |---|---|---:|---:|---:|---:|
 | `01-demo` | Hello from lib-say. This is an English demo sentence. | **69.1%** | 37 | -13.70 | -15.78 |
-| `02-hamlet` | To be or not to be, that is the question. | **61.4%** | 25 | -23.64 | -20.77 |
-| `03-sibilants` | She sells seashells by the seashore. | **75.7%** | 21 | -25.13 | -24.37 |
-| `04-dentals` | This thing is worth the effort. | **57.4%** | 16 | -33.75 | -34.84 |
-| `05-voiced-dentals` | Those feathers gather there. | **51.9%** | 15 | -29.27 | -32.62 |
-| `06-affricates` | Judge the changing church bells. | **70.4%** | 18 | -27.72 | -33.52 |
-| `07-stress` | English fricatives shift sharply. | **58.3%** | 17 | -21.67 | -25.48 |
+| `02-hamlet` | To be or not to be, that is the question. | **59.7%** | 25 | -23.49 | -20.77 |
+| `03-sibilants` | She sells seashells by the seashore. | **76.0%** | 21 | -25.35 | -24.37 |
+| `04-dentals` | This thing is worth the effort. | **56.7%** | 16 | -34.33 | -34.84 |
+| `05-voiced-dentals` | Those feathers gather there. | **51.9%** | 15 | -29.41 | -32.62 |
+| `06-affricates` | Judge the changing church bells. | **71.4%** | 18 | -27.67 | -33.52 |
+| `07-stress` | English fricatives shift sharply. | **55.5%** | 17 | -23.52 | -25.48 |
 | `08-finals` | Leave these clothes and bags. | **55.5%** | 16 | -23.01 | -35.36 |
 
-**Global DSS: 62.5%**
+**Global DSS: 62.0%**
 
 ## Per-sample phoneme pairs
 
@@ -74,26 +74,26 @@
 | IY | 70 | 110 | 0.64 | 64% | Vowels |
 | Ɒ | 80 | 70 | 1.14 | 87% | Other |
 | R | 60 | 60 | 1.00 | 100% | Liquids |
-| N | 140 | 70 | 2.00 | 50% | Nasals |
+| N | 130 | 70 | 1.86 | 54% | Nasals |
 | AA | 120 | 150 | 0.80 | 80% | Vowels |
 | T | 40 | 40 | 1.00 | 100% | Stops |
 | Tʰ | 100 | 90 | 1.11 | 90% | Other |
 | Ʉː | 60 | 60 | 1.00 | 100% | Other |
 | Bʲ | 70 | 50 | 1.40 | 71% | Other |
 | IY | 90 | 300 | 0.30 | 30% ⚠ | Vowels |
-| AE | 120 | 40 | 3.00 | 33% ⚠ | Vowels |
-| T | 100 | 100 | 1.00 | 100% | Stops |
-| IH | 30 | 40 | 0.75 | 75% | Vowels |
+| AE | 140 | 40 | 3.50 | 29% ⚠ | Vowels |
+| T | 40 | 100 | 0.40 | 40% ⚠ | Stops |
+| IH | 40 | 40 | 1.00 | 100% | Vowels |
 | Z | 30 | 80 | 0.38 | 38% ⚠ | Sibilants |
-| DH | 110 | 40 | 2.75 | 36% ⚠ | Dentals |
-| AH | 110 | 60 | 1.83 | 55% | Vowels |
-| Cʷ | 90 | 40 | 2.25 | 44% ⚠ | Other |
+| DH | 100 | 40 | 2.50 | 40% ⚠ | Dentals |
+| AH | 120 | 60 | 2.00 | 50% | Vowels |
+| Cʷ | 100 | 40 | 2.50 | 40% ⚠ | Other |
 | EH | 30 | 110 | 0.27 | 27% ⚠ | Vowels |
-| S | 30 | 110 | 0.27 | 27% ⚠ | Sibilants |
+| SH | 30 | 110 | 0.27 | 27% ⚠ | Sibilants |
 | CH | 30 | 90 | 0.33 | 33% ⚠ | Affricates |
 | AH | 30 | 130 | 0.23 | 23% ⚠ | Vowels |
 | N | 30 | 70 | 0.43 | 43% ⚠ | Nasals |
-| **DSS** | | | | **61.4%** | |
+| **DSS** | | | | **59.7%** | |
 
 ### `03-sibilants` — She sells seashells by the seashore.
 
@@ -103,14 +103,14 @@
 | IY | 40 | 80 | 0.50 | 50% | Vowels |
 | S | 100 | 110 | 0.91 | 91% | Sibilants |
 | EH | 80 | 80 | 1.00 | 100% | Vowels |
-| Ɫ | 90 | 90 | 1.00 | 100% | Other |
-| Z | 40 | 40 | 1.00 | 100% | Sibilants |
+| Ɫ | 80 | 90 | 0.89 | 89% | Other |
+| Z | 50 | 40 | 1.25 | 80% | Sibilants |
 | S | 180 | 100 | 1.80 | 56% | Sibilants |
 | IY | 110 | 110 | 1.00 | 100% | Vowels |
 | SH | 120 | 100 | 1.20 | 83% | Sibilants |
-| EH | 70 | 80 | 0.87 | 87% | Vowels |
-| Ɫ | 90 | 80 | 1.13 | 89% | Other |
-| Z | 140 | 50 | 2.80 | 36% ⚠ | Sibilants |
+| EH | 80 | 80 | 1.00 | 100% | Vowels |
+| Ɫ | 70 | 80 | 0.88 | 88% | Other |
+| Z | 150 | 50 | 3.00 | 33% ⚠ | Sibilants |
 | B | 50 | 110 | 0.45 | 45% ⚠ | Stops |
 | AY | 180 | 130 | 1.38 | 72% | Vowels |
 | DH | 30 | 40 | 0.75 | 75% | Dentals |
@@ -119,15 +119,15 @@
 | IY | 130 | 120 | 1.08 | 92% | Vowels |
 | SH | 110 | 110 | 1.00 | 100% | Sibilants |
 | Ɒ | 70 | 110 | 0.64 | 64% | Other |
-| R | 40 | 220 | 0.18 | 18% ⚠ | Liquids |
-| **DSS** | | | | **75.7%** | |
+| R | 100 | 220 | 0.45 | 45% ⚠ | Liquids |
+| **DSS** | | | | **76.0%** | |
 
 ### `04-dentals` — This thing is worth the effort.
 
 | ARPA | ours (ms) | mary (ms) | ratio | sim | family |
 |---|---:|---:|---:|---:|---|
-| DH | 50 | 60 | 0.83 | 83% | Dentals |
-| IH | 30 | 70 | 0.43 | 43% ⚠ | Vowels |
+| DH | 30 | 60 | 0.50 | 50% | Dentals |
+| IH | 40 | 70 | 0.57 | 57% | Vowels |
 | S | 30 | 80 | 0.38 | 38% ⚠ | Sibilants |
 | T̪ | 230 | 100 | 2.30 | 43% ⚠ | Other |
 | IH | 30 | 70 | 0.43 | 43% ⚠ | Vowels |
@@ -137,12 +137,12 @@
 | ɝ | 80 | 60 | 1.33 | 75% | Other |
 | TH | 150 | 130 | 1.15 | 87% | Dentals |
 | DH | 70 | 30 | 2.33 | 43% ⚠ | Dentals |
-| AH | 110 | 40 | 2.75 | 36% ⚠ | Vowels |
+| AH | 120 | 40 | 3.00 | 33% ⚠ | Vowels |
 | EH | 30 | 60 | 0.50 | 50% | Vowels |
-| F | 120 | 140 | 0.86 | 86% | Other |
+| F | 110 | 140 | 0.79 | 79% | Other |
 | ER | 40 | 120 | 0.33 | 33% ⚠ | Vowels |
-| T | 70 | 40 | 1.75 | 57% | Stops |
-| **DSS** | | | | **57.4%** | |
+| T | 30 | 40 | 0.75 | 75% | Stops |
+| **DSS** | | | | **56.7%** | |
 
 ### `05-voiced-dentals` — Those feathers gather there.
 
@@ -179,15 +179,15 @@
 | N | 230 | 80 | 2.88 | 35% ⚠ | Nasals |
 | JH | 110 | 60 | 1.83 | 55% | Affricates |
 | IH | 60 | 70 | 0.86 | 86% | Vowels |
-| NG | 70 | 80 | 0.88 | 88% | Nasals |
+| NG | 80 | 80 | 1.00 | 100% | Nasals |
 | CH | 100 | 120 | 0.83 | 83% | Affricates |
 | ɝ | 30 | 110 | 0.27 | 27% ⚠ | Other |
 | CH | 140 | 140 | 1.00 | 100% | Affricates |
 | B | 30 | 40 | 0.75 | 75% | Stops |
-| EH | 90 | 100 | 0.90 | 90% | Vowels |
+| EH | 100 | 100 | 1.00 | 100% | Vowels |
 | Ɫ | 70 | 160 | 0.44 | 44% ⚠ | Other |
-| Z | 130 | 180 | 0.72 | 72% | Sibilants |
-| **DSS** | | | | **70.4%** | |
+| Z | 120 | 180 | 0.67 | 67% | Sibilants |
+| **DSS** | | | | **71.4%** | |
 
 ### `07-stress` — English fricatives shift sharply.
 
@@ -199,18 +199,18 @@
 | L | 30 | 50 | 0.60 | 60% | Liquids |
 | IH | 30 | 60 | 0.50 | 50% | Vowels |
 | SH | 30 | 80 | 0.37 | 37% ⚠ | Sibilants |
-| SPN | 1390 | 470 | 2.96 | 34% ⚠ | Other |
-| SH | 50 | 120 | 0.42 | 42% ⚠ | Sibilants |
+| SPN | 1340 | 470 | 2.85 | 35% ⚠ | Other |
+| SH | 30 | 120 | 0.25 | 25% ⚠ | Sibilants |
 | IH | 30 | 60 | 0.50 | 50% | Vowels |
 | F | 30 | 90 | 0.33 | 33% ⚠ | Other |
-| T | 30 | 40 | 0.75 | 75% | Stops |
+| T | 70 | 40 | 1.75 | 57% | Stops |
 | SH | 100 | 130 | 0.77 | 77% | Sibilants |
 | AA | 80 | 60 | 1.33 | 75% | Vowels |
 | R | 60 | 90 | 0.67 | 67% | Liquids |
 | Pʲ | 130 | 90 | 1.44 | 69% | Other |
-| L | 70 | 60 | 1.17 | 86% | Liquids |
-| IY | 130 | 210 | 0.62 | 62% | Vowels |
-| **DSS** | | | | **58.3%** | |
+| L | 80 | 60 | 1.33 | 75% | Liquids |
+| IY | 120 | 210 | 0.57 | 57% | Vowels |
+| **DSS** | | | | **55.5%** | |
 
 ### `08-finals` — Leave these clothes and bags.
 
@@ -238,15 +238,15 @@
 
 | Family | N | Mean sim | Mean ratio |
 |---|---:|---:|---:|
-| Vowels | 53 | 62.7% | 0.91 |
-| Sibilants | 26 | 64.9% | 1.04 |
-| Stops | 13 | 69.1% | 0.90 |
-| Nasals | 13 | 62.2% | 1.35 |
-| Liquids | 12 | 58.6% | 1.17 |
-| Dentals | 13 | 60.9% | 1.94 |
+| Vowels | 53 | 63.5% | 0.94 |
+| Sibilants | 26 | 63.2% | 1.05 |
+| Stops | 13 | 64.5% | 0.85 |
+| Nasals | 13 | 63.4% | 1.34 |
+| Liquids | 12 | 60.0% | 1.21 |
+| Dentals | 13 | 58.6% | 1.89 |
 | VoicedFric | 1 | 29.4% | 3.40 |
 | Affricates | 9 | 73.3% | 1.17 |
-| Other | 25 | 65.1% | 1.15 |
+| Other | 25 | 64.2% | 1.14 |
 
 ## Improvement leads (sim < 60%)
 
@@ -256,51 +256,49 @@
 | | | | | | → too long | |
 | R | `05-voiced-dentals` | 30 | 180 | 0.17 | 17% | Liquids |
 | | | | | | → too short | |
-| R | `03-sibilants` | 40 | 220 | 0.18 | 18% | Liquids |
-| | | | | | → too short | |
 | AH | `02-hamlet` | 30 | 130 | 0.23 | 23% | Vowels |
 | | | | | | → too short | |
 | N | `07-stress` | 40 | 160 | 0.25 | 25% | Nasals |
 | | | | | | → too short | |
-| S | `02-hamlet` | 30 | 110 | 0.27 | 27% | Sibilants |
+| SH | `07-stress` | 30 | 120 | 0.25 | 25% | Sibilants |
+| | | | | | → too short | |
+| EH | `02-hamlet` | 30 | 110 | 0.27 | 27% | Vowels |
 | | | | | | → too short | |
 | K | `08-finals` | 30 | 110 | 0.27 | 27% | Stops |
 | | | | | | → too short | |
 | ɝ | `06-affricates` | 30 | 110 | 0.27 | 27% | Other |
 | | | | | | → too short | |
-| EH | `02-hamlet` | 30 | 110 | 0.27 | 27% | Vowels |
+| SH | `02-hamlet` | 30 | 110 | 0.27 | 27% | Sibilants |
 | | | | | | → too short | |
+| AE | `02-hamlet` | 140 | 40 | 3.50 | 29% | Vowels |
+| | | | | | → too long | |
 | V | `08-finals` | 170 | 50 | 3.40 | 29% | VoicedFric |
 | | | | | | → too long | |
 | IY | `02-hamlet` | 90 | 300 | 0.30 | 30% | Vowels |
 | | | | | | → too short | |
 | ER | `05-voiced-dentals` | 30 | 100 | 0.30 | 30% | Vowels |
 | | | | | | → too short | |
+| CH | `02-hamlet` | 30 | 90 | 0.33 | 33% | Affricates |
+| | | | | | → too short | |
 | ER | `04-dentals` | 40 | 120 | 0.33 | 33% | Vowels |
 | | | | | | → too short | |
+| AH | `04-dentals` | 120 | 40 | 3.00 | 33% | Vowels |
+| | | | | | → too long | |
 | F | `07-stress` | 30 | 90 | 0.33 | 33% | Other |
 | | | | | | → too short | |
 | IY | `08-finals` | 30 | 90 | 0.33 | 33% | Vowels |
 | | | | | | → too short | |
 | EJ | `06-affricates` | 40 | 120 | 0.33 | 33% | Other |
 | | | | | | → too short | |
-| AE | `02-hamlet` | 120 | 40 | 3.00 | 33% | Vowels |
+| Z | `03-sibilants` | 150 | 50 | 3.00 | 33% | Sibilants |
 | | | | | | → too long | |
-| CH | `02-hamlet` | 30 | 90 | 0.33 | 33% | Affricates |
-| | | | | | → too short | |
 | IH | `01-demo` | 30 | 90 | 0.33 | 33% | Vowels |
 | | | | | | → too short | |
 | JH | `01-demo` | 90 | 30 | 3.00 | 33% | Affricates |
 | | | | | | → too long | |
-| SPN | `07-stress` | 1390 | 470 | 2.96 | 34% | Other |
-| | | | | | → too long | |
 | N | `06-affricates` | 230 | 80 | 2.88 | 35% | Nasals |
 | | | | | | → too long | |
-| Z | `03-sibilants` | 140 | 50 | 2.80 | 36% | Sibilants |
-| | | | | | → too long | |
-| DH | `02-hamlet` | 110 | 40 | 2.75 | 36% | Dentals |
-| | | | | | → too long | |
-| AH | `04-dentals` | 110 | 40 | 2.75 | 36% | Vowels |
+| SPN | `07-stress` | 1340 | 470 | 2.85 | 35% | Other |
 | | | | | | → too long | |
 | AH | `01-demo` | 110 | 40 | 2.75 | 36% | Vowels |
 | | | | | | → too long | |
@@ -324,9 +322,15 @@
 | | | | | | → too long | |
 | DH | `05-voiced-dentals` | 130 | 50 | 2.60 | 38% | Dentals |
 | | | | | | → too long | |
-| SH | `07-stress` | 50 | 120 | 0.42 | 42% | Sibilants |
+| DH | `02-hamlet` | 100 | 40 | 2.50 | 40% | Dentals |
+| | | | | | → too long | |
+| Cʷ | `02-hamlet` | 100 | 40 | 2.50 | 40% | Other |
+| | | | | | → too long | |
+| T | `02-hamlet` | 40 | 100 | 0.40 | 40% | Stops |
 | | | | | | → too short | |
 | F | `01-demo` | 50 | 120 | 0.42 | 42% | Other |
+| | | | | | → too short | |
+| N | `02-hamlet` | 30 | 70 | 0.43 | 43% | Nasals |
 | | | | | | → too short | |
 | DH | `04-dentals` | 70 | 30 | 2.33 | 43% | Dentals |
 | | | | | | → too long | |
@@ -334,11 +338,7 @@
 | | | | | | → too short | |
 | IH | `01-demo` | 140 | 60 | 2.33 | 43% | Vowels |
 | | | | | | → too long | |
-| IH | `04-dentals` | 30 | 70 | 0.43 | 43% | Vowels |
-| | | | | | → too short | |
 | EH | `05-voiced-dentals` | 60 | 140 | 0.43 | 43% | Vowels |
-| | | | | | → too short | |
-| N | `02-hamlet` | 30 | 70 | 0.43 | 43% | Nasals |
 | | | | | | → too short | |
 | T̪ | `04-dentals` | 230 | 100 | 2.30 | 43% | Other |
 | | | | | | → too long | |
@@ -348,10 +348,10 @@
 | | | | | | → too short | |
 | IH | `01-demo` | 40 | 90 | 0.44 | 44% | Vowels |
 | | | | | | → too short | |
-| Cʷ | `02-hamlet` | 90 | 40 | 2.25 | 44% | Other |
-| | | | | | → too long | |
 | L | `01-demo` | 110 | 50 | 2.20 | 45% | Liquids |
 | | | | | | → too long | |
+| R | `03-sibilants` | 100 | 220 | 0.45 | 45% | Liquids |
+| | | | | | → too short | |
 | B | `03-sibilants` | 50 | 110 | 0.45 | 45% | Stops |
 | | | | | | → too short | |
 | B | `08-finals` | 100 | 210 | 0.48 | 48% | Stops |
@@ -360,8 +360,8 @@
 | | | | | | → too short | |
 | Z | `01-demo` | 120 | 60 | 2.00 | 50% | Sibilants |
 | | | | | | → too long | |
-| N | `02-hamlet` | 140 | 70 | 2.00 | 50% | Nasals |
-| | | | | | → too long | |
+| DH | `04-dentals` | 30 | 60 | 0.50 | 50% | Dentals |
+| | | | | | → too short | |
 | EH | `04-dentals` | 30 | 60 | 0.50 | 50% | Vowels |
 | | | | | | → too short | |
 | IH | `07-stress` | 30 | 60 | 0.50 | 50% | Vowels |
@@ -380,7 +380,9 @@
 | | | | | | → too short | |
 | AH | `06-affricates` | 30 | 60 | 0.50 | 50% | Vowels |
 | | | | | | → too short | |
-| AH | `02-hamlet` | 110 | 60 | 1.83 | 55% | Vowels |
+| AH | `02-hamlet` | 120 | 60 | 2.00 | 50% | Vowels |
+| | | | | | → too long | |
+| N | `02-hamlet` | 130 | 70 | 1.86 | 54% | Nasals |
 | | | | | | → too long | |
 | JH | `06-affricates` | 110 | 60 | 1.83 | 55% | Affricates |
 | | | | | | → too long | |
@@ -390,7 +392,11 @@
 | | | | | | → too long | |
 | Z | `05-voiced-dentals` | 160 | 90 | 1.78 | 56% | Sibilants |
 | | | | | | → too long | |
-| T | `04-dentals` | 70 | 40 | 1.75 | 57% | Stops |
+| IY | `07-stress` | 120 | 210 | 0.57 | 57% | Vowels |
+| | | | | | → too short | |
+| IH | `04-dentals` | 40 | 70 | 0.57 | 57% | Vowels |
+| | | | | | → too short | |
+| T | `07-stress` | 70 | 40 | 1.75 | 57% | Stops |
 | | | | | | → too long | |
 | DH | `08-finals` | 30 | 50 | 0.60 | 60% | Dentals |
 | | | | | | → too short | |
