@@ -1,2 +1,2 @@
 file,begin,end,speaker,overall_log_likelihood,speech_log_likelihood,phone_duration_deviation,snr
-ours-03-sibilants,0.0,2.69,ours-03-sibilants,-59.31649337825279,-62.80080359322684,1.1285529900799376,2.5563476411934296
+ours-03-sibilants,0.0,2.5949886621315192,ours-03-sibilants,-59.215185546875,-64.48235947745187,1.091089451179962,2.454530973033288
