@@ -153,12 +153,12 @@ Ratio = ours / mary.  < 0.5 flagged with ▒, >= 0.5 flagged with █
   K           30.0     110.0   0.27  ▒▒           ⚠ < 40% of reference  [Stops]
   IY          55.0     110.0   0.50  ██             [Vowels]
   AE         110.0     165.0   0.67  ██             [Vowels]
-  N           70.0      80.0   0.87  ███            [Nasals]
-  G           90.0      90.0   1.00  ████           [Stops]
+  G           80.0      90.0   0.89  ███            [Stops]
+  N           80.0      80.0   1.00  ███            [Nasals]
   Z          123.3     118.3   1.04  ████           [Sibilants]
   DH          55.0      50.0   1.10  ████           [Dentals]
+  B          100.0      90.0   1.11  ████           [Stops]
   OW         230.0     140.0   1.64  ██████         [Vowels]
-  B          170.0      90.0   1.89  ███████        [Stops]
   L          120.0      50.0   2.40  █████████      [Liquids]
   V          170.0      50.0   3.40  ████████████ ↑ too long  [VoicedFric]
 
@@ -169,10 +169,10 @@ Ratio = ours / mary.  < 0.5 flagged with ▒, >= 0.5 flagged with █
   Family              N  mean ratio  bar
   Vowels             29        0.84  ███
   Liquids             8        0.97  ███
+  Stops              12        0.98  ███
   Sibilants          14        1.05  ████
-  Stops              12        1.06  ████
-  Nasals              8        1.30  █████
   Affricates          5        1.32  █████
+  Nasals              8        1.32  █████
   VoicedFric          8        1.69  ██████
   Dentals             8        1.89  ███████
 

@@ -1,6 +1,6 @@
 # MFA Duration Similarity Score
 
-- Generated: `2026-04-29T11:37:56+02:00`
+- Generated: `2026-04-29T13:57:18+02:00`
 - Metric: DSS = mean( min(r, 1/r) ) per phoneme pair, r = ours/mary duration
 - 100% = perfect timing match with MaryTTS reference
 
@@ -15,9 +15,9 @@
 | `05-voiced-dentals` | Those feathers gather there. | **52.2%** | 15 | -29.42 | -28.36 |
 | `06-affricates` | Judge the changing church bells. | **66.6%** | 18 | -25.82 | -33.82 |
 | `07-stress` | English fricatives shift sharply. | **56.1%** | 17 | -21.51 | -25.88 |
-| `08-finals` | Leave these clothes and bags. | **57.7%** | 17 | -21.51 | -35.79 |
+| `08-finals` | Leave these clothes and bags. | **59.7%** | 17 | -22.45 | -35.79 |
 
-**Global DSS: 62.8%**
+**Global DSS: 63.1%**
 
 ## Per-sample phoneme pairs
 
@@ -227,22 +227,22 @@
 | OW | 230 | 140 | 1.64 | 61% | Vowels |
 | DH | 80 | 60 | 1.33 | 75% | Dentals |
 | Z | 140 | 80 | 1.75 | 57% | Sibilants |
-| AE | 100 | 110 | 0.91 | 91% | Vowels |
-| N | 70 | 80 | 0.87 | 87% | Nasals |
-| B | 170 | 90 | 1.89 | 53% | Stops |
-| AE | 120 | 220 | 0.55 | 55% | Vowels |
-| G | 90 | 90 | 1.00 | 100% | Stops |
+| AE | 90 | 110 | 0.82 | 82% | Vowels |
+| N | 80 | 80 | 1.00 | 100% | Nasals |
+| B | 100 | 90 | 1.11 | 90% | Stops |
+| AE | 130 | 220 | 0.59 | 59% | Vowels |
+| G | 80 | 90 | 0.89 | 89% | Stops |
 | Z | 90 | 205 | 0.44 | 44% ⚠ | Sibilants |
-| **DSS** | | | | **57.7%** | |
+| **DSS** | | | | **59.7%** | |
 
 ## Family summary
 
 | Family | N | Mean sim | Mean ratio |
 |---|---:|---:|---:|
-| Vowels | 53 | 64.5% | 0.94 |
+| Vowels | 53 | 64.4% | 0.94 |
 | Sibilants | 27 | 61.9% | 1.04 |
-| Stops | 13 | 63.4% | 1.03 |
-| Nasals | 13 | 66.3% | 1.32 |
+| Stops | 13 | 65.4% | 0.96 |
+| Nasals | 13 | 67.3% | 1.33 |
 | Liquids | 12 | 64.2% | 1.11 |
 | Dentals | 13 | 61.1% | 1.76 |
 | VoicedFric | 1 | 29.4% | 3.40 |
@@ -369,11 +369,7 @@
 | | | | | | → too long | |
 | B | `03-sibilants` | 50 | 100 | 0.50 | 50% | Stops |
 | | | | | | → too short | |
-| B | `08-finals` | 170 | 90 | 1.89 | 53% | Stops |
-| | | | | | → too long | |
 | Ɫ | `06-affricates` | 80 | 150 | 0.53 | 53% | Other |
-| | | | | | → too short | |
-| AE | `08-finals` | 120 | 220 | 0.55 | 55% | Vowels |
 | | | | | | → too short | |
 | IH | `01-demo` | 110 | 60 | 1.83 | 55% | Vowels |
 | | | | | | → too long | |
@@ -395,6 +391,8 @@
 | | | | | | → too short | |
 | N | `02-hamlet` | 120 | 70 | 1.71 | 58% | Nasals |
 | | | | | | → too long | |
+| AE | `08-finals` | 130 | 220 | 0.59 | 59% | Vowels |
+| | | | | | → too short | |
 | L | `01-demo` | 30 | 50 | 0.60 | 60% | Liquids |
 | | | | | | → too short | |
 | B | `01-demo` | 100 | 60 | 1.67 | 60% | Stops |
