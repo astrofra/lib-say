@@ -20,6 +20,27 @@ OUT_DIR   = REPO_ROOT / "bin" / "reference-en" / "mfa-analysis"
 ALIGN_DIR = OUT_DIR / "aligned"
 REPORT    = OUT_DIR / "score.md"
 
+
+def resolve_conda_exe() -> str:
+    candidates = [
+        os.environ.get("LIBSAY_CONDA_EXE"),
+        os.environ.get("CONDA_EXE"),
+        r"S:\tools\miniforge3\Scripts\conda.exe",
+        r"C:\tools\miniforge3\Scripts\conda.exe",
+    ]
+    for candidate in candidates:
+        if candidate and Path(candidate).exists():
+            return candidate
+    raise FileNotFoundError(
+        "Unable to find conda.exe. Set LIBSAY_CONDA_EXE to the full conda.exe path."
+    )
+
+
+CONDA_EXE = resolve_conda_exe()
+
+if not os.environ.get("MFA_ROOT_DIR") and Path(r"S:\tools\mfa-data").exists():
+    os.environ["MFA_ROOT_DIR"] = r"S:\tools\mfa-data"
+
 CORPUS = [
     ("01-demo",           "Hello from lib-say. This is an English demo sentence."),
     ("02-hamlet",         "To be or not to be, that is the question."),
@@ -119,7 +140,7 @@ def main() -> None:
     if regen:
         print("Re-running MFA alignment...")
         subprocess.run(
-            [r"C:\tools\miniforge3\Scripts\conda.exe", "run", "-n", "mfa",
+            [CONDA_EXE, "run", "-n", "mfa",
              "python", str(REPO_ROOT / "bin" / "run-mfa-analysis.py")],
             check=True,
         )

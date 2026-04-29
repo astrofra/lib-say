@@ -22,26 +22,26 @@ item []:
             text = "thing" 
         intervals [3]:
             xmin = 0.47 
-            xmax = 0.59 
+            xmax = 0.61 
             text = "is" 
         intervals [4]:
-            xmin = 0.59 
-            xmax = 0.82 
+            xmin = 0.61 
+            xmax = 0.83 
             text = "worth" 
         intervals [5]:
-            xmin = 0.82 
-            xmax = 0.94 
+            xmin = 0.83 
+            xmax = 0.93 
             text = "" 
         intervals [6]:
-            xmin = 0.94 
-            xmax = 1.02 
+            xmin = 0.93 
+            xmax = 1.03 
             text = "the" 
         intervals [7]:
-            xmin = 1.02 
-            xmax = 1.36 
+            xmin = 1.03 
+            xmax = 1.37 
             text = "effort" 
         intervals [8]:
-            xmin = 1.36 
+            xmin = 1.37 
             xmax = 1.535 
             text = "" 
     item [2]:
@@ -68,61 +68,61 @@ item []:
             text = "t̪" 
         intervals [5]:
             xmin = 0.31 
-            xmax = 0.39 
+            xmax = 0.38 
             text = "ɪ" 
         intervals [6]:
-            xmin = 0.39 
+            xmin = 0.38 
             xmax = 0.47 
-            text = "ŋ" 
+            text = "n" 
         intervals [7]:
             xmin = 0.47 
             xmax = 0.55 
-            text = "i" 
+            text = "ɪ" 
         intervals [8]:
             xmin = 0.55 
-            xmax = 0.59 
+            xmax = 0.61 
             text = "z" 
         intervals [9]:
-            xmin = 0.59 
-            xmax = 0.66 
-            text = "ʋ" 
+            xmin = 0.61 
+            xmax = 0.67 
+            text = "w" 
         intervals [10]:
-            xmin = 0.66 
-            xmax = 0.79 
-            text = "ɜː" 
+            xmin = 0.67 
+            xmax = 0.8 
+            text = "ɝ" 
         intervals [11]:
-            xmin = 0.79 
-            xmax = 0.82 
-            text = "t̪" 
+            xmin = 0.8 
+            xmax = 0.83 
+            text = "θ" 
         intervals [12]:
-            xmin = 0.82 
-            xmax = 0.94 
+            xmin = 0.83 
+            xmax = 0.93 
             text = "" 
         intervals [13]:
-            xmin = 0.94 
-            xmax = 0.98 
-            text = "ð" 
+            xmin = 0.93 
+            xmax = 0.97 
+            text = "d̪" 
         intervals [14]:
-            xmin = 0.98 
-            xmax = 1.02 
-            text = "a" 
+            xmin = 0.97 
+            xmax = 1.03 
+            text = "iː" 
         intervals [15]:
-            xmin = 1.02 
-            xmax = 1.17 
+            xmin = 1.03 
+            xmax = 1.18 
             text = "ɛ" 
         intervals [16]:
-            xmin = 1.17 
+            xmin = 1.18 
             xmax = 1.29 
             text = "f" 
         intervals [17]:
             xmin = 1.29 
             xmax = 1.33 
-            text = "ɔ" 
+            text = "ɚ" 
         intervals [18]:
             xmin = 1.33 
-            xmax = 1.36 
+            xmax = 1.37 
             text = "t" 
         intervals [19]:
-            xmin = 1.36 
+            xmin = 1.37 
             xmax = 1.535 
             text = "" 

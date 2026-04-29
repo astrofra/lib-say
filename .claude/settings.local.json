@@ -45,7 +45,10 @@
       "Bash(bin/tts.exe \"She sells seashells by the seashore.\" --debug-report - --dry-run --lang en)",
       "Bash(bin/tts.exe \"English fricatives shift sharply.\" --debug-report - --dry-run --lang en)",
       "Bash(C:/tools/miniforge3/envs/mfa/python.exe bin/run-mfa-analysis.py)",
-      "Bash(dir \"bin\\\\reference-en\\\\mfa-analysis\\\\aligned\\\\ours-07-stress\\\\\" 2>&1 | tail -5)"
+      "Bash(dir \"bin\\\\reference-en\\\\mfa-analysis\\\\aligned\\\\ours-07-stress\\\\\" 2>&1 | tail -5)",
+      "Bash(gh repo *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

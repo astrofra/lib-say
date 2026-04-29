@@ -86,6 +86,7 @@ typedef struct segment_t {
     int boundary_type;
     int weak_word;
     int stress;
+    int diphthong_target; /* phoneme_id_t, 0 = none. When set, the segment glides toward this phoneme's formants. */
 } segment_t;
 
 typedef struct segment_buffer_t {
@@ -578,6 +579,11 @@ static int say_is_vowel_phone(phoneme_id_t id)
     return say_get_phoneme(id)->is_vowel;
 }
 
+static int say_is_glide_phone(phoneme_id_t id)
+{
+    return id == PH_J || id == PH_W;
+}
+
 static int say_is_boundary_char(char c)
 {
     return c == '.' || c == ',' || c == '!' || c == '?' || c == ';' || c == ':';
@@ -655,6 +661,7 @@ static int say_segment_buffer_push(
     segment->boundary_type = boundary_type;
     segment->weak_word = 0;
     segment->stress = 0;
+    segment->diphthong_target = 0;
     return 1;
 }
 
@@ -2694,6 +2701,7 @@ static int say_generate_frames(
     for (i = 0; i < segment_count; ++i) {
         const phoneme_def_t *current;
         const phoneme_def_t *target;
+        const phoneme_def_t *next_vowel; /* A1/A2 — burst color target for plosives/affricates */
         prosody_role_t prosody_role;
         prosody_tune_t tune;
         double duration_ms;
@@ -2744,12 +2752,32 @@ static int say_generate_frames(
 
         next_index = say_find_next_non_pause(segments, segment_count, i + 1);
         target = next_index >= 0 ? say_get_phoneme(segments[next_index].phoneme) : current;
+        next_vowel = NULL;
+        if (options->language == SAY_LANG_EN &&
+            (say_is_plosive_phone(segments[i].phoneme) || say_is_affricate_phone(segments[i].phoneme))) {
+            size_t k;
+            for (k = i + 1; k < segment_count; ++k) {
+                if (segments[k].phoneme == PH_PAUSE) {
+                    break;
+                }
+                if (say_is_vowel_phone(segments[k].phoneme)) {
+                    next_vowel = say_get_phoneme(segments[k].phoneme);
+                    break;
+                }
+            }
+        }
         dental_fricative = say_is_dental_fricative_phone(segments[i].phoneme);
         word_final_fricative = segments[i].word_end &&
             (say_is_fricative_phone(segments[i].phoneme) || say_is_affricate_phone(segments[i].phoneme));
         word_final_sibilant = segments[i].word_end && say_is_sibilant_phone(segments[i].phoneme);
         if (word_final_fricative) {
             target = current;
+        }
+        /* A3 — diphthong: override the formant target so the in-segment glide drives
+         * toward the second element of the diphthong (J or W) rather than toward the
+         * next phoneme. */
+        if (segments[i].diphthong_target != 0) {
+            target = say_get_phoneme((phoneme_id_t) segments[i].diphthong_target);
         }
         duration_ms = current->base_ms * segments[i].duration_scale;
 
@@ -2907,6 +2935,43 @@ static int say_generate_frames(
             duration_ms *= current->voiced ? 1.10 : 1.14;
         }
 
+        /* A1 — affricate additive duration (Amiga PROSOD Rule 12).
+         * The closure-burst-fricative sequence is intrinsically longer than a single
+         * phoneme. Scaled ~75% from the Amiga values (60/100 for CH, 50/65 for JH)
+         * because lib-say's base_ms already covers some of the burst/fricative time
+         * that the Amiga's INHDUR (70ms closure) does not. The "followed by R"
+         * exception preserves the unstressed value ("CHRome", "JREady"). */
+        if (options->language == SAY_LANG_EN && say_is_affricate_phone(segments[i].phoneme)) {
+            int affric_stressed = 0;
+            int followed_by_r = 0;
+            double additive_ms;
+            size_t k;
+            for (k = i + 1; k < segment_count; ++k) {
+                if (segments[k].phoneme == PH_PAUSE) {
+                    break;
+                }
+                if (segments[k].phoneme == PH_R) {
+                    followed_by_r = 1;
+                }
+                if (say_is_vowel_phone(segments[k].phoneme)) {
+                    if (segments[k].stress >= 2 && !segments[k].weak_word) {
+                        affric_stressed = 1;
+                    }
+                    break;
+                }
+                if (segments[k].word_end) {
+                    break;
+                }
+            }
+            if (current->voiced) {
+                additive_ms = (affric_stressed && !followed_by_r) ? 50.0 : 30.0;
+            }
+            else {
+                additive_ms = (affric_stressed && !followed_by_r) ? 75.0 : 40.0;
+            }
+            duration_ms += additive_ms;
+        }
+
         frame_count = (int) ceil(duration_ms / options->frame_ms);
         if (frame_count < 1) {
             frame_count = 1;
@@ -2924,6 +2989,11 @@ static int say_generate_frames(
             steady_ratio = say_is_vowel_phone(segments[i].phoneme) ?
                 (options->language == SAY_LANG_FR ? 0.68 : 0.62) :
                 (options->language == SAY_LANG_FR ? 0.46 : 0.42);
+            if (segments[i].diphthong_target != 0) {
+                /* A3 — diphthong glide takes ~58% of the segment so the F-trajectory
+                 * is clearly perceptible. The first 42% is the steady vowel target. */
+                steady_ratio = 0.42;
+            }
             if (options->language == SAY_LANG_FR && say_is_nasal_vowel_phone(segments[i].phoneme)) {
                 steady_ratio = 0.74;
             }
@@ -3121,6 +3191,28 @@ static int say_generate_frames(
                 frame.bandwidth[j] = current->bandwidth[j] + (target->bandwidth[j] - current->bandwidth[j]) * transition_alpha;
                 frame.gain[j] = current->gain[j] + (target->gain[j] - current->gain[j]) * transition_alpha;
             }
+
+            /* A2 — plosive aspiration coloring. A1 — affricate burst coloring.
+             * During the burst phase, bias F2/F3 toward the upcoming vowel so the
+             * noise burst takes on a vowel-shaped character. The Amiga PlosAspID[37][5]
+             * table picked a specific aspiration vowel-shaped noise per (plosive, vowel);
+             * with the biquad bank we approximate it by lifting next-vowel's F2/F3 into
+             * the burst formant filter. Active only in EN, between closure end and the
+             * onset of the formant transition / fricative phase. */
+            if (next_vowel != NULL) {
+                double burst_w = 0.0;
+                if (say_is_plosive_phone(segments[i].phoneme) && alpha >= 0.30 && alpha < 0.58) {
+                    burst_w = sin((alpha - 0.30) / 0.28 * M_PI) * 0.55;
+                }
+                else if (say_is_affricate_phone(segments[i].phoneme) && alpha >= 0.30 && alpha < 0.48) {
+                    burst_w = sin((alpha - 0.30) / 0.18 * M_PI) * 0.45;
+                }
+                if (burst_w > 0.0) {
+                    frame.formant_freq[1] = frame.formant_freq[1] * (1.0 - burst_w) + next_vowel->formant_freq[1] * burst_w;
+                    frame.formant_freq[2] = frame.formant_freq[2] * (1.0 - burst_w) + next_vowel->formant_freq[2] * burst_w;
+                }
+            }
+
             if (options->language == SAY_LANG_EN && aff_fric_phase) {
                 /* Blend toward SH (CH) or ZH (JH) formants in the fricative phase */
                 const phoneme_def_t *fric_ph = say_get_phoneme(current->voiced ? PH_ZH : PH_SH);
@@ -4008,6 +4100,58 @@ static void say_release_pipeline_buffers(
     }
 }
 
+/* A3 — diphthong fusion. Detects [stressed-vowel + glide] pairs in the same English
+ * word and merges them into a single segment that carries an internal F-trajectory
+ * (start at the vowel formants, end at the glide formants). The downstream frame
+ * generator drives the trajectory using `diphthong_target`. SCHWA and the French
+ * nasal vowels never form diphthongs. */
+static void say_fuse_english_diphthongs(segment_buffer_t *segments)
+{
+    size_t read;
+    size_t write;
+
+    if (segments == NULL || segments->count < 2) {
+        return;
+    }
+
+    write = 0;
+    read = 0;
+    while (read < segments->count) {
+        segment_t cur = segments->data[read];
+        int fused = 0;
+
+        if (read + 1 < segments->count) {
+            segment_t nxt = segments->data[read + 1];
+            if (say_is_vowel_phone(cur.phoneme) &&
+                cur.phoneme != PH_SCHWA &&
+                !say_is_nasal_vowel_phone(cur.phoneme) &&
+                say_is_glide_phone(nxt.phoneme) &&
+                !cur.word_end &&
+                cur.diphthong_target == 0) {
+                /* Collapse the glide into the vowel. The glide contributes ~55% of its
+                 * duration to the diphthong (real diphthongs are ~1.4× a plain vowel,
+                 * not 2× as we get from concatenating both segments). */
+                cur.duration_scale += nxt.duration_scale * 0.55;
+                cur.diphthong_target = (int) nxt.phoneme;
+                cur.word_end = nxt.word_end;
+                if (nxt.boundary_type > cur.boundary_type) {
+                    cur.boundary_type = nxt.boundary_type;
+                }
+                read += 2;
+                fused = 1;
+            }
+        }
+
+        if (!fused) {
+            ++read;
+        }
+
+        segments->data[write++] = cur;
+    }
+
+    segments->count = write;
+}
+
 static int say_prepare_pipeline(
     const char *input,
     const say_options_t *options,
@@ -4056,6 +4200,10 @@ static int say_prepare_pipeline(
             say_release_pipeline_buffers(normalized, segments, frames);
             return 0;
         }
+    }
+
+    if (resolved_options.language == SAY_LANG_EN) {
+        say_fuse_english_diphthongs(segments);
     }
 
     if (!say_generate_frames(segments->data, segments->count, &resolved_options, frames, error, error_size)) {
@@ -4133,6 +4281,12 @@ static int say_text_buffer_append_phoneme_stream(
         }
         if (!say_text_buffer_append(buffer, phoneme->symbol)) {
             return 0;
+        }
+        if (segments[i].diphthong_target != 0) {
+            const phoneme_def_t *target_phoneme = say_get_phoneme((phoneme_id_t) segments[i].diphthong_target);
+            if (!say_text_buffer_appendf(buffer, "->%s", target_phoneme->symbol)) {
+                return 0;
+            }
         }
         first = 0;
     }

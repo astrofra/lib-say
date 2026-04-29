@@ -16,9 +16,29 @@ REF_DIR     = REPO_ROOT / "bin" / "reference-en"
 OUT_DIR     = REF_DIR / "mfa-analysis"
 CORPUS_DIR  = OUT_DIR / "corpus"
 ALIGN_DIR   = OUT_DIR / "aligned"
-MFA_EXE     = r"C:\tools\miniforge3\Scripts\conda.exe"
 MFA_CONDA_ENV = "mfa"
 SAMPLE_RATE = 22050
+
+
+def resolve_conda_exe():
+    candidates = [
+        os.environ.get("LIBSAY_CONDA_EXE"),
+        os.environ.get("CONDA_EXE"),
+        r"S:\tools\miniforge3\Scripts\conda.exe",
+        r"C:\tools\miniforge3\Scripts\conda.exe",
+    ]
+    for candidate in candidates:
+        if candidate and Path(candidate).exists():
+            return candidate
+    raise FileNotFoundError(
+        "Unable to find conda.exe. Set LIBSAY_CONDA_EXE to the full conda.exe path."
+    )
+
+
+MFA_EXE = resolve_conda_exe()
+
+if not os.environ.get("MFA_ROOT_DIR") and Path(r"S:\tools\mfa-data").exists():
+    os.environ["MFA_ROOT_DIR"] = r"S:\tools\mfa-data"
 
 CORPUS = [
     ("01-demo",          "Hello from lib-say. This is an English demo sentence."),
@@ -143,13 +163,16 @@ def run_alignment():
         name = corpus_subdir.name
         out  = ALIGN_DIR / name
         print(f"  aligning {name} ...", end=" ", flush=True)
-        r = mfa("align", str(corpus_subdir), "english_mfa", "english_mfa",
+        r = mfa("align", str(corpus_subdir), "english_us_mfa", "english_mfa",
                 str(out), "--clean", "--quiet")
         if r.returncode == 0:
             print("OK")
         else:
             print("FAIL")
-            print(r.stderr[-400:] if r.stderr else "(no stderr)")
+            try:
+                print(r.stderr[-600:] if r.stderr else "(no stderr)")
+            except UnicodeEncodeError:
+                print(r.stderr[-600:].encode("ascii", "replace").decode("ascii") if r.stderr else "(no stderr)")
 
 def load_alignments():
     """Return dict: key=(speaker, tag) → list of phone intervals."""

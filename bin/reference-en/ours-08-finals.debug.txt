@@ -16,10 +16,10 @@ word_to_phoneme:
   [pause:sentence]
 
 phoneme_stream:
-  L 'I V / DH 'I Z / K L 'OH W DH Z / 'AE N D / B 'AE G Z [pause x2:sentence]
+  L 'I V / DH 'I Z / K L 'OH->W DH Z / 'AE N D / B 'AE G Z [pause x2:sentence]
 
 segments:
-segment_count: 21
+segment_count: 20
   00  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
   01  I          nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
   02  V          nominal_ms=84.0 voiced=1 vowel=0 noise=0.18 scale=1.00 weak=0 stress=0
@@ -28,27 +28,26 @@ segment_count: 21
   05  Z          nominal_ms=84.6 voiced=1 vowel=0 noise=0.44 scale=0.94 weak=0 stress=0
   06  K          nominal_ms=70.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   07  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
-  08  OH         nominal_ms=108.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
-  09  W          nominal_ms=72.0 voiced=1 vowel=0 noise=0.03 scale=1.00 weak=0 stress=0
-  10  DH         nominal_ms=90.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
-  11  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
-  12  AE         nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
-  13  N          nominal_ms=76.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0 stress=0
-  14  D          nominal_ms=68.0 voiced=1 vowel=0 noise=0.34 scale=1.00 weak=0 stress=0
-  15  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
-  16  AE         nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
-  17  G          nominal_ms=72.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
-  18  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
+  08  OH         nominal_ms=167.4 voiced=1 vowel=1 noise=0.02 scale=1.55 weak=0 stress=2
+  09  DH         nominal_ms=90.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
+  10  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
+  11  AE         nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  12  N          nominal_ms=76.0 voiced=1 vowel=0 noise=0.05 scale=1.00 weak=0 stress=0
+  13  D          nominal_ms=68.0 voiced=1 vowel=0 noise=0.34 scale=1.00 weak=0 stress=0
+  14  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
+  15  AE         nominal_ms=110.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
+  16  G          nominal_ms=72.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
+  17  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
+  18  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
   19  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
-  20  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 473
+frame_count: 472
 frame_duration_ms: 5
-estimated_duration_ms: 2365.0
-voiced_frames: 353
+estimated_duration_ms: 2360.0
+voiced_frames: 352
 unvoiced_frames: 28
 pause_frames: 92
-pitch_hz: min=110.80 avg=133.98 max=150.80
-amplitude: min=0.016 avg=0.566 max=1.045
+pitch_hz: min=110.80 avg=134.38 max=150.80
+amplitude: min=0.016 avg=0.579 max=1.045
 noise_mix: min=0.000 avg=0.093 max=0.380
