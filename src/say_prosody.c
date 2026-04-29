@@ -890,6 +890,16 @@ int say_generate_frames(
                      (say_is_fricative_phone(segments[i].phoneme) || say_is_affricate_phone(segments[i].phoneme))) {
                 steady_ratio = 0.44;
             }
+            /* F2 — articulation. articulation_pct=100 leaves steady_ratio alone;
+             * <100 shrinks the steady portion (more transition / lazier coarticulation),
+             * >100 expands it (clipped / staccato). The "1 - steady_ratio" portion
+             * is the transition zone, so multiplying steady_ratio by k effectively
+             * scales transition by (1 - k * orig). Clamped to [0.10, 0.90]. */
+            if (options->articulation_pct > 0 && options->articulation_pct != 100) {
+                steady_ratio *= (double) options->articulation_pct / 100.0;
+                if (steady_ratio < 0.10) steady_ratio = 0.10;
+                if (steady_ratio > 0.90) steady_ratio = 0.90;
+            }
             transition_alpha = say_transition_alpha(alpha, steady_ratio);
             segment_envelope = 1.0;
             local_noise_mix = current->noise_mix;
@@ -1212,6 +1222,37 @@ int say_generate_frames(
             if (word_final_sibilant) {
                 frame.gain[3] *= options->language == SAY_LANG_EN ? 1.00 : 1.03;
                 frame.gain[4] *= options->language == SAY_LANG_EN ? 1.01 : 1.04;
+            }
+
+            /* F1 — centralization: blend a vowel's formants toward the schwa
+             * targets. Applied last so the per-phoneme bandwidth/gain shaping
+             * runs first; only formant frequencies get pulled toward schwa.
+             * Skipped for sonorants and consonants because the rule is that
+             * vowels reduce — consonants stay where they are. */
+            if (options->centralization_pct > 0 &&
+                say_is_vowel_phone(segments[i].phoneme) &&
+                segments[i].phoneme != PH_SCHWA)
+            {
+                double t = (double) options->centralization_pct / 100.0;
+                const phoneme_def_t *schwa = say_get_phoneme(PH_SCHWA);
+                if (t > 1.0) t = 1.0;
+                for (j = 0; j < SAY_MAX_FORMANTS; ++j) {
+                    frame.formant_freq[j] = say_lerp(frame.formant_freq[j], schwa->formant_freq[j], t);
+                }
+            }
+
+            /* F3 — voice tilt. Multiply all formant frequencies by
+             * voice_formants_pct (≈117 for a higher / smaller-vocal-tract voice,
+             * ≈92 for a deeper one) and pitch by voice_pitch_pct. Both default
+             * to 100 (no change). */
+            if (options->voice_formants_pct > 0 && options->voice_formants_pct != 100) {
+                double k = (double) options->voice_formants_pct / 100.0;
+                for (j = 0; j < SAY_MAX_FORMANTS; ++j) {
+                    frame.formant_freq[j] *= k;
+                }
+            }
+            if (options->voice_pitch_pct > 0 && options->voice_pitch_pct != 100) {
+                frame.pitch_hz *= (double) options->voice_pitch_pct / 100.0;
             }
 
             if (!say_frame_buffer_push(frames, &frame)) {

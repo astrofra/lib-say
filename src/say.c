@@ -461,6 +461,10 @@ void say_default_options(say_options_t *options)
     options->frame_ms = 5;
     options->language = SAY_LANG_EN;
     options->phoneme_input = 0;
+    options->centralization_pct = 0;     /* F1 — neutral (no schwa blend) */
+    options->articulation_pct  = 100;    /* F2 — neutral (steady_ratio unchanged) */
+    options->voice_formants_pct = 100;   /* F3 — neutral (no formant tilt) */
+    options->voice_pitch_pct   = 100;    /* F3 — neutral (no pitch shift) */
 }
 
 const char *say_language_name(say_language_t language)

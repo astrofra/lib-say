@@ -20,6 +20,20 @@ typedef struct say_options_t {
     int frame_ms;
     say_language_t language;
     int phoneme_input;
+    /* F1 — centralization (0..100). Blends every vowel's formant frequencies
+     * toward the schwa target. 0 = neutral, 100 = fully reduced (everything
+     * sounds like schwa). Useful for fast-speech / fatigued voice effects. */
+    int centralization_pct;
+    /* F2 — articulation (50..200, default 100). Scales the steady-state ratio
+     * inside each segment. <100 = lazier (longer transitions, blurrier),
+     * >100 = clipped/staccato (shorter transitions, more abrupt). */
+    int articulation_pct;
+    /* F3 — voice tilt. Multiplies all formant frequencies by voice_formants_pct
+     * (80..130, default 100; ~117 for a higher / smaller-vocal-tract voice).
+     * Multiplies pitch by voice_pitch_pct (50..200, default 100). Both default
+     * to 100, leaving the synthesized voice unchanged. */
+    int voice_formants_pct;
+    int voice_pitch_pct;
 } say_options_t;
 
 void say_default_options(say_options_t *options);

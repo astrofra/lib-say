@@ -20,6 +20,10 @@ static void tts_print_usage(FILE *stream)
         "  --lang <en|fr>        Language rules for text input (default: en)\n"
         "  --rate <hz>           Sample rate, 44100 only (default: 44100)\n"
         "  --frame-ms <5-10>     Frame size in milliseconds (default: 5)\n"
+        "  --centralize <0-100>  Vowel reduction toward schwa (default: 0)\n"
+        "  --articulate <50-200> Steady-portion scale; <100 lazier, >100 clipped (default: 100)\n"
+        "  --voice-formants <80-130>  Formant frequency multiplier (default: 100)\n"
+        "  --voice-pitch <50-200>     Pitch multiplier (default: 100)\n"
         "  --phonemes            Treat the input as phoneme symbols instead of plain text\n"
         "  --debug-report <p>    Write a debug report to a file, or use - for stdout\n"
         "  --dry-run             Build the debug pipeline but skip audio rendering/output\n"
@@ -182,6 +186,38 @@ int main(int argc, char **argv)
                 return 1;
             }
             options.frame_ms = atoi(argv[++i]);
+            continue;
+        }
+        if (strcmp(argv[i], "--centralize") == 0) {
+            if (i + 1 >= argc) {
+                fprintf(stderr, "missing value after --centralize\n");
+                return 1;
+            }
+            options.centralization_pct = atoi(argv[++i]);
+            continue;
+        }
+        if (strcmp(argv[i], "--articulate") == 0) {
+            if (i + 1 >= argc) {
+                fprintf(stderr, "missing value after --articulate\n");
+                return 1;
+            }
+            options.articulation_pct = atoi(argv[++i]);
+            continue;
+        }
+        if (strcmp(argv[i], "--voice-formants") == 0) {
+            if (i + 1 >= argc) {
+                fprintf(stderr, "missing value after --voice-formants\n");
+                return 1;
+            }
+            options.voice_formants_pct = atoi(argv[++i]);
+            continue;
+        }
+        if (strcmp(argv[i], "--voice-pitch") == 0) {
+            if (i + 1 >= argc) {
+                fprintf(stderr, "missing value after --voice-pitch\n");
+                return 1;
+            }
+            options.voice_pitch_pct = atoi(argv[++i]);
             continue;
         }
         if (strcmp(argv[i], "--phonemes") == 0) {
