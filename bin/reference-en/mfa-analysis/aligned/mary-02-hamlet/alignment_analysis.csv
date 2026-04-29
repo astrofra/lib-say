@@ -1,2 +1,2 @@
 file,begin,end,speaker,overall_log_likelihood,speech_log_likelihood,phone_duration_deviation,snr
-mary-02-hamlet,0.0,2.55,mary-02-hamlet,-51.22774203431373,-53.404449780782066,1.15470053837829,18.883453796470967
+mary-02-hamlet,0.0,2.55,mary-02-hamlet,-50.98326439950981,-53.149776458740234,1.3907604707760162,18.727625016378468

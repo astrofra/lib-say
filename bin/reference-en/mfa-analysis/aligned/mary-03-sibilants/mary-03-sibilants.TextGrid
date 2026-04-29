@@ -22,10 +22,10 @@ item []:
             text = "sells" 
         intervals [3]:
             xmin = 0.54 
-            xmax = 1.06 
+            xmax = 1.07 
             text = "seashells" 
         intervals [4]:
-            xmin = 1.06 
+            xmin = 1.07 
             xmax = 1.3 
             text = "by" 
         intervals [5]:
@@ -34,10 +34,10 @@ item []:
             text = "the" 
         intervals [6]:
             xmin = 1.39 
-            xmax = 2.05 
+            xmax = 2.06 
             text = "seashore" 
         intervals [7]:
-            xmin = 2.05 
+            xmin = 2.06 
             xmax = 2.21 
             text = "" 
     item [2]:
@@ -84,18 +84,18 @@ item []:
             text = "ʃ" 
         intervals [10]:
             xmin = 0.85 
-            xmax = 0.92 
+            xmax = 0.93 
             text = "ɛ" 
         intervals [11]:
-            xmin = 0.92 
+            xmin = 0.93 
             xmax = 1.01 
             text = "ɫ" 
         intervals [12]:
             xmin = 1.01 
-            xmax = 1.06 
+            xmax = 1.07 
             text = "z" 
         intervals [13]:
-            xmin = 1.06 
+            xmin = 1.07 
             xmax = 1.17 
             text = "b" 
         intervals [14]:
@@ -128,9 +128,9 @@ item []:
             text = "ɒ" 
         intervals [21]:
             xmin = 1.84 
-            xmax = 2.05 
+            xmax = 2.06 
             text = "ɹ" 
         intervals [22]:
-            xmin = 2.05 
+            xmin = 2.06 
             xmax = 2.21 
             text = "" 

@@ -88,10 +88,10 @@ item []:
             text = "k" 
         intervals [10]:
             xmin = 0.7 
-            xmax = 0.79 
+            xmax = 0.78 
             text = "l" 
         intervals [11]:
-            xmin = 0.79 
+            xmin = 0.78 
             xmax = 1.01 
             text = "ow" 
         intervals [12]:
@@ -104,18 +104,18 @@ item []:
             text = "z" 
         intervals [14]:
             xmin = 1.23 
-            xmax = 1.32 
+            xmax = 1.33 
             text = "æ" 
         intervals [15]:
-            xmin = 1.32 
+            xmin = 1.33 
             xmax = 1.4 
             text = "n" 
         intervals [16]:
             xmin = 1.4 
-            xmax = 1.58 
+            xmax = 1.57 
             text = "b" 
         intervals [17]:
-            xmin = 1.58 
+            xmin = 1.57 
             xmax = 1.69 
             text = "æ" 
         intervals [18]:
