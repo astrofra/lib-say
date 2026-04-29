@@ -111,6 +111,13 @@ static int say_prepare_pipeline(
         }
     }
 
+    /* C2 — feature-driven phonological rule pass: cluster simplifications,
+     * allophonic substitutions, etc. Currently English-only. Runs before
+     * diphthong fusion so the rule context is the raw NRL/lexicon output. */
+    if (resolved_options.language == SAY_LANG_EN) {
+        say_apply_phonological_rules(segments);
+    }
+
     if (resolved_options.language == SAY_LANG_EN) {
         say_fuse_english_diphthongs(segments);
     }

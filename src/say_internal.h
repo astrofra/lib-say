@@ -222,6 +222,12 @@ const char *say_digit_word(char digit, say_language_t language);
 int   say_phonemize_english_nrl(const char *word, segment_buffer_t *segments);
 
 /* ---------------------------------------------------------------------------
+ * say_phonol.c — feature-driven phonological rule pass (C2)
+ * ------------------------------------------------------------------------- */
+
+void  say_apply_phonological_rules(segment_buffer_t *segments);
+
+/* ---------------------------------------------------------------------------
  * say_prosody.c — clause analysis, F0, duration cascade, frame generation
  * ------------------------------------------------------------------------- */
 
