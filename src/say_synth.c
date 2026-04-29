@@ -177,6 +177,10 @@ int say_synthesize_frames(
     double source_state;
     double source_hp_x1;
     double source_hp_y1;
+    double source_tilt_state;     /* Spectral tilt LP — emulates the natural −6 dB/oct
+                                   * roll-off of the glottal source above ~600 Hz, before
+                                   * the signal enters the formant bank. Reduces the
+                                   * "buzzy" overtone energy on high formants. */
     double noise_hp1_x1;
     double noise_hp1_y1;
     double noise_hp2_x1;
@@ -228,6 +232,7 @@ int say_synthesize_frames(
     source_state = 0.0;
     source_hp_x1 = 0.0;
     source_hp_y1 = 0.0;
+    source_tilt_state = 0.0;
     noise_hp1_x1 = 0.0;
     noise_hp1_y1 = 0.0;
     noise_hp2_x1 = 0.0;
@@ -413,6 +418,12 @@ int say_synthesize_frames(
             source_hp_y1 = source_hp;
             source_state += 0.16 * (source_hp - source_state);
             voiced_excitation = 0.80 * source_state + 0.20 * source_hp;
+            /* Spectral tilt — one-pole LP at fc = 0.085 × fs / 2π ≈ 596 Hz.
+             * Stacks with source_state's existing −6 dB/oct shaping above ~1124 Hz
+             * to give roughly −12 dB/oct above 1.1 kHz, matching the natural
+             * glottal source roll-off and damping the high-formant buzz. */
+            source_tilt_state += 0.085 * (voiced_excitation - source_tilt_state);
+            voiced_excitation = source_tilt_state;
 
             noise_hp1 = noise - noise_hp1_x1 + 0.985 * noise_hp1_y1;
             noise_hp1_x1 = noise;
@@ -463,6 +474,7 @@ int say_synthesize_frames(
                 noise_path_lp.z1 *= 0.84;
                 noise_path_lp.z2 *= 0.84;
                 vbar_lp_state *= 0.84;
+                source_tilt_state *= 0.84;
             }
 
             output *= amplitude_state * 0.86;
