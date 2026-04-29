@@ -817,10 +817,14 @@ int say_generate_frames(
 
         /* A1 — affricate additive duration (PROSOD Rule 12).
          * The closure-burst-fricative sequence is intrinsically longer than a single
-         * phoneme. Scaled ~75% from the reference values (60/100 for CH, 50/65 for JH)
-         * because lib-say's base_ms already covers some of the burst/fricative time
-         * that the reference's INHDUR (70ms closure) does not. The "followed by R"
-         * exception preserves the unstressed value ("CHRome", "JREady"). */
+         * phoneme. Reduced ~50% from the first-pass values (40/75 unvoiced,
+         * 30/50 voiced) because MFA tended to align the closure phase as
+         * silence, leaving only the burst+fricative tagged as the affricate —
+         * which made our affricates measure too long against MaryTTS. The new
+         * values match Mary's natural CH/JH durations more closely while still
+         * giving the closure-burst sequence enough time to be perceptible.
+         * The "followed by R" exception preserves the unstressed value
+         * ("CHRome", "JREady"). */
         if (options->language == SAY_LANG_EN && say_is_affricate_phone(segments[i].phoneme)) {
             int affric_stressed = 0;
             int followed_by_r = 0;
@@ -844,10 +848,12 @@ int say_generate_frames(
                 }
             }
             if (current->voiced) {
-                additive_ms = (affric_stressed && !followed_by_r) ? 50.0 : 30.0;
+                /* JH (e.g. judge, changing): stressed +25 ms, unstressed +15 ms */
+                additive_ms = (affric_stressed && !followed_by_r) ? 25.0 : 15.0;
             }
             else {
-                additive_ms = (affric_stressed && !followed_by_r) ? 75.0 : 40.0;
+                /* CH (e.g. church, question): stressed +35 ms, unstressed +20 ms */
+                additive_ms = (affric_stressed && !followed_by_r) ? 35.0 : 20.0;
             }
             duration_ms += additive_ms;
         }
