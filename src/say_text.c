@@ -413,6 +413,7 @@ int say_segment_buffer_push(
     segment->weak_word = 0;
     segment->stress = 0;
     segment->diphthong_target = 0;
+    segment->accent_n = 0;
     return 1;
 }
 
@@ -995,6 +996,11 @@ static void say_finalize_word_metadata(
             ++vowel_rank;
             if (primary_stress_vowel > 0 && vowel_rank == primary_stress_vowel) {
                 segments->data[i].stress = 2;
+                /* E1 — lexicon entries assert "this is the primary-stress vowel" without
+                 * a graded level, so seed accent_n with 4 (the reference default). */
+                if (segments->data[i].accent_n == 0) {
+                    segments->data[i].accent_n = 4;
+                }
             }
         }
     }

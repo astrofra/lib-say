@@ -619,13 +619,14 @@ static int nrl_emit_phonemes(
 
         if (c == ' ') { ++p; continue; }
         if (c >= '1' && c <= '9') {
-            /* Reference rule digits are relative stress levels (1..9) within a word.
-             * The rule writer's intent is "this vowel is stressed"; lib-say only
-             * has a binary stress field, so any digit ≥ 1 marks the most-recent
-             * vowel as primary-stressed. Words ending with no digit at all are
-             * handled by the accenter post-processor below. */
+            /* E1 — Reference rule digits are graded stress levels (1..9). Store
+             * the digit verbatim in `accent_n` so the F0 declination model can
+             * vary peak emphasis per AS, and flip the binary `stress` so existing
+             * clause_anchor / finalize logic still sees this vowel as stressed.
+             * Words with no digit at all are handled by the accenter below. */
             if (last_vowel != (size_t) -1) {
                 segments->data[last_vowel].stress = 2;
+                segments->data[last_vowel].accent_n = c - '0';
             }
             ++p;
             continue;
@@ -753,6 +754,7 @@ int say_phonemize_english_nrl(const char *word, segment_buffer_t *segments)
     }
     if (!has_vowel_with_stress && first_vowel_seg != (size_t) -1) {
         segments->data[first_vowel_seg].stress = 2;
+        segments->data[first_vowel_seg].accent_n = 4;  /* default level — same convention as the reference */
     }
     return segments->count > segs_at_start;
 }

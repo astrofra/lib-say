@@ -25,6 +25,11 @@ typedef enum prosody_role_t {
     SAY_PROSODY_TAIL
 } prosody_role_t;
 
+/* E2 — accented syllables in a clause, in order, capped at 16. The declination
+ * model walks this list to compute peak F0 per AS; segments between adjacent
+ * AS interpolate between their peaks. */
+#define SAY_MAX_AS_PER_CLAUSE 16
+
 typedef struct clause_prosody_t {
     size_t start;
     size_t end;
@@ -34,6 +39,9 @@ typedef struct clause_prosody_t {
     size_t first_anchor;
     size_t nucleus;
     size_t anchor_count;
+    size_t as_indices[SAY_MAX_AS_PER_CLAUSE];
+    int    as_accent_n[SAY_MAX_AS_PER_CLAUSE];
+    int    as_count;
 } clause_prosody_t;
 
 typedef struct prosody_tune_t {
@@ -169,6 +177,7 @@ static void say_analyze_clause(
     clause->first_anchor = (size_t) -1;
     clause->nucleus = (size_t) -1;
     clause->anchor_count = 0;
+    clause->as_count = 0;
 
     while (start_index < segment_count && segments[start_index].phoneme == PH_PAUSE) {
         ++start_index;
@@ -199,12 +208,29 @@ static void say_analyze_clause(
             }
             clause->nucleus = i;
             ++clause->anchor_count;
+            /* E2 — record this AS into the ordered declination list. The first
+             * SAY_MAX_AS_PER_CLAUSE anchors are kept; anything past that is rare
+             * (very long clauses) and its excess is rolled into the tail. */
+            if (clause->as_count < SAY_MAX_AS_PER_CLAUSE) {
+                int n = segments[i].accent_n;
+                if (n <= 0) n = 4;  /* defensive: anchor without explicit level → default */
+                clause->as_indices[clause->as_count] = i;
+                clause->as_accent_n[clause->as_count] = n;
+                ++clause->as_count;
+            }
         }
     }
 
     if (clause->first_anchor == (size_t) -1) {
         clause->first_anchor = clause->first_vowel;
         clause->nucleus = clause->last_vowel;
+        /* No real anchors — synthesize a single AS at the last vowel so the
+         * declination model still has somewhere to peak. */
+        if (clause->last_vowel != (size_t) -1) {
+            clause->as_indices[0] = clause->last_vowel;
+            clause->as_accent_n[0] = 4;
+            clause->as_count = 1;
+        }
     }
 }
 
@@ -348,6 +374,66 @@ static prosody_tune_t say_select_tune(say_language_t language, int boundary_type
     return tune;
 }
 
+/* E2 — F0 contour from declination + per-AS accent modification.
+ *
+ * Mirrors the Reference's F0HDPEAK / F0B / F0B3B logic but compressed for our
+ * smaller register and run through `prosody_tune_t` for cross-clause-type
+ * variation:
+ *
+ *   1. The clause's "head peak" (offset from BOR) is `tune->head_start`.
+ *   2. The clause's "final target" (last AS peak before any tail decay) is
+ *      `tune->nucleus_no_tail_end` if the nucleus IS the last vowel (no tail),
+ *      otherwise `tune->tail_end`.
+ *   3. Each accented syllable sits on the linear declination line connecting
+ *      the head peak to the final target (evenly spaced by AS index).
+ *   4. Each AS peak is shifted by `(accent_n - 4) × emphasis_pct × local_room`,
+ *      where local_room = peak - 0 (baseline already factored out) and
+ *      emphasis_pct is a small fraction (~0.10).  accent_n = 4 (default) is
+ *      neutral; >4 is more emphatic, <4 is reduced.
+ *   5. Segments before the first AS rise from `tune->prehead_start` to AS_0.
+ *   6. Segments between AS_i and AS_{i+1} interpolate between their peaks.
+ *   7. Segments after the last AS fall to `tune->tail_end`.
+ *
+ * Heads-up: weak-word drops, schwa dips, and the old role-based bumps are NOT
+ * preserved — declination is meant to capture the same effect more uniformly.
+ * If a sample regresses on those grounds, the tune knobs above are the place
+ * to retune. */
+
+static double say_as_peak(
+    const clause_prosody_t *clause,
+    const prosody_tune_t *tune,
+    int as_idx
+)
+{
+    double head_off = tune->head_start;
+    double final_off = (clause->last_vowel == clause->nucleus || clause->nucleus == clause->end)
+                       ? tune->nucleus_no_tail_end
+                       : tune->tail_end;
+    double frac;
+    double base_peak;
+    double accent_mod;
+    int n = clause->as_count;
+    int level = clause->as_accent_n[as_idx];
+
+    if (n <= 1) {
+        base_peak = head_off;
+    } else {
+        frac = (double) as_idx / (double) (n - 1);
+        base_peak = say_lerp(head_off, final_off, frac);
+    }
+
+    /* Per-AS accent modification. The reference modifies by 10% of "local room"
+     * (peak above register base); we use the same proportion but scaled by
+     * |peak| rather than (peak − BOR) since `base_peak` here is already an
+     * offset from BOR (BOR is folded into `base_pitch` upstream). For accent
+     * digit 4 (default), modification is zero. */
+    {
+        double local_room = base_peak >= 0.0 ? base_peak + 4.0 : 4.0;
+        accent_mod = ((double)(level - 4)) * 0.10 * local_room;
+    }
+    return base_peak + accent_mod;
+}
+
 static double say_clause_pitch_offset(
     const segment_t *segments,
     size_t segment_count,
@@ -358,58 +444,54 @@ static double say_clause_pitch_offset(
     double alpha
 )
 {
-    prosody_role_t role;
+    int n;
+    int i;
     double t;
-    double pitch;
-    size_t head_end;
-    size_t tail_start;
-    int anchor;
 
+    (void) segments;
     (void) segment_count;
+    (void) language;
 
     if (clause->start == (size_t) -1 || clause->first_vowel == (size_t) -1) {
         return 0.0;
     }
 
-    role = say_clause_role_for_segment(clause, index);
-    anchor = say_is_clause_anchor(segments, segment_count, language, index);
+    n = clause->as_count;
+    if (n == 0) {
+        /* Degenerate clause with no vowels — flat. */
+        t = say_segment_progress(index, clause->start, clause->end, alpha);
+        return say_lerp(tune->prehead_start, tune->tail_end, say_smoothstep01(t));
+    }
 
-    switch (role) {
-        case SAY_PROSODY_PREHEAD:
-            t = say_segment_progress(
-                index,
-                clause->start,
-                clause->first_anchor > clause->start ? clause->first_anchor - 1 : clause->start,
-                alpha);
-            return say_lerp(tune->prehead_start, tune->prehead_end, say_smoothstep01(t));
+    /* Locate which AS bracket holds `index`. */
+    for (i = 0; i < n; ++i) {
+        if (clause->as_indices[i] >= index) {
+            break;
+        }
+    }
 
-        case SAY_PROSODY_HEAD:
-            head_end = clause->nucleus > clause->first_anchor ? clause->nucleus - 1 : clause->first_anchor;
-            t = say_segment_progress(index, clause->first_anchor, head_end, alpha);
-            pitch = say_lerp(tune->head_start, tune->head_end, say_smoothstep01(t));
-            if (say_is_vowel_phone(segments[index].phoneme)) {
-                pitch += anchor ? tune->head_anchor_bump : tune->head_unstressed_drop;
-            }
-            else if (segments[index].weak_word) {
-                pitch += 0.65 * tune->head_unstressed_drop;
-            }
-            return pitch;
-
-        case SAY_PROSODY_NUCLEUS:
-            if (clause->last_vowel == clause->nucleus || clause->nucleus == clause->end) {
-                return say_lerp(tune->nucleus_start, tune->nucleus_no_tail_end, say_smoothstep01(alpha));
-            }
-            return say_lerp(tune->nucleus_start, tune->nucleus_end, say_smoothstep01(alpha));
-
-        case SAY_PROSODY_TAIL:
-        default:
-            tail_start = clause->nucleus < clause->end ? clause->nucleus + 1 : clause->nucleus;
-            t = say_segment_progress(index, tail_start, clause->end, alpha);
-            pitch = say_lerp(tune->tail_start, tune->tail_end, say_smoothstep01(t));
-            if (say_is_vowel_phone(segments[index].phoneme) && segments[index].weak_word) {
-                pitch += 0.35 * tune->head_unstressed_drop;
-            }
-            return pitch;
+    if (i == 0) {
+        /* Pre-head: rise from prehead_start to AS_0 peak. */
+        double peak0 = say_as_peak(clause, tune, 0);
+        t = say_segment_progress(index, clause->start, clause->as_indices[0], alpha);
+        return say_lerp(tune->prehead_start, peak0, say_smoothstep01(t));
+    }
+    if (i == n) {
+        /* Tail: fall from AS_{n-1} peak to tail_end. */
+        double peak_last = say_as_peak(clause, tune, n - 1);
+        t = say_segment_progress(index, clause->as_indices[n - 1], clause->end, alpha);
+        return say_lerp(peak_last, tune->tail_end, say_smoothstep01(t));
+    }
+    if (clause->as_indices[i] == index) {
+        /* Sitting on AS_i. */
+        return say_as_peak(clause, tune, i);
+    }
+    /* Between AS_{i-1} and AS_i. */
+    {
+        double peak_prev = say_as_peak(clause, tune, i - 1);
+        double peak_next = say_as_peak(clause, tune, i);
+        t = say_segment_progress(index, clause->as_indices[i - 1], clause->as_indices[i], alpha);
+        return say_lerp(peak_prev, peak_next, say_smoothstep01(t));
     }
 }
 

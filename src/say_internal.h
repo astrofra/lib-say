@@ -119,6 +119,13 @@ typedef struct segment_t {
     int weak_word;
     int stress;
     int diphthong_target;
+    /* E1 — graded accent level (0 = unstressed, 1..9 = rule-emitted stress digit
+     * with 4 = default primary). NRL fills this from the rule's stress digit;
+     * lexicon-path words use 4 on the primary vowel. The binary `stress` field
+     * stays in lock-step (stress=2 ⇔ accent_n>=1) so the rest of the code
+     * keeps working unchanged. The F0 declination model in say_prosody.c reads
+     * accent_n to vary peak emphasis per accented syllable. */
+    int accent_n;
 } segment_t;
 
 typedef struct segment_buffer_t {
