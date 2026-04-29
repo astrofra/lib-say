@@ -69,17 +69,17 @@ item []:
         intervals [1]:
             xmin = 0.0 
             xmax = 0.09 
-            text = "t" 
+            text = "tʰ" 
         intervals [2]:
             xmin = 0.09 
             xmax = 0.15 
-            text = "ə" 
+            text = "ʉː" 
         intervals [3]:
             xmin = 0.15 
-            xmax = 0.21 
+            xmax = 0.22 
             text = "bʲ" 
         intervals [4]:
-            xmin = 0.21 
+            xmin = 0.22 
             xmax = 0.33 
             text = "i" 
         intervals [5]:

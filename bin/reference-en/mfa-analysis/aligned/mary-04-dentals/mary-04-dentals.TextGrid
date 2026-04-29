@@ -18,10 +18,10 @@ item []:
             text = "this" 
         intervals [2]:
             xmin = 0.21 
-            xmax = 0.47 
+            xmax = 0.48 
             text = "thing" 
         intervals [3]:
-            xmin = 0.47 
+            xmin = 0.48 
             xmax = 0.61 
             text = "is" 
         intervals [4]:
@@ -68,14 +68,14 @@ item []:
             text = "t̪" 
         intervals [5]:
             xmin = 0.31 
-            xmax = 0.38 
+            xmax = 0.39 
             text = "ɪ" 
         intervals [6]:
-            xmin = 0.38 
-            xmax = 0.47 
+            xmin = 0.39 
+            xmax = 0.48 
             text = "n" 
         intervals [7]:
-            xmin = 0.47 
+            xmin = 0.48 
             xmax = 0.55 
             text = "ɪ" 
         intervals [8]:
@@ -100,10 +100,10 @@ item []:
             text = "" 
         intervals [13]:
             xmin = 0.93 
-            xmax = 0.97 
+            xmax = 0.98 
             text = "d̪" 
         intervals [14]:
-            xmin = 0.97 
+            xmin = 0.98 
             xmax = 1.03 
             text = "iː" 
         intervals [15]:

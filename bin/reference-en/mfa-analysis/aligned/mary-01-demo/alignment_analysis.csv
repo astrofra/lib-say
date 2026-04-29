@@ -1,2 +1,2 @@
 file,begin,end,speaker,overall_log_likelihood,speech_log_likelihood,phone_duration_deviation,snr
-mary-01-demo,0.0,3.325,mary-01-demo,-53.03811233108108,-52.9300069394319,1.4142144989650394,18.416972396961324
+mary-01-demo,0.0,3.325,mary-01-demo,-53.1798048048048,-52.749058433201,1.18817653082744,18.75807798879572

@@ -14,10 +14,10 @@ item []:
         intervals: size = 5 
         intervals [1]:
             xmin = 0.0 
-            xmax = 0.26 
+            xmax = 0.23 
             text = "those" 
         intervals [2]:
-            xmin = 0.26 
+            xmin = 0.23 
             xmax = 0.72 
             text = "feathers" 
         intervals [3]:
@@ -26,10 +26,10 @@ item []:
             text = "gather" 
         intervals [4]:
             xmin = 1.04 
-            xmax = 1.39 
+            xmax = 1.4 
             text = "there" 
         intervals [5]:
-            xmin = 1.39 
+            xmin = 1.4 
             xmax = 1.545 
             text = "" 
     item [2]:
@@ -48,10 +48,10 @@ item []:
             text = "ow" 
         intervals [3]:
             xmin = 0.18 
-            xmax = 0.26 
+            xmax = 0.23 
             text = "z" 
         intervals [4]:
-            xmin = 0.26 
+            xmin = 0.23 
             xmax = 0.37 
             text = "f" 
         intervals [5]:
@@ -96,9 +96,9 @@ item []:
             text = "ɛ" 
         intervals [15]:
             xmin = 1.22 
-            xmax = 1.39 
+            xmax = 1.4 
             text = "ɹ" 
         intervals [16]:
-            xmin = 1.39 
+            xmin = 1.4 
             xmax = 1.545 
             text = "" 
