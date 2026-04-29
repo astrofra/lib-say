@@ -47,6 +47,29 @@ add_library(say_core STATIC
     src/say.h
     src/say_internal.h
 )
+
+# P1 — Amiga substrate ported sources (compiled in isolation for now, not
+# linked into say_core yet — confirms they build cleanly while the bridge
+# layer is still pending).
+add_executable(smoke_synth_amiga bin/smoke_synth_amiga.c)
+target_link_libraries(smoke_synth_amiga PRIVATE say_amiga_substrate)
+say_apply_common_compile_options(smoke_synth_amiga)
+say_set_runtime_output(smoke_synth_amiga "${CMAKE_SOURCE_DIR}/bin")
+
+add_library(say_amiga_substrate STATIC
+    src/say_phonemes_amiga.c
+    src/say_phonet.c
+    src/say_synth_amiga.c
+    src/say_synth_tables.c
+    src/say_amiga_compat.h
+    src/say_amiga_pc.h
+    src/say_amiga_parms.h
+    src/say_amiga_phonet.h
+    src/say_amiga_phonet_subs.h
+    src/say_synth_tables.inc
+)
+target_include_directories(say_amiga_substrate PRIVATE src)
+say_apply_common_compile_options(say_amiga_substrate)
 target_include_directories(say_core PUBLIC src)
 say_apply_common_compile_options(say_core)
 
