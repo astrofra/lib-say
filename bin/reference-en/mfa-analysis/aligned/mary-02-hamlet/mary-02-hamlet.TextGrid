@@ -34,10 +34,10 @@ item []:
             text = "to" 
         intervals [6]:
             xmin = 0.87 
-            xmax = 1.21 
+            xmax = 1.2 
             text = "be" 
         intervals [7]:
-            xmin = 1.21 
+            xmin = 1.2 
             xmax = 1.33 
             text = "" 
         intervals [8]:
@@ -76,10 +76,10 @@ item []:
             text = "ə" 
         intervals [3]:
             xmin = 0.15 
-            xmax = 0.21 
+            xmax = 0.22 
             text = "bʲ" 
         intervals [4]:
-            xmin = 0.21 
+            xmin = 0.22 
             xmax = 0.33 
             text = "i" 
         intervals [5]:
@@ -96,10 +96,10 @@ item []:
             text = "n" 
         intervals [8]:
             xmin = 0.53 
-            xmax = 0.67 
+            xmax = 0.68 
             text = "ɑ" 
         intervals [9]:
-            xmin = 0.67 
+            xmin = 0.68 
             xmax = 0.72 
             text = "t" 
         intervals [10]:
@@ -116,10 +116,10 @@ item []:
             text = "bʲ" 
         intervals [13]:
             xmin = 0.92 
-            xmax = 1.21 
+            xmax = 1.2 
             text = "iː" 
         intervals [14]:
-            xmin = 1.21 
+            xmin = 1.2 
             xmax = 1.33 
             text = "" 
         intervals [15]:

@@ -14,14 +14,14 @@ item []:
         intervals: size = 8 
         intervals [1]:
             xmin = 0.0 
-            xmax = 0.21 
+            xmax = 0.19 
             text = "this" 
         intervals [2]:
-            xmin = 0.21 
-            xmax = 0.47 
+            xmin = 0.19 
+            xmax = 0.48 
             text = "thing" 
         intervals [3]:
-            xmin = 0.47 
+            xmin = 0.48 
             xmax = 0.61 
             text = "is" 
         intervals [4]:
@@ -60,22 +60,22 @@ item []:
             text = "ɪ" 
         intervals [3]:
             xmin = 0.13 
-            xmax = 0.21 
+            xmax = 0.19 
             text = "s" 
         intervals [4]:
-            xmin = 0.21 
+            xmin = 0.19 
             xmax = 0.31 
-            text = "t̪" 
+            text = "θ" 
         intervals [5]:
             xmin = 0.31 
             xmax = 0.38 
             text = "ɪ" 
         intervals [6]:
             xmin = 0.38 
-            xmax = 0.47 
+            xmax = 0.48 
             text = "n" 
         intervals [7]:
-            xmin = 0.47 
+            xmin = 0.48 
             xmax = 0.55 
             text = "ɪ" 
         intervals [8]:
@@ -84,10 +84,10 @@ item []:
             text = "z" 
         intervals [9]:
             xmin = 0.61 
-            xmax = 0.66 
+            xmax = 0.67 
             text = "w" 
         intervals [10]:
-            xmin = 0.66 
+            xmin = 0.67 
             xmax = 0.8 
             text = "ɝ" 
         intervals [11]:

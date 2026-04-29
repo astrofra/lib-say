@@ -1,2 +1,2 @@
 file,begin,end,speaker,overall_log_likelihood,speech_log_likelihood,phone_duration_deviation,snr
-ours-06-affricates,0.0,2.5649886621315194,ours-06-affricates,-60.35175249270428,-66.22950744628906,1.1487535463826681,6.808657596521304
+ours-06-affricates,0.0,2.41,ours-06-affricates,-59.721071868516596,-65.54352315266927,1.144586201106563,6.905261096698215

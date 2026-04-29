@@ -26,14 +26,14 @@ item []:
             text = "changing" 
         intervals [4]:
             xmin = 0.94 
-            xmax = 1.28 
+            xmax = 1.31 
             text = "church" 
         intervals [5]:
-            xmin = 1.28 
-            xmax = 1.37 
+            xmin = 1.31 
+            xmax = 1.36 
             text = "" 
         intervals [6]:
-            xmin = 1.37 
+            xmin = 1.36 
             xmax = 1.84 
             text = "bells" 
     item [2]:
@@ -64,10 +64,10 @@ item []:
             text = "ə" 
         intervals [6]:
             xmin = 0.4 
-            xmax = 0.53 
+            xmax = 0.52 
             text = "tʃ" 
         intervals [7]:
-            xmin = 0.53 
+            xmin = 0.52 
             xmax = 0.65 
             text = "ej" 
         intervals [8]:
@@ -96,14 +96,14 @@ item []:
             text = "ɝ" 
         intervals [14]:
             xmin = 1.17 
-            xmax = 1.28 
+            xmax = 1.31 
             text = "tʃ" 
         intervals [15]:
-            xmin = 1.28 
-            xmax = 1.37 
+            xmin = 1.31 
+            xmax = 1.36 
             text = "" 
         intervals [16]:
-            xmin = 1.37 
+            xmin = 1.36 
             xmax = 1.4 
             text = "b" 
         intervals [17]:

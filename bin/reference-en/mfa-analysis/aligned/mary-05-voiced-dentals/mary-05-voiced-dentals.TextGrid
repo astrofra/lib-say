@@ -92,10 +92,10 @@ item []:
             text = "d̪" 
         intervals [14]:
             xmin = 1.08 
-            xmax = 1.22 
+            xmax = 1.21 
             text = "ɛ" 
         intervals [15]:
-            xmin = 1.22 
+            xmin = 1.21 
             xmax = 1.4 
             text = "ɹ" 
         intervals [16]:
