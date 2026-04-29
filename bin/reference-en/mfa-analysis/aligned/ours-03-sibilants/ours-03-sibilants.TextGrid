@@ -42,10 +42,10 @@ item []:
             text = "the" 
         intervals [8]:
             xmin = 1.6 
-            xmax = 2.13 
+            xmax = 2.06 
             text = "seashore" 
         intervals [9]:
-            xmin = 2.13 
+            xmin = 2.06 
             xmax = 2.594989 
             text = "" 
     item [2]:
@@ -144,9 +144,9 @@ item []:
             text = "ɒ" 
         intervals [23]:
             xmin = 2.02 
-            xmax = 2.13 
+            xmax = 2.06 
             text = "ɹ" 
         intervals [24]:
-            xmin = 2.13 
+            xmin = 2.06 
             xmax = 2.594989 
             text = "" 

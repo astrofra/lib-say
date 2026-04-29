@@ -26,18 +26,18 @@ item []:
             text = "" 
         intervals [4]:
             xmin = 0.36 
-            xmax = 0.54 
+            xmax = 0.53 
             text = "the" 
         intervals [5]:
-            xmin = 0.54 
+            xmin = 0.53 
             xmax = 0.58 
             text = "" 
         intervals [6]:
             xmin = 0.58 
-            xmax = 1.22 
+            xmax = 1.21 
             text = "changing" 
         intervals [7]:
-            xmin = 1.22 
+            xmin = 1.21 
             xmax = 1.28 
             text = "" 
         intervals [8]:
@@ -84,14 +84,14 @@ item []:
             text = "" 
         intervals [6]:
             xmin = 0.36 
-            xmax = 0.51 
+            xmax = 0.5 
             text = "ð" 
         intervals [7]:
-            xmin = 0.51 
-            xmax = 0.54 
+            xmin = 0.5 
+            xmax = 0.53 
             text = "ə" 
         intervals [8]:
-            xmin = 0.54 
+            xmin = 0.53 
             xmax = 0.58 
             text = "" 
         intervals [9]:
@@ -112,14 +112,14 @@ item []:
             text = "dʒ" 
         intervals [13]:
             xmin = 1.08 
-            xmax = 1.15 
+            xmax = 1.14 
             text = "ɪ" 
         intervals [14]:
-            xmin = 1.15 
-            xmax = 1.22 
+            xmin = 1.14 
+            xmax = 1.21 
             text = "ŋ" 
         intervals [15]:
-            xmin = 1.22 
+            xmin = 1.21 
             xmax = 1.28 
             text = "" 
         intervals [16]:

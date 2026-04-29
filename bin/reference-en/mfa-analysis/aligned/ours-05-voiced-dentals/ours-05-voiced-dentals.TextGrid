@@ -26,10 +26,10 @@ item []:
             text = "feathers" 
         intervals [4]:
             xmin = 0.91 
-            xmax = 1.25 
+            xmax = 1.1 
             text = "gather" 
         intervals [5]:
-            xmin = 1.25 
+            xmin = 1.1 
             xmax = 1.5 
             text = "there" 
         intervals [6]:
@@ -80,22 +80,22 @@ item []:
             text = "z" 
         intervals [10]:
             xmin = 0.91 
-            xmax = 0.97 
+            xmax = 0.98 
             text = "ɡ" 
         intervals [11]:
-            xmin = 0.97 
-            xmax = 1.1 
+            xmin = 0.98 
+            xmax = 1.04 
             text = "æ" 
         intervals [12]:
-            xmin = 1.1 
-            xmax = 1.22 
+            xmin = 1.04 
+            xmax = 1.07 
             text = "ð" 
         intervals [13]:
-            xmin = 1.22 
-            xmax = 1.25 
+            xmin = 1.07 
+            xmax = 1.1 
             text = "ɚ" 
         intervals [14]:
-            xmin = 1.25 
+            xmin = 1.1 
             xmax = 1.41 
             text = "ð" 
         intervals [15]:

@@ -14,10 +14,10 @@ item []:
         intervals: size = 8 
         intervals [1]:
             xmin = 0.0 
-            xmax = 0.07 
+            xmax = 0.06 
             text = "" 
         intervals [2]:
-            xmin = 0.07 
+            xmin = 0.06 
             xmax = 0.17 
             text = "this" 
         intervals [3]:
@@ -52,14 +52,14 @@ item []:
         intervals: size = 18 
         intervals [1]:
             xmin = 0.0 
-            xmax = 0.07 
+            xmax = 0.06 
             text = "" 
         intervals [2]:
-            xmin = 0.07 
-            xmax = 0.1 
+            xmin = 0.06 
+            xmax = 0.11 
             text = "d̪" 
         intervals [3]:
-            xmin = 0.1 
+            xmin = 0.11 
             xmax = 0.14 
             text = "ɪ" 
         intervals [4]:

@@ -26,10 +26,10 @@ item []:
             text = "clothes" 
         intervals [4]:
             xmin = 0.78 
-            xmax = 0.89 
+            xmax = 0.88 
             text = "" 
         intervals [5]:
-            xmin = 0.89 
+            xmin = 0.88 
             xmax = 1.06 
             text = "and" 
         intervals [6]:
@@ -84,10 +84,10 @@ item []:
             text = "z" 
         intervals [11]:
             xmin = 0.78 
-            xmax = 0.89 
+            xmax = 0.88 
             text = "" 
         intervals [12]:
-            xmin = 0.89 
+            xmin = 0.88 
             xmax = 0.98 
             text = "æ" 
         intervals [13]:
@@ -100,10 +100,10 @@ item []:
             text = "b" 
         intervals [15]:
             xmin = 1.15 
-            xmax = 1.37 
+            xmax = 1.36 
             text = "æ" 
         intervals [16]:
-            xmin = 1.37 
+            xmin = 1.36 
             xmax = 1.45 
             text = "ɡ" 
         intervals [17]:
