@@ -1,6 +1,6 @@
 # MFA Duration Similarity Score
 
-- Generated: `2026-04-29T13:57:18+02:00`
+- Generated: `2026-04-29T15:32:45+02:00`
 - Metric: DSS = mean( min(r, 1/r) ) per phoneme pair, r = ours/mary duration
 - 100% = perfect timing match with MaryTTS reference
 

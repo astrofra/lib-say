@@ -74,6 +74,6 @@ estimated_duration_ms: 4320.0
 voiced_frames: 521
 unvoiced_frames: 159
 pause_frames: 184
-pitch_hz: min=108.84 avg=130.98 max=150.80
+pitch_hz: min=106.50 avg=124.76 max=144.20
 amplitude: min=0.016 avg=0.609 max=1.024
 noise_mix: min=0.000 avg=0.102 max=0.440
