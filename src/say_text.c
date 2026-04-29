@@ -1052,6 +1052,20 @@ static int say_phonemize_english_word(const char *word, segment_buffer_t *segmen
     int rule_result;
 
     start = segments->count;
+
+    /* D1/D2 — try the NRL rule engine first. The lexicon is already consulted
+     * upstream in say_append_text_word; reaching here means the word was OOV.
+     * NRL covers most English orthography deterministically; only fall through
+     * to the legacy grapheme-by-grapheme heuristics if NRL produced nothing
+     * (over-long words or pathological input). */
+    if (say_phonemize_english_nrl(word, segments)) {
+        say_finalize_word_metadata(segments, start, 1.0, 0, 0);
+        return 1;
+    }
+
+    /* Roll back any partial emission from a failed NRL attempt. */
+    segments->count = start;
+
     i = 0;
     while (word[i] != '\0') {
         if (i > 0 && word[i] == word[i - 1] && !say_is_vowel_char(word[i])) {

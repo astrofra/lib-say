@@ -39,6 +39,7 @@ add_library(say_core STATIC
     src/say.c
     src/say_phonemes.c
     src/say_text.c
+    src/say_text_en_nrl.c
     src/say_prosody.c
     src/say_synth.c
     src/say_audio_io.c

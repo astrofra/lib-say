@@ -208,6 +208,12 @@ int   say_append_text_word(const char *word, say_language_t language,
                            segment_buffer_t *segments);
 const char *say_digit_word(char digit, say_language_t language);
 
+/* D1/D2 — NRL letter-to-sound rule engine (English). Tries the bundled reference
+ * rule set against `word`, appending the resulting PH_* segments. Returns 1
+ * on success and a non-empty emission, 0 otherwise. The caller is responsible
+ * for word_start / word_end metadata after this returns. */
+int   say_phonemize_english_nrl(const char *word, segment_buffer_t *segments);
+
 /* ---------------------------------------------------------------------------
  * say_prosody.c — clause analysis, F0, duration cascade, frame generation
  * ------------------------------------------------------------------------- */
