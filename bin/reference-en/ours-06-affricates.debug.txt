@@ -16,7 +16,7 @@ word_to_phoneme:
   [pause:sentence]
 
 phoneme_stream:
-  JH 'AH D JH / DH SCHWA / CH 'E->J N JH IH NG / CH R CH / B 'EH L Z [pause x2:sentence]
+  JH 'AH D JH / DH SCHWA / CH 'E->J N JH IH NG / CH R CH / B 'EH LX Z [pause x2:sentence]
 
 segments:
 segment_count: 21
@@ -37,7 +37,7 @@ segment_count: 21
   14  CH         nominal_ms=88.3 voiced=0 vowel=0 noise=1.00 scale=0.96 weak=0 stress=0
   15  B          nominal_ms=70.0 voiced=1 vowel=0 noise=0.36 scale=1.00 weak=0 stress=0
   16  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
-  17  L          nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
+  17  LX         nominal_ms=76.0 voiced=1 vowel=0 noise=0.04 scale=1.00 weak=0 stress=0
   18  Z          nominal_ms=90.0 voiced=1 vowel=0 noise=0.44 scale=1.00 weak=0 stress=0
   19  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
   20  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0

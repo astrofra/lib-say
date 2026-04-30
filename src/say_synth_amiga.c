@@ -82,7 +82,17 @@ typedef struct {
     const uint8_t *coef;
     size_t   frame_idx;
 
-    /* Per-frame derived state. */
+    /* Per-frame derived state. The substrate keeps a fixed "base" pointer per
+     * formant (set when the frame is loaded — this is the start of the
+     * impulse response in the LUT) and a working pointer that advances during
+     * synthesis. At each pitch boundary the working pointer is restored to
+     * the base, retriggering the formant burst — that's what gives voiced
+     * speech its periodic structure (the glottal-pulse rate). The original
+     * asm holds these in F1REC/F2REC/F3REC (save) vs a1/a2/a3 (working);
+     * the FUbypass branch at synth.asm:367-372 restores them. */
+    const uint8_t *f1_rec_base;
+    const uint8_t *f2_rec_base;
+    const uint8_t *f3_rec_base;
     const uint8_t *f1_rec;
     const uint8_t *f2_rec;
     const uint8_t *f3_rec;
@@ -274,7 +284,13 @@ static int run_pitch_period(synth_state_t *s)
     int half_count;
     int amp2_save;
 
-    /* Reset per-pitch-period state. */
+    /* Reset per-pitch-period state — equivalent to FUbypass in synth.asm:
+     * working pointers restored to the saved start-of-record so the formant
+     * impulse response retriggers, reclen/rec_end reset, fric/aspir indices
+     * keep their reflecting state across periods (those use fric_idx). */
+    s->f1_rec = s->f1_rec_base;
+    s->f2_rec = s->f2_rec_base;
+    s->f3_rec = s->f3_rec_base;
     s->reclen = 127;
     s->rec_end = 0;
 
@@ -362,22 +378,25 @@ static int load_frame(synth_state_t *s)
     f0     = frame[COEF_F0];
 
     /* F1 record: 128-sample impulse response, base = F1table + idx*128. */
-    s->f1_rec = F1table + (f1_idx * 128);
+    s->f1_rec_base = F1table + (f1_idx * 128);
 
     /* F2: voiced uses F2table[idx*128]; fricative uses FRICtable[idx*64]
      * (the asm shifts left by 6, since CONVERT pre-shifted by 3). */
     if (flags & FLAG_FRIC) {
-        s->f2_rec = FRICtable + (f2_idx * 64);
+        s->f2_rec_base = FRICtable + (f2_idx * 64);
     } else {
-        s->f2_rec = F2table + (f2_idx * 128);
+        s->f2_rec_base = F2table + (f2_idx * 128);
     }
 
     /* F3: same pattern with ASPIR. */
     if (flags & FLAG_ASPIR) {
-        s->f3_rec = FRICtable + (f3_idx * 64);
+        s->f3_rec_base = FRICtable + (f3_idx * 64);
     } else {
-        s->f3_rec = F3table + (f3_idx * 128);
+        s->f3_rec_base = F3table + (f3_idx * 128);
     }
+    s->f1_rec = s->f1_rec_base;
+    s->f2_rec = s->f2_rec_base;
+    s->f3_rec = s->f3_rec_base;
 
     /* Amplitudes: shifted up by 5 to form the high bits of the MULT-table
      * index. Voiced fricatives also halve amp2 for the second half of the
@@ -416,10 +435,15 @@ static int compute_samperframe(int sample_rate, int rate_wpm)
 
 /* ---- Public entry ------------------------------------------------------ */
 
-int say_synth_amiga_run(
+/* P5 — bridge entry point. Lets the caller pin samperframe explicitly so it
+ * can match an external frame cadence (lib-say emits parameter frames every
+ * 5..10 ms). When samperframe_override <= 0 we keep the legacy WPM-derived
+ * value. The original say_synth_amiga_run is now a thin wrapper. */
+int say_synth_amiga_run_ex(
     const uint8_t *coef,
     int sample_rate,
     int rate_wpm,
+    int samperframe_override,
     int16_t **out_samples,
     size_t *out_sample_count
 )
@@ -428,10 +452,13 @@ int say_synth_amiga_run(
     memset(&s, 0, sizeof(s));
 
     if (coef == NULL || out_samples == NULL || out_sample_count == NULL) return 0;
-    if (sample_rate <= 0 || rate_wpm <= 0) return 0;
+    if (sample_rate <= 0) return 0;
+    if (samperframe_override <= 0 && rate_wpm <= 0) return 0;
 
     s.coef = coef;
-    s.samperframe = compute_samperframe(sample_rate, rate_wpm);
+    s.samperframe = samperframe_override > 0
+                  ? samperframe_override
+                  : compute_samperframe(sample_rate, rate_wpm);
     s.microframe  = s.samperframe;
     s.friclen     = 511;
     s.frinc       = +1;
@@ -444,23 +471,64 @@ int say_synth_amiga_run(
     s.f2_rec = F2table;
     s.f3_rec = F3table;
 
-    /* Outer pitch-period loop. Each iteration synthesizes one pitch period;
-     * if `update` was set during the previous period we load the next frame
-     * before synthesizing.  When load_frame hits the terminator we exit. */
+    /* Outer pitch-period loop. `update` counts how many microframes (each
+     * SAMPERFRAME samples long) elapsed during the previous pitch period.
+     * The original asm at NewPulse (synth.asm:293-312) advances the coef
+     * pointer once per microframe wrap and only writes the latched F1/F2/F3
+     * records on the LAST iteration — i.e. it skips past intermediate frames
+     * to keep the audio clock locked to samperframe rather than pitch period.
+     * We replicate by calling load_frame `update` times before synthesizing
+     * the next period. */
+    {
+    int frames_consumed = 0;
+    int pitch_periods = 0;
+    int loaded_once = 0;
     for (;;) {
-        if (s.update > 0) {
-            s.update = 0;
+        /* synth.asm:293-312 — at each pitch boundary, if UPDATE>0 then advance
+         * UPDATE coef entries past the buffer pointer (skipping intermediate
+         * frames) and load the last one as the new IR set. UPDATE=0 means
+         * "reuse the latched IR" — FUbypass falls straight to synthesis. The
+         * very first iteration is forced (`UPDATE=1` initial seed) so we load
+         * the opening frame. */
+        int reload_count = loaded_once ? s.update : 1;
+        int loaded_any = 0;
+        s.update = 0;
+        while (reload_count-- > 0) {
             if (!load_frame(&s)) {
-                break;
+                if (loaded_any) goto render;
+                goto done;
             }
+            loaded_any = 1;
+            loaded_once = 1;
+            ++frames_consumed;
         }
+render:
+        ++pitch_periods;
         if (!run_pitch_period(&s)) {
             free(s.out);
             return 0;
         }
     }
+done:
+    if (getenv("SAY_AMIGA_DEBUG")) {
+        fprintf(stderr, "[amiga-synth] frames_consumed=%d pitch_periods=%d emitted=%zu samperframe=%d\n",
+                frames_consumed, pitch_periods, s.out_pos, s.samperframe);
+    }
+    }
 
     *out_samples = s.out;
     *out_sample_count = s.out_pos;
     return 1;
+}
+
+int say_synth_amiga_run(
+    const uint8_t *coef,
+    int sample_rate,
+    int rate_wpm,
+    int16_t **out_samples,
+    size_t *out_sample_count
+)
+{
+    return say_synth_amiga_run_ex(coef, sample_rate, rate_wpm, /*samperframe_override*/ 0,
+                                  out_samples, out_sample_count);
 }

@@ -15,7 +15,7 @@ word_to_phoneme:
   [pause:sentence]
 
 phoneme_stream:
-  'IH NG G L IH SH / F R 'I K SCHWA T IH V Z / SH 'IH F T / SH 'A R P L I [pause x2:sentence]
+  'IH NG G L IH SH / F R 'I K SCHWA DX IH V Z / SH 'IH F T / SH 'A RX P L I [pause x2:sentence]
 
 segments:
 segment_count: 27
@@ -30,7 +30,7 @@ segment_count: 27
   08  I          nominal_ms=103.7 voiced=1 vowel=1 noise=0.02 scale=0.96 weak=0 stress=2
   09  K          nominal_ms=67.2 voiced=0 vowel=0 noise=1.00 scale=0.96 weak=0 stress=0
   10  SCHWA      nominal_ms=81.6 voiced=1 vowel=1 noise=0.03 scale=0.96 weak=0 stress=0
-  11  T          nominal_ms=63.4 voiced=0 vowel=0 noise=1.00 scale=0.96 weak=0 stress=0
+  11  DX         nominal_ms=38.4 voiced=1 vowel=0 noise=0.30 scale=0.96 weak=0 stress=0
   12  IH         nominal_ms=92.2 voiced=1 vowel=1 noise=0.02 scale=0.96 weak=0 stress=0
   13  V          nominal_ms=80.6 voiced=1 vowel=0 noise=0.18 scale=0.96 weak=0 stress=0
   14  Z          nominal_ms=86.4 voiced=1 vowel=0 noise=0.44 scale=0.96 weak=0 stress=0
@@ -40,7 +40,7 @@ segment_count: 27
   18  T          nominal_ms=66.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   19  SH         nominal_ms=90.2 voiced=0 vowel=0 noise=1.00 scale=0.96 weak=0 stress=0
   20  A          nominal_ms=110.4 voiced=1 vowel=1 noise=0.02 scale=0.96 weak=0 stress=2
-  21  R          nominal_ms=73.0 voiced=1 vowel=0 noise=0.08 scale=0.96 weak=0 stress=0
+  21  RX         nominal_ms=65.3 voiced=1 vowel=0 noise=0.08 scale=0.96 weak=0 stress=0
   22  P          nominal_ms=65.3 voiced=0 vowel=0 noise=1.00 scale=0.96 weak=0 stress=0
   23  L          nominal_ms=73.0 voiced=1 vowel=0 noise=0.04 scale=0.96 weak=0 stress=0
   24  I          nominal_ms=103.7 voiced=1 vowel=1 noise=0.02 scale=0.96 weak=0 stress=0
@@ -48,12 +48,12 @@ segment_count: 27
   26  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 551
+frame_count: 545
 frame_duration_ms: 5
-estimated_duration_ms: 2755.0
-voiced_frames: 302
-unvoiced_frames: 157
+estimated_duration_ms: 2725.0
+voiced_frames: 306
+unvoiced_frames: 147
 pause_frames: 92
-pitch_hz: min=108.80 avg=124.32 max=142.60
-amplitude: min=0.016 avg=0.538 max=1.045
-noise_mix: min=0.000 avg=0.130 max=0.420
+pitch_hz: min=108.80 avg=124.36 max=142.60
+amplitude: min=0.016 avg=0.542 max=1.045
+noise_mix: min=0.000 avg=0.129 max=0.420

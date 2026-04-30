@@ -266,6 +266,40 @@ int   say_synthesize_frames(const frame_t *frames, size_t frame_count,
  * translation unit. */
 
 /* ---------------------------------------------------------------------------
+ * say_amiga_bridge.c — P5 bridge from lib-say frames to the Amiga substrate
+ *
+ * The biquad path (say_synth.c) and the Amiga substrate (say_synth_amiga.c)
+ * share the same upstream pipeline up to frame generation. The bridge takes
+ * those frames and produces an 8-byte coefficient buffer the substrate's
+ * synth.asm-port accepts. Output is at SAY_AMIGA_SAMPLE_RATE — the rate at
+ * which the impulse-response LUTs were measured on the original hardware.
+ * ------------------------------------------------------------------------- */
+
+/* The Amiga substrate emits one logical audio sample per inner-loop iteration.
+ * In synth.asm each iteration writes TWO bytes (`move.b d7,(a0)+` twice — see
+ * syn.i:36-37) which the audio chip plays as two sequential 8-bit samples at
+ * its 22 200 Hz byte rate. So the logical sample rate is half that, and that
+ * is the rate the F0 byte (pitch period in samples) and the LUTs were
+ * calibrated for — convert.asm uses `SAMPRATE equ 11100` for the F0 conversion
+ * (convert.asm:73). The bridge upsamples 4x to deliver 44100 Hz output. */
+#define SAY_AMIGA_SAMPLE_RATE 11025
+
+int say_synth_amiga_from_frames(
+    const frame_t *frames, size_t frame_count, int frame_ms,
+    int16_t **out_samples, size_t *out_sample_count,
+    char *error, size_t error_size);
+
+/* Substrate entry points (defined in say_synth_amiga.c). The bridge uses the
+ * _ex variant so it can pin samperframe to the lib-say frame cadence. */
+int say_synth_amiga_run_ex(
+    const uint8_t *coef, int sample_rate, int rate_wpm,
+    int samperframe_override,
+    int16_t **out_samples, size_t *out_sample_count);
+int say_synth_amiga_run(
+    const uint8_t *coef, int sample_rate, int rate_wpm,
+    int16_t **out_samples, size_t *out_sample_count);
+
+/* ---------------------------------------------------------------------------
  * Tiny math helpers used by both prosody and synth
  * ------------------------------------------------------------------------- */
 

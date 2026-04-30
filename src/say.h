@@ -55,6 +55,22 @@ int say_synthesize(
     size_t error_size
 );
 
+/* P5 — Amiga substrate path. Same upstream pipeline as say_synthesize() but
+ * the synthesizer is the cascade-formant LUT bank ported from the Amiga
+ * narrator (clean-room C port of synth.asm). The output sample rate is
+ * fixed at 22 050 Hz — the rate the impulse-response LUTs were measured at
+ * — and is returned via out_sample_rate. options->sample_rate is ignored
+ * for this path. */
+int say_synthesize_amiga(
+    const char *input,
+    const say_options_t *options,
+    int16_t **out_samples,
+    size_t *out_sample_count,
+    int *out_sample_rate,
+    char *error,
+    size_t error_size
+);
+
 int say_build_debug_report(
     const char *input,
     const say_options_t *options,

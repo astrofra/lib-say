@@ -27,6 +27,7 @@ static void tts_print_usage(FILE *stream)
         "  --phonemes            Treat the input as phoneme symbols instead of plain text\n"
         "  --debug-report <p>    Write a debug report to a file, or use - for stdout\n"
         "  --dry-run             Build the debug pipeline but skip audio rendering/output\n"
+        "  --amiga               Render through the ported Amiga substrate (22050 Hz LUTs, 44100 Hz output)\n"
         "  -h, --help            Show this message\n"
         "\n"
         "Phoneme mode accepts symbols like:\n"
@@ -133,6 +134,7 @@ int main(int argc, char **argv)
     size_t sample_count;
     char error[256];
     int dry_run;
+    int use_amiga;
     int i;
 
     say_default_options(&options);
@@ -144,6 +146,7 @@ int main(int argc, char **argv)
     samples = NULL;
     sample_count = 0;
     dry_run = 0;
+    use_amiga = 0;
     error[0] = '\0';
 
     if (argc <= 1) {
@@ -236,6 +239,10 @@ int main(int argc, char **argv)
             dry_run = 1;
             continue;
         }
+        if (strcmp(argv[i], "--amiga") == 0) {
+            use_amiga = 1;
+            continue;
+        }
         if (input_arg == NULL) {
             input_arg = argv[i];
             continue;
@@ -308,15 +315,26 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    if (!say_synthesize(input_text, &options, &samples, &sample_count, error, sizeof(error))) {
-        free(input_text);
-        say_free(debug_report);
-        fprintf(stderr, "%s\n", error);
-        return 1;
+    int output_sample_rate = options.sample_rate;
+    if (use_amiga) {
+        if (!say_synthesize_amiga(input_text, &options, &samples, &sample_count,
+                                  &output_sample_rate, error, sizeof(error))) {
+            free(input_text);
+            say_free(debug_report);
+            fprintf(stderr, "%s\n", error);
+            return 1;
+        }
+    } else {
+        if (!say_synthesize(input_text, &options, &samples, &sample_count, error, sizeof(error))) {
+            free(input_text);
+            say_free(debug_report);
+            fprintf(stderr, "%s\n", error);
+            return 1;
+        }
     }
 
     format = say_guess_audio_format(output_path);
-    if (!say_write_audio_file(output_path, format, options.sample_rate, samples, sample_count, error, sizeof(error))) {
+    if (!say_write_audio_file(output_path, format, output_sample_rate, samples, sample_count, error, sizeof(error))) {
         free(input_text);
         say_free(debug_report);
         say_free(samples);
@@ -331,7 +349,7 @@ int main(int argc, char **argv)
         sample_count,
         output_path,
         tts_format_label(format),
-        options.sample_rate);
+        output_sample_rate);
 
     free(input_text);
     say_free(debug_report);

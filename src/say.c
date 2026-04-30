@@ -669,6 +669,59 @@ cleanup:
     return ok;
 }
 
+int say_synthesize_amiga(
+    const char *input,
+    const say_options_t *options,
+    int16_t **out_samples,
+    size_t *out_sample_count,
+    int *out_sample_rate,
+    char *error,
+    size_t error_size
+)
+{
+    say_options_t resolved_options;
+    char *normalized;
+    segment_buffer_t segments;
+    frame_buffer_t frames;
+    int ok;
+
+    if (out_samples == NULL || out_sample_count == NULL) {
+        say_set_error(error, error_size, "output pointers must not be null");
+        return 0;
+    }
+    if (options == NULL) {
+        say_set_error(error, error_size, "options must not be null");
+        return 0;
+    }
+
+    normalized = NULL;
+    ok = 0;
+    memset(&segments, 0, sizeof(segments));
+    memset(&frames, 0, sizeof(frames));
+    *out_samples = NULL;
+    *out_sample_count = 0;
+    /* The substrate synthesizes at SAY_AMIGA_SAMPLE_RATE (22050 Hz) but the
+     * bridge upsamples to 44100 Hz before returning. */
+    if (out_sample_rate != NULL) *out_sample_rate = 44100;
+
+    /* Prepare pipeline at the upstream-required 44100 Hz — frame generation is
+     * sample-rate-agnostic (the bridge re-times to the substrate's 22050 Hz). */
+    resolved_options = *options;
+    resolved_options.sample_rate = 44100;
+    if (!say_prepare_pipeline(input, &resolved_options, &normalized, &segments, &frames, error, error_size)) {
+        goto cleanup;
+    }
+    if (!say_synth_amiga_from_frames(frames.data, frames.count, resolved_options.frame_ms, out_samples, out_sample_count, error, error_size)) {
+        goto cleanup;
+    }
+
+    ok = 1;
+
+cleanup:
+    say_release_pipeline_buffers(normalized, &segments, &frames);
+    return ok;
+}
+
 
 /* === say.c lines 5075..5078 === */
 void say_free(void *ptr)

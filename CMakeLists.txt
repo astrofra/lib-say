@@ -43,6 +43,7 @@ add_library(say_core STATIC
     src/say_phonol.c
     src/say_prosody.c
     src/say_synth.c
+    src/say_amiga_bridge.c
     src/say_audio_io.c
     src/say.h
     src/say_internal.h
@@ -55,6 +56,16 @@ add_executable(smoke_synth_amiga bin/smoke_synth_amiga.c)
 target_link_libraries(smoke_synth_amiga PRIVATE say_amiga_substrate)
 say_apply_common_compile_options(smoke_synth_amiga)
 say_set_runtime_output(smoke_synth_amiga "${CMAKE_SOURCE_DIR}/bin")
+
+add_executable(probe_bridge_timing bin/probe_bridge_timing.c)
+target_link_libraries(probe_bridge_timing PRIVATE say_amiga_substrate)
+say_apply_common_compile_options(probe_bridge_timing)
+say_set_runtime_output(probe_bridge_timing "${CMAKE_SOURCE_DIR}/bin")
+
+add_executable(probe_bridge_vs_smoke bin/probe_bridge_vs_smoke.c)
+target_link_libraries(probe_bridge_vs_smoke PRIVATE say_amiga_substrate)
+say_apply_common_compile_options(probe_bridge_vs_smoke)
+say_set_runtime_output(probe_bridge_vs_smoke "${CMAKE_SOURCE_DIR}/bin")
 
 add_library(say_amiga_substrate STATIC
     src/say_phonemes_amiga.c
@@ -72,6 +83,11 @@ target_include_directories(say_amiga_substrate PRIVATE src)
 say_apply_common_compile_options(say_amiga_substrate)
 target_include_directories(say_core PUBLIC src)
 say_apply_common_compile_options(say_core)
+
+# P5 — say_core's bridge calls into the substrate's synth.asm port. Link them
+# together so consumers of say_core (tts CLI, smoke tests, Lua extension) get
+# the substrate symbols transparently.
+target_link_libraries(say_core PUBLIC say_amiga_substrate)
 
 add_executable(tts src/main.c)
 target_link_libraries(tts PRIVATE say_core)

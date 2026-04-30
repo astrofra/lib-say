@@ -17,10 +17,10 @@ word_to_phoneme:
   [pause:sentence]
 
 phoneme_stream:
-  DH 'IH S / TH 'IH NG / IH Z / W R TH / DH SCHWA / 'EH F R T [pause x2:sentence]
+  DH 'IH S / TH 'IH NG / IH Z / W R TH / DH SCHWA / 'EH F R Q AXP [pause x2:sentence]
 
 segments:
-segment_count: 19
+segment_count: 20
   00  DH         nominal_ms=82.8 voiced=1 vowel=0 noise=0.44 scale=0.92 weak=0 stress=0
   01  IH         nominal_ms=88.3 voiced=1 vowel=1 noise=0.02 scale=0.92 weak=0 stress=2
   02  S          nominal_ms=84.6 voiced=0 vowel=0 noise=1.00 scale=0.92 weak=0 stress=0
@@ -37,17 +37,18 @@ segment_count: 19
   13  EH         nominal_ms=104.0 voiced=1 vowel=1 noise=0.02 scale=1.00 weak=0 stress=2
   14  F          nominal_ms=82.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
   15  R          nominal_ms=76.0 voiced=1 vowel=0 noise=0.08 scale=1.00 weak=0 stress=0
-  16  T          nominal_ms=66.0 voiced=0 vowel=0 noise=1.00 scale=1.00 weak=0 stress=0
-  17  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
+  16  Q          nominal_ms=40.0 voiced=0 vowel=0 noise=0.00 scale=1.00 weak=0 stress=0
+  17  AXP        nominal_ms=50.0 voiced=1 vowel=1 noise=0.04 scale=1.00 weak=0 stress=0
   18  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
+  19  PAUSE      nominal_ms=289.0 boundary=sentence scale=1.70 weak=0
 
 frames:
-frame_count: 388
+frame_count: 393
 frame_duration_ms: 5
-estimated_duration_ms: 1940.0
-voiced_frames: 203
-unvoiced_frames: 93
+estimated_duration_ms: 1965.0
+voiced_frames: 214
+unvoiced_frames: 87
 pause_frames: 92
-pitch_hz: min=104.20 avg=121.32 max=144.20
-amplitude: min=0.016 avg=0.568 max=1.024
-noise_mix: min=0.000 avg=0.127 max=0.422
+pitch_hz: min=104.20 avg=120.74 max=144.20
+amplitude: min=0.005 avg=0.579 max=1.024
+noise_mix: min=0.000 avg=0.122 max=0.422
