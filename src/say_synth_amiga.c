@@ -123,6 +123,7 @@ typedef struct {
 
 static int synth_emit_sample(synth_state_t *s, int sample_byte)
 {
+    int s8;
     int16_t value;
     if (s->out_pos >= s->out_capacity) {
         size_t new_cap = s->out_capacity ? s->out_capacity * 2 : 4096;
@@ -131,9 +132,14 @@ static int synth_emit_sample(synth_state_t *s, int sample_byte)
         s->out = grown;
         s->out_capacity = new_cap;
     }
-    /* sample_byte is two's-complement 8-bit (the MULT-table products are
-     * signed bytes).  Promote to int16 by sign-extending and shifting up. */
-    value = (int16_t) ((int8_t) sample_byte) << 8;
+    /* sample_byte is two's-complement 8-bit (MULT-table products are signed
+     * bytes plus a `(int8_t) sum` wraparound). Clamp to [-127, +127] before
+     * promoting so the output range is symmetric — leaving -128 in place would
+     * map to int16 -32768 with no positive counterpart, audible as a one-sided
+     * spike on the loudest voiced fricative samples. */
+    s8 = (int8_t) sample_byte;
+    if (s8 < -127) s8 = -127;
+    value = (int16_t) (s8 * 256);
     s->out[s->out_pos++] = value;
     return 1;
 }
