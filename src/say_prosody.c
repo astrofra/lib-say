@@ -551,6 +551,7 @@ int say_generate_frames(
             memset(&frame, 0, sizeof(frame));
             frame.is_pause = 1;
             frame.voiced = 0;
+            frame.source_phoneme = PH_PAUSE;
             for (frame_index = 0; frame_index < (size_t) frame_count; ++frame_index) {
                 if (!say_frame_buffer_push(frames, &frame)) {
                     say_set_error(error, error_size, "out of memory while generating pause frames");
@@ -1033,6 +1034,7 @@ int say_generate_frames(
             memset(&frame, 0, sizeof(frame));
             frame.voiced = current->voiced;
             frame.is_pause = 0;
+            frame.source_phoneme = segments[i].phoneme;
             if (say_is_plosive_phone(segments[i].phoneme) && alpha < 0.30) {
                 frame.voiced = 0;
             }

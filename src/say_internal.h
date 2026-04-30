@@ -160,6 +160,11 @@ typedef struct frame_t {
     double noise_path_f_high;
     double noise_path_gain;
     double voicing_bar_amp;
+    /* P5/P6 — phoneme that produced this frame. The biquad path doesn't read
+     * it; the Amiga bridge uses it to route nasals (M/N/NY/NG) through the
+     * substrate's V+N "AN" branch instead of the vowel branch, since the
+     * acoustic class can't be inferred from voiced + noise_mix alone. */
+    phoneme_id_t source_phoneme;
 } frame_t;
 
 typedef struct frame_buffer_t {
