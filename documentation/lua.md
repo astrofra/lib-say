@@ -26,10 +26,11 @@ Generates audio in memory and returns:
 Supported options:
 
 - `lang` or `language`: `"en"` or `"fr"`
-- `sample_rate` or `rate`: currently `44100` only
+- `sample_rate` or `rate`: `44100` (default) on the biquad path; ignored on the Amiga path (output is fixed at 44100 Hz, see `amiga` below)
 - `frame_ms`: integer between `5` and `10`
 - `phonemes`: boolean, interpret `input` as phoneme symbols
 - `format`: `"raw"`, `"aiff"`, or `"wav"` (`"raw"` by default)
+- `amiga`: boolean, route synthesis through the Amiga substrate (clean-room C port of the original Amiga `narrator` synth). The substrate runs at 11025 Hz internally and the bridge upsamples 4x to 44100 Hz, so the returned blob is always at 44100 Hz regardless of `sample_rate`. `info.sample_rate` reflects the effective rate.
 
 Example:
 ```lua
@@ -42,6 +43,18 @@ local blob, info = say.synthesize("Hello from Lua", {
 
 print(info.format, info.sample_count, info.duration_seconds)
 print(blob:GetSize())
+```
+
+Amiga substrate example (uses the ported `narrator` synth instead of the biquad path):
+```lua
+local blob, info = say.synthesize("This is Amiga speaking.", {
+    lang  = "en",
+    amiga = true,
+    format = "wav",
+})
+
+print(info.sample_rate)        -- 44100 (substrate runs at 11025 Hz, bridge upsamples 4x)
+print(info.duration_seconds)
 ```
 
 Blob methods:

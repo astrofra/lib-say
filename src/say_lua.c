@@ -96,7 +96,8 @@ static void saylua_parse_options(
     lua_State *L,
     int index,
     say_options_t *out_options,
-    say_audio_format_t *out_format
+    say_audio_format_t *out_format,
+    int *out_use_amiga
 )
 {
     const char *text_value;
@@ -105,6 +106,9 @@ static void saylua_parse_options(
 
     say_default_options(out_options);
     *out_format = SAY_FORMAT_RAW;
+    if (out_use_amiga != NULL) {
+        *out_use_amiga = 0;
+    }
 
     if (lua_isnoneornil(L, index)) {
         return;
@@ -138,12 +142,18 @@ static void saylua_parse_options(
             luaL_error(L, "unsupported format '%s'", text_value);
         }
     }
+
+    if (out_use_amiga != NULL &&
+        saylua_get_boolean_field(L, index, "amiga", &bool_value)) {
+        *out_use_amiga = bool_value;
+    }
 }
 
 static void saylua_push_info(
     lua_State *L,
     const say_options_t *options,
     say_audio_format_t format,
+    int sample_rate,
     size_t sample_count,
     size_t byte_count
 )
@@ -156,7 +166,12 @@ static void saylua_push_info(
     lua_pushstring(L, say_audio_format_name(format));
     lua_setfield(L, -2, "format");
 
-    lua_pushinteger(L, options->sample_rate);
+    /* sample_rate is the rate of the bytes inside `blob`, which can differ
+     * from options->sample_rate when the Amiga path was used (the substrate
+     * runs at 11025 Hz internally and the bridge upsamples to 44100 Hz —
+     * see say_amiga_bridge.c). We report the effective rate so callers
+     * reading the WAV/AIFF header don't have to second-guess. */
+    lua_pushinteger(L, sample_rate);
     lua_setfield(L, -2, "sample_rate");
 
     lua_pushinteger(L, options->frame_ms);
@@ -177,7 +192,7 @@ static void saylua_push_info(
     lua_pushinteger(L, (lua_Integer) byte_count);
     lua_setfield(L, -2, "byte_count");
 
-    lua_pushnumber(L, options->sample_rate > 0 ? (lua_Number) sample_count / (lua_Number) options->sample_rate : 0.0);
+    lua_pushnumber(L, sample_rate > 0 ? (lua_Number) sample_count / (lua_Number) sample_rate : 0.0);
     lua_setfield(L, -2, "duration_seconds");
 
     if (format == SAY_FORMAT_AIFF) {
@@ -225,6 +240,8 @@ static int saylua_synthesize(lua_State *L)
 {
     say_options_t options;
     say_audio_format_t format;
+    int use_amiga;
+    int effective_sample_rate;
     const char *input;
     int16_t *samples;
     size_t sample_count;
@@ -233,25 +250,33 @@ static int saylua_synthesize(lua_State *L)
     char error[256];
 
     input = luaL_checkstring(L, 1);
-    saylua_parse_options(L, 2, &options, &format);
+    saylua_parse_options(L, 2, &options, &format, &use_amiga);
 
     samples = NULL;
     sample_count = 0;
     blob = NULL;
     blob_size = 0;
+    effective_sample_rate = options.sample_rate;
     error[0] = '\0';
 
-    if (!say_synthesize(input, &options, &samples, &sample_count, error, sizeof(error))) {
+    if (use_amiga) {
+        if (!say_synthesize_amiga(input, &options, &samples, &sample_count,
+                                  &effective_sample_rate, error, sizeof(error))) {
+            return luaL_error(L, "%s", error);
+        }
+    }
+    else if (!say_synthesize(input, &options, &samples, &sample_count, error, sizeof(error))) {
         return luaL_error(L, "%s", error);
     }
 
-    if (!say_encode_audio(format, options.sample_rate, samples, sample_count, &blob, &blob_size, error, sizeof(error))) {
+    if (!say_encode_audio(format, effective_sample_rate, samples, sample_count,
+                          &blob, &blob_size, error, sizeof(error))) {
         say_free(samples);
         return luaL_error(L, "%s", error);
     }
 
     saylua_push_blob(L, blob, blob_size);
-    saylua_push_info(L, &options, format, sample_count, blob_size);
+    saylua_push_info(L, &options, format, effective_sample_rate, sample_count, blob_size);
 
     say_free(samples);
     return 2;
@@ -266,7 +291,7 @@ static int saylua_debug_report(lua_State *L)
     char error[256];
 
     input = luaL_checkstring(L, 1);
-    saylua_parse_options(L, 2, &options, &ignored_format);
+    saylua_parse_options(L, 2, &options, &ignored_format, /*out_use_amiga*/ NULL);
 
     report = NULL;
     error[0] = '\0';
