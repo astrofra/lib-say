@@ -10,7 +10,11 @@ if not exist "%TTS%" (
 )
 
 echo Generating English demo...
-"%TTS%" "... we've heard my former pastor ... use incendiary language to express views that have the potential not only to widen the racial divide, but views that denigrate both the greatness and the goodness of our nation; that rightly offend white and black alike.  I have already condemned, in unequivocal terms, the statements of Reverend Wright that have caused such controversy. For some, nagging questions remain. Did I know him to be an occasionally fierce critic of American domestic and foreign policy? Of course. Did I ever hear him make remarks that could be considered controversial while I sat in church? Yes. Did I strongly disagree with many of his political views? Absolutely—just as I'm sure many of you have heard remarks from your pastors, priests, or rabbis with which you strongly disagreed.  But the remarks that have caused this recent firestorm weren't simply controversial. They weren't simply a religious leader's effort to speak out against perceived injustice. Instead, they expressed a profoundly distorted view of this country—a view that sees white racism as endemic, and that elevates what is wrong with America above all that we know is right with America .." -o "%ROOT%demo-en.aiff" --lang en
+"%TTS%" "Empty your mind, be formless, shapeless, like water. If you put water into a cup, it becomes the cup. You put water into a bottle and it becomes the bottle. You put it in a teapot it becomes the teapot. Now, water can flow or it can crash. Be water, my friend." -o "%ROOT%demo-en.aiff" --lang en  --articulate 50
+if errorlevel 1 exit /b 1
+
+echo Generating Amiga English demo...
+"%TTS%" "Empty your mind, be formless, shapeless, like water. If you put water into a cup, it becomes the cup. You put water into a bottle and it becomes the bottle. You put it in a teapot it becomes the teapot. Now, water can flow or it can crash. Be water, my friend." -o "%ROOT%demo-amiga-en.aiff" --lang en --amiga --articulate 50
 if errorlevel 1 exit /b 1
 
 echo Generating French demo...
