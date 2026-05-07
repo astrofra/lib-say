@@ -28,6 +28,7 @@ static void tts_print_usage(FILE *stream)
         "  --debug-report <p>    Write a debug report to a file, or use - for stdout\n"
         "  --dry-run             Build the debug pipeline but skip audio rendering/output\n"
         "  --amiga               Render through the ported Amiga substrate (22050 Hz LUTs, 44100 Hz output)\n"
+        "  --gain <x>            Post-synthesis linear gain with soft-knee limiter (default: 1.0)\n"
         "  -h, --help            Show this message\n"
         "\n"
         "Phoneme mode accepts symbols like:\n"
@@ -135,6 +136,7 @@ int main(int argc, char **argv)
     char error[256];
     int dry_run;
     int use_amiga;
+    double gain;
     int i;
 
     say_default_options(&options);
@@ -147,6 +149,7 @@ int main(int argc, char **argv)
     sample_count = 0;
     dry_run = 0;
     use_amiga = 0;
+    gain = 1.0;
     error[0] = '\0';
 
     if (argc <= 1) {
@@ -243,6 +246,18 @@ int main(int argc, char **argv)
             use_amiga = 1;
             continue;
         }
+        if (strcmp(argv[i], "--gain") == 0) {
+            if (i + 1 >= argc) {
+                fprintf(stderr, "missing value after --gain\n");
+                return 1;
+            }
+            gain = atof(argv[++i]);
+            if (gain <= 0.0) {
+                fprintf(stderr, "--gain must be > 0\n");
+                return 1;
+            }
+            continue;
+        }
         if (input_arg == NULL) {
             input_arg = argv[i];
             continue;
@@ -331,6 +346,10 @@ int main(int argc, char **argv)
             fprintf(stderr, "%s\n", error);
             return 1;
         }
+    }
+
+    if (gain != 1.0) {
+        say_apply_gain(samples, sample_count, gain);
     }
 
     format = say_guess_audio_format(output_path);

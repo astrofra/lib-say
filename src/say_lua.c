@@ -55,6 +55,19 @@ static int saylua_get_integer_field(lua_State *L, int index, const char *key, lu
     return 1;
 }
 
+static int saylua_get_number_field(lua_State *L, int index, const char *key, lua_Number *out_value)
+{
+    lua_getfield(L, index, key);
+    if (lua_isnil(L, -1)) {
+        lua_pop(L, 1);
+        return 0;
+    }
+
+    *out_value = luaL_checknumber(L, -1);
+    lua_pop(L, 1);
+    return 1;
+}
+
 static int saylua_get_boolean_field(lua_State *L, int index, const char *key, int *out_value)
 {
     int type;
@@ -97,17 +110,22 @@ static void saylua_parse_options(
     int index,
     say_options_t *out_options,
     say_audio_format_t *out_format,
-    int *out_use_amiga
+    int *out_use_amiga,
+    double *out_gain
 )
 {
     const char *text_value;
     lua_Integer int_value;
+    lua_Number num_value;
     int bool_value;
 
     say_default_options(out_options);
     *out_format = SAY_FORMAT_RAW;
     if (out_use_amiga != NULL) {
         *out_use_amiga = 0;
+    }
+    if (out_gain != NULL) {
+        *out_gain = 1.0;
     }
 
     if (lua_isnoneornil(L, index)) {
@@ -146,6 +164,14 @@ static void saylua_parse_options(
     if (out_use_amiga != NULL &&
         saylua_get_boolean_field(L, index, "amiga", &bool_value)) {
         *out_use_amiga = bool_value;
+    }
+
+    if (out_gain != NULL &&
+        saylua_get_number_field(L, index, "gain", &num_value)) {
+        if (num_value <= 0.0) {
+            luaL_error(L, "option 'gain' must be > 0");
+        }
+        *out_gain = (double) num_value;
     }
 }
 
@@ -241,6 +267,7 @@ static int saylua_synthesize(lua_State *L)
     say_options_t options;
     say_audio_format_t format;
     int use_amiga;
+    double gain;
     int effective_sample_rate;
     const char *input;
     int16_t *samples;
@@ -250,7 +277,7 @@ static int saylua_synthesize(lua_State *L)
     char error[256];
 
     input = luaL_checkstring(L, 1);
-    saylua_parse_options(L, 2, &options, &format, &use_amiga);
+    saylua_parse_options(L, 2, &options, &format, &use_amiga, &gain);
 
     samples = NULL;
     sample_count = 0;
@@ -267,6 +294,10 @@ static int saylua_synthesize(lua_State *L)
     }
     else if (!say_synthesize(input, &options, &samples, &sample_count, error, sizeof(error))) {
         return luaL_error(L, "%s", error);
+    }
+
+    if (gain != 1.0) {
+        say_apply_gain(samples, sample_count, gain);
     }
 
     if (!say_encode_audio(format, effective_sample_rate, samples, sample_count,
@@ -291,7 +322,8 @@ static int saylua_debug_report(lua_State *L)
     char error[256];
 
     input = luaL_checkstring(L, 1);
-    saylua_parse_options(L, 2, &options, &ignored_format, /*out_use_amiga*/ NULL);
+    saylua_parse_options(L, 2, &options, &ignored_format,
+                         /*out_use_amiga*/ NULL, /*out_gain*/ NULL);
 
     report = NULL;
     error[0] = '\0';

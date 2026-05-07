@@ -31,7 +31,10 @@ Goals:
 tts input.txt -o output.aiff --lang en
 tts input.txt -o output.wav --lang en
 tts "Hello world" -o out.raw --lang fr
+tts "Cutting through music" -o loud.wav --gain 2.0
 ```
+
+Run `tts --help` for the full flag list.
 
 ---
 
@@ -121,6 +124,10 @@ Text → Phonemizer → Prosody → Frame Generator → DSP Synth → Audio Outp
 - Sample rate: 44100 Hz
 - Real-time capable (buffer-based processing)
 - No dynamic allocation in DSP loop
+
+### Output Gain
+
+The library ships with a single output-side knob, `say_apply_gain(samples, count, gain)`, declared in `say.h`. It applies a linear gain to the int16 PCM buffer in place, with a tanh soft-knee starting at -3 dBFS — peaks above the knee bend toward the ceiling instead of square-clipping. The curve is C¹-continuous at the knee (no audible kink). It is exposed as `--gain` on the CLI and as the `gain` option in the Lua binding. Typical use: cutting speech through background music without engineering a full ducking pipeline.
 
 ---
 

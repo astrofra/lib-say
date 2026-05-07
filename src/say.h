@@ -100,6 +100,13 @@ int say_encode_audio(
     size_t error_size
 );
 
+/* Apply linear gain to a 16-bit PCM buffer, in place. Above an internal
+ * knee at ~0.7 of full scale (-3 dBFS), the response soft-saturates with a
+ * tanh curve so loud peaks bend toward the ceiling instead of clipping. The
+ * curve is C1-continuous at the knee. gain == 1.0 is a no-op; gain < 1.0
+ * attenuates linearly (the knee never engages). */
+void say_apply_gain(int16_t *samples, size_t sample_count, double gain);
+
 void say_free(void *ptr);
 
 #endif

@@ -460,3 +460,44 @@ int say_encode_audio(
     *out_size = byte_count;
     return 1;
 }
+
+/* Linear gain + soft-knee saturator. Samples are normalised to [-1, 1],
+ * scaled by gain, then any magnitude above KNEE is bent toward the ±1
+ * ceiling with a tanh curve. tanh'(0) = 1, so the slope matches the linear
+ * branch at the knee — no kink, no audible discontinuity. tanh < 1 strictly
+ * for finite input, so the result is always inside the int16 range without
+ * needing a saturating clamp; the clamp at the end only catches rounding. */
+void say_apply_gain(int16_t *samples, size_t sample_count, double gain)
+{
+    const double KNEE = 0.7;
+    const double knee_span = 1.0 - KNEE;
+    size_t i;
+
+    if (samples == NULL || sample_count == 0 || gain == 1.0) {
+        return;
+    }
+
+    for (i = 0; i < sample_count; ++i) {
+        double x = (double) samples[i] * (1.0 / 32768.0);
+        double abs_x;
+        double y;
+        int v;
+
+        x *= gain;
+        abs_x = x < 0.0 ? -x : x;
+
+        if (abs_x <= KNEE) {
+            y = x;
+        }
+        else {
+            double sign = x < 0.0 ? -1.0 : 1.0;
+            double over = (abs_x - KNEE) / knee_span;
+            y = sign * (KNEE + knee_span * tanh(over));
+        }
+
+        v = (int) (y * 32767.0 + (y >= 0.0 ? 0.5 : -0.5));
+        if (v >  32767) v =  32767;
+        if (v < -32768) v = -32768;
+        samples[i] = (int16_t) v;
+    }
+}
