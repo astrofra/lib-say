@@ -107,6 +107,14 @@ int say_encode_audio(
  * attenuates linearly (the knee never engages). */
 void say_apply_gain(int16_t *samples, size_t sample_count, double gain);
 
+/* Telephone-band emulator — "remote / bad-connection" flavour. Tight
+ * 500-2800 Hz bandpass with 24 dB/oct skirts, a midrange resonance peak at
+ * ~1700 Hz to mimic an earpiece capsule, and a hard tanh saturator that
+ * stands in for low-bitrate codec compression. Works on any synthesizer
+ * output — pass the rate the buffer was rendered at. No-op if sample_rate
+ * is too low for the LP cutoff to fit below Nyquist. */
+void say_apply_phone_filter(int16_t *samples, size_t sample_count, int sample_rate);
+
 void say_free(void *ptr);
 
 #endif

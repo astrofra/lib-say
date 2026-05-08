@@ -29,6 +29,7 @@ static void tts_print_usage(FILE *stream)
         "  --dry-run             Build the debug pipeline but skip audio rendering/output\n"
         "  --amiga               Render through the ported Amiga substrate (22050 Hz LUTs, 44100 Hz output)\n"
         "  --gain <x>            Post-synthesis linear gain with soft-knee limiter (default: 1.0)\n"
+        "  --phone               Telephone-band filter (300-3400 Hz bandpass + light saturation)\n"
         "  -h, --help            Show this message\n"
         "\n"
         "Phoneme mode accepts symbols like:\n"
@@ -136,6 +137,7 @@ int main(int argc, char **argv)
     char error[256];
     int dry_run;
     int use_amiga;
+    int phone;
     double gain;
     int i;
 
@@ -149,6 +151,7 @@ int main(int argc, char **argv)
     sample_count = 0;
     dry_run = 0;
     use_amiga = 0;
+    phone = 0;
     gain = 1.0;
     error[0] = '\0';
 
@@ -244,6 +247,10 @@ int main(int argc, char **argv)
         }
         if (strcmp(argv[i], "--amiga") == 0) {
             use_amiga = 1;
+            continue;
+        }
+        if (strcmp(argv[i], "--phone") == 0) {
+            phone = 1;
             continue;
         }
         if (strcmp(argv[i], "--gain") == 0) {
@@ -346,6 +353,10 @@ int main(int argc, char **argv)
             fprintf(stderr, "%s\n", error);
             return 1;
         }
+    }
+
+    if (phone) {
+        say_apply_phone_filter(samples, sample_count, output_sample_rate);
     }
 
     if (gain != 1.0) {

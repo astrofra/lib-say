@@ -501,3 +501,144 @@ void say_apply_gain(int16_t *samples, size_t sample_count, double gain)
         samples[i] = (int16_t) v;
     }
 }
+
+/* Telephone-band emulator — "remote / bad-connection" flavour.
+ *
+ * Signal chain: HPF(500 Hz)x2 -> LPF(2800 Hz)x2 -> peak EQ(+8 dB at 1700 Hz)
+ * -> tanh saturator. The bandpass is tighter than the canonical 300-3400 Hz
+ * channel and each side is a 2-biquad cascade (24 dB/oct), so the voice is
+ * audibly stripped of low body and high air. The peak EQ adds the small
+ * resonance you'd expect from a tiny earpiece capsule — it's what makes a
+ * phone voice sound "tinny" rather than just bandlimited. The tanh is driven
+ * hard enough to compress consonants the way a low-bitrate codec would, with
+ * a matching makeup gain so the perceived loudness lands near the input.
+ *
+ * All biquad coefficients come from the RBJ audio-EQ cookbook. Stable for
+ * any sample rate where 2800 Hz < Nyquist (i.e. rate >= ~6 kHz). */
+void say_apply_phone_filter(int16_t *samples, size_t sample_count, int sample_rate)
+{
+    const double PI = 3.14159265358979323846;
+    const double HPF_FREQ = 500.0;
+    const double LPF_FREQ = 2800.0;
+    const double BUTTER_Q = 0.7071067811865476;
+    const double PEAK_FREQ = 1700.0;
+    const double PEAK_Q = 2.0;
+    const double PEAK_GAIN_DB = 8.0;
+    const double DRIVE = 2.4;
+    const double MAKEUP = 2.6;
+
+    double hp1_b0, hp1_b1, hp1_b2, hp1_a1, hp1_a2;
+    double hp2_b0, hp2_b1, hp2_b2, hp2_a1, hp2_a2;
+    double lp1_b0, lp1_b1, lp1_b2, lp1_a1, lp1_a2;
+    double lp2_b0, lp2_b1, lp2_b2, lp2_a1, lp2_a2;
+    double pk_b0,  pk_b1,  pk_b2,  pk_a1,  pk_a2;
+    double hp1_x1, hp1_x2, hp1_y1, hp1_y2;
+    double hp2_x1, hp2_x2, hp2_y1, hp2_y2;
+    double lp1_x1, lp1_x2, lp1_y1, lp1_y2;
+    double lp2_x1, lp2_x2, lp2_y1, lp2_y2;
+    double pk_x1,  pk_x2,  pk_y1,  pk_y2;
+    size_t i;
+
+    if (samples == NULL || sample_count == 0 || sample_rate <= 0) {
+        return;
+    }
+    if ((double) sample_rate <= 2.0 * LPF_FREQ) {
+        return;
+    }
+
+    /* Two cascaded HPFs at 500 Hz (24 dB/oct). */
+    {
+        double w0 = 2.0 * PI * HPF_FREQ / (double) sample_rate;
+        double cos_w0 = cos(w0);
+        double alpha = sin(w0) / (2.0 * BUTTER_Q);
+        double a0 = 1.0 + alpha;
+        double b0 = ((1.0 + cos_w0) * 0.5) / a0;
+        double b1 = (-(1.0 + cos_w0))      / a0;
+        double b2 = ((1.0 + cos_w0) * 0.5) / a0;
+        double a1 = (-2.0 * cos_w0)        / a0;
+        double a2 = (1.0 - alpha)          / a0;
+        hp1_b0 = hp2_b0 = b0;
+        hp1_b1 = hp2_b1 = b1;
+        hp1_b2 = hp2_b2 = b2;
+        hp1_a1 = hp2_a1 = a1;
+        hp1_a2 = hp2_a2 = a2;
+    }
+    /* Two cascaded LPFs at 2800 Hz (24 dB/oct). */
+    {
+        double w0 = 2.0 * PI * LPF_FREQ / (double) sample_rate;
+        double cos_w0 = cos(w0);
+        double alpha = sin(w0) / (2.0 * BUTTER_Q);
+        double a0 = 1.0 + alpha;
+        double b0 = ((1.0 - cos_w0) * 0.5) / a0;
+        double b1 = (1.0 - cos_w0)         / a0;
+        double b2 = ((1.0 - cos_w0) * 0.5) / a0;
+        double a1 = (-2.0 * cos_w0)        / a0;
+        double a2 = (1.0 - alpha)          / a0;
+        lp1_b0 = lp2_b0 = b0;
+        lp1_b1 = lp2_b1 = b1;
+        lp1_b2 = lp2_b2 = b2;
+        lp1_a1 = lp2_a1 = a1;
+        lp1_a2 = lp2_a2 = a2;
+    }
+    /* Peak EQ at 1700 Hz, +PEAK_GAIN_DB, Q=2 — earpiece resonance. */
+    {
+        double A = pow(10.0, PEAK_GAIN_DB / 40.0);
+        double w0 = 2.0 * PI * PEAK_FREQ / (double) sample_rate;
+        double cos_w0 = cos(w0);
+        double alpha = sin(w0) / (2.0 * PEAK_Q);
+        double a0 = 1.0 + alpha / A;
+        pk_b0 = (1.0 + alpha * A) / a0;
+        pk_b1 = (-2.0 * cos_w0)   / a0;
+        pk_b2 = (1.0 - alpha * A) / a0;
+        pk_a1 = (-2.0 * cos_w0)   / a0;
+        pk_a2 = (1.0 - alpha / A) / a0;
+    }
+
+    hp1_x1 = hp1_x2 = hp1_y1 = hp1_y2 = 0.0;
+    hp2_x1 = hp2_x2 = hp2_y1 = hp2_y2 = 0.0;
+    lp1_x1 = lp1_x2 = lp1_y1 = lp1_y2 = 0.0;
+    lp2_x1 = lp2_x2 = lp2_y1 = lp2_y2 = 0.0;
+    pk_x1  = pk_x2  = pk_y1  = pk_y2  = 0.0;
+
+    for (i = 0; i < sample_count; ++i) {
+        double x = (double) samples[i] * (1.0 / 32768.0);
+        double y, sat;
+        int v;
+
+        y = hp1_b0 * x + hp1_b1 * hp1_x1 + hp1_b2 * hp1_x2 - hp1_a1 * hp1_y1 - hp1_a2 * hp1_y2;
+        hp1_x2 = hp1_x1; hp1_x1 = x;
+        hp1_y2 = hp1_y1; hp1_y1 = y;
+
+        {
+            double in = y;
+            y = hp2_b0 * in + hp2_b1 * hp2_x1 + hp2_b2 * hp2_x2 - hp2_a1 * hp2_y1 - hp2_a2 * hp2_y2;
+            hp2_x2 = hp2_x1; hp2_x1 = in;
+            hp2_y2 = hp2_y1; hp2_y1 = y;
+        }
+        {
+            double in = y;
+            y = lp1_b0 * in + lp1_b1 * lp1_x1 + lp1_b2 * lp1_x2 - lp1_a1 * lp1_y1 - lp1_a2 * lp1_y2;
+            lp1_x2 = lp1_x1; lp1_x1 = in;
+            lp1_y2 = lp1_y1; lp1_y1 = y;
+        }
+        {
+            double in = y;
+            y = lp2_b0 * in + lp2_b1 * lp2_x1 + lp2_b2 * lp2_x2 - lp2_a1 * lp2_y1 - lp2_a2 * lp2_y2;
+            lp2_x2 = lp2_x1; lp2_x1 = in;
+            lp2_y2 = lp2_y1; lp2_y1 = y;
+        }
+        {
+            double in = y;
+            y = pk_b0 * in + pk_b1 * pk_x1 + pk_b2 * pk_x2 - pk_a1 * pk_y1 - pk_a2 * pk_y2;
+            pk_x2 = pk_x1; pk_x1 = in;
+            pk_y2 = pk_y1; pk_y1 = y;
+        }
+
+        sat = tanh(y * DRIVE * MAKEUP);
+
+        v = (int) (sat * 32767.0 + (sat >= 0.0 ? 0.5 : -0.5));
+        if (v >  32767) v =  32767;
+        if (v < -32768) v = -32768;
+        samples[i] = (int16_t) v;
+    }
+}

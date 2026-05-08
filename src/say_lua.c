@@ -111,7 +111,8 @@ static void saylua_parse_options(
     say_options_t *out_options,
     say_audio_format_t *out_format,
     int *out_use_amiga,
-    double *out_gain
+    double *out_gain,
+    int *out_phone
 )
 {
     const char *text_value;
@@ -126,6 +127,9 @@ static void saylua_parse_options(
     }
     if (out_gain != NULL) {
         *out_gain = 1.0;
+    }
+    if (out_phone != NULL) {
+        *out_phone = 0;
     }
 
     if (lua_isnoneornil(L, index)) {
@@ -172,6 +176,11 @@ static void saylua_parse_options(
             luaL_error(L, "option 'gain' must be > 0");
         }
         *out_gain = (double) num_value;
+    }
+
+    if (out_phone != NULL &&
+        saylua_get_boolean_field(L, index, "phone", &bool_value)) {
+        *out_phone = bool_value;
     }
 }
 
@@ -267,6 +276,7 @@ static int saylua_synthesize(lua_State *L)
     say_options_t options;
     say_audio_format_t format;
     int use_amiga;
+    int phone;
     double gain;
     int effective_sample_rate;
     const char *input;
@@ -277,7 +287,7 @@ static int saylua_synthesize(lua_State *L)
     char error[256];
 
     input = luaL_checkstring(L, 1);
-    saylua_parse_options(L, 2, &options, &format, &use_amiga, &gain);
+    saylua_parse_options(L, 2, &options, &format, &use_amiga, &gain, &phone);
 
     samples = NULL;
     sample_count = 0;
@@ -294,6 +304,10 @@ static int saylua_synthesize(lua_State *L)
     }
     else if (!say_synthesize(input, &options, &samples, &sample_count, error, sizeof(error))) {
         return luaL_error(L, "%s", error);
+    }
+
+    if (phone) {
+        say_apply_phone_filter(samples, sample_count, effective_sample_rate);
     }
 
     if (gain != 1.0) {
@@ -323,7 +337,8 @@ static int saylua_debug_report(lua_State *L)
 
     input = luaL_checkstring(L, 1);
     saylua_parse_options(L, 2, &options, &ignored_format,
-                         /*out_use_amiga*/ NULL, /*out_gain*/ NULL);
+                         /*out_use_amiga*/ NULL, /*out_gain*/ NULL,
+                         /*out_phone*/ NULL);
 
     report = NULL;
     error[0] = '\0';
