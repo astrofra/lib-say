@@ -241,24 +241,80 @@ static int say_text_buffer_append_word_debug(
             continue;
         }
         if (normalized_text[i] >= '0' && normalized_text[i] <= '9') {
-            segment_buffer_t temp_segments;
-            const char *digit_word;
+            size_t digit_start = i;
+            size_t digit_count;
+            const char *number_words[6];
+            size_t number_word_count = 0;
 
-            memset(&temp_segments, 0, sizeof(temp_segments));
-            digit_word = say_digit_word(normalized_text[i], language);
-            if (digit_word == NULL || !say_append_text_word(digit_word, language, &temp_segments)) {
-                free(temp_segments.data);
-                say_set_error(error, error_size, "failed to debug digit token %c", normalized_text[i]);
-                return 0;
+            while (normalized_text[i] >= '0' && normalized_text[i] <= '9') {
+                ++i;
             }
-            if (!say_text_buffer_appendf(buffer, "  %c -> %s -> ", normalized_text[i], digit_word) ||
-                !say_text_buffer_append_phoneme_stream(buffer, temp_segments.data, temp_segments.count) ||
-                !say_text_buffer_append(buffer, "\n")) {
-                free(temp_segments.data);
-                return 0;
+            digit_count = i - digit_start;
+
+            /* Mirror the rule in say_phonemize_text: English 10..9999 with no
+             * leading zero gets spoken as words; everything else falls back to
+             * per-digit. The debug report has to use the same logic, otherwise
+             * "word_to_phoneme" would lie about what the synth actually emits. */
+            if (language == SAY_LANG_EN
+                && digit_count >= 2 && digit_count <= 4
+                && normalized_text[digit_start] != '0') {
+                unsigned value = 0;
+                size_t k;
+                for (k = 0; k < digit_count; ++k) {
+                    value = value * 10u + (unsigned) (normalized_text[digit_start + k] - '0');
+                }
+                number_word_count = say_number_words_en(value, number_words, SAY_ARRAY_COUNT(number_words));
             }
-            free(temp_segments.data);
-            ++i;
+
+            if (number_word_count > 0) {
+                segment_buffer_t temp_segments;
+                size_t k;
+
+                memset(&temp_segments, 0, sizeof(temp_segments));
+                if (!say_text_buffer_append(buffer, "  ")) return 0;
+                if (!say_text_buffer_appendf(buffer, "%.*s -> ",
+                                             (int) digit_count, normalized_text + digit_start)) return 0;
+                for (k = 0; k < number_word_count; ++k) {
+                    if (k > 0 && !say_text_buffer_append(buffer, " ")) return 0;
+                    if (!say_text_buffer_append(buffer, number_words[k])) return 0;
+                    if (!say_append_text_word(number_words[k], language, &temp_segments)) {
+                        free(temp_segments.data);
+                        say_set_error(error, error_size, "failed to debug number word %s", number_words[k]);
+                        return 0;
+                    }
+                }
+                if (!say_text_buffer_append(buffer, " -> ") ||
+                    !say_text_buffer_append_phoneme_stream(buffer, temp_segments.data, temp_segments.count) ||
+                    !say_text_buffer_append(buffer, "\n")) {
+                    free(temp_segments.data);
+                    return 0;
+                }
+                free(temp_segments.data);
+                continue;
+            }
+
+            {
+                size_t k;
+                for (k = digit_start; k < i; ++k) {
+                    segment_buffer_t temp_segments;
+                    const char *digit_word;
+
+                    memset(&temp_segments, 0, sizeof(temp_segments));
+                    digit_word = say_digit_word(normalized_text[k], language);
+                    if (digit_word == NULL || !say_append_text_word(digit_word, language, &temp_segments)) {
+                        free(temp_segments.data);
+                        say_set_error(error, error_size, "failed to debug digit token %c", normalized_text[k]);
+                        return 0;
+                    }
+                    if (!say_text_buffer_appendf(buffer, "  %c -> %s -> ", normalized_text[k], digit_word) ||
+                        !say_text_buffer_append_phoneme_stream(buffer, temp_segments.data, temp_segments.count) ||
+                        !say_text_buffer_append(buffer, "\n")) {
+                        free(temp_segments.data);
+                        return 0;
+                    }
+                    free(temp_segments.data);
+                }
+            }
             continue;
         }
         if (say_is_token_char(normalized_text[i])) {

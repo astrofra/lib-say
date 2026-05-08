@@ -1852,6 +1852,90 @@ static int say_append_digit_word(char digit, say_language_t language, segment_bu
     return say_append_text_word(word, language, segments);
 }
 
+/* Speak an English integer in the range 10..9999 as words. Writes word
+ * pointers into out_words and returns the count (max 6 — "nine thousand
+ * nine hundred ninety nine"). Returns 0 if value is out of range. The phoneme
+ * forms come from the NRL ruleset (no lexicon entries are required); the
+ * caller decides where to send the words (segment buffer, debug report, …). */
+size_t say_number_words_en(unsigned value, const char **out_words, size_t capacity)
+{
+    static const char *ones[] = {
+        "zero", "one", "two", "three", "four",
+        "five", "six", "seven", "eight", "nine"
+    };
+    static const char *teens[] = {
+        "ten", "eleven", "twelve", "thirteen", "fourteen",
+        "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"
+    };
+    static const char *tens_words[] = {
+        NULL, NULL, "twenty", "thirty", "forty",
+        "fifty", "sixty", "seventy", "eighty", "ninety"
+    };
+
+    unsigned thousands;
+    unsigned remainder;
+    unsigned hundreds;
+    unsigned last_two;
+    unsigned t;
+    unsigned o;
+    size_t n = 0;
+
+    if (value < 10u || value > 9999u || out_words == NULL || capacity < 6) {
+        return 0;
+    }
+
+    thousands = value / 1000u;
+    remainder = value % 1000u;
+    hundreds  = remainder / 100u;
+    last_two  = remainder % 100u;
+    t = last_two / 10u;
+    o = last_two % 10u;
+
+    if (thousands > 0) {
+        out_words[n++] = ones[thousands];
+        out_words[n++] = "thousand";
+    }
+    if (hundreds > 0) {
+        out_words[n++] = ones[hundreds];
+        out_words[n++] = "hundred";
+    }
+    if (last_two != 0) {
+        if (t == 0) {
+            /* Pure ones digit, reachable only when thousands or hundreds were
+             * emitted (e.g. 1005 → "one thousand five", 305 → "three hundred five"). */
+            out_words[n++] = ones[o];
+        }
+        else if (t == 1) {
+            out_words[n++] = teens[o];
+        }
+        else {
+            out_words[n++] = tens_words[t];
+            if (o != 0) {
+                out_words[n++] = ones[o];
+            }
+        }
+    }
+    return n;
+}
+
+static int say_append_number_words_en(unsigned value, segment_buffer_t *segments)
+{
+    const char *words[6];
+    size_t count;
+    size_t k;
+
+    count = say_number_words_en(value, words, SAY_ARRAY_COUNT(words));
+    if (count == 0) {
+        return 0;
+    }
+    for (k = 0; k < count; ++k) {
+        if (!say_append_text_word(words[k], SAY_LANG_EN, segments)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int say_phonemize_text(
     const char *normalized_text,
     say_language_t language,
@@ -1904,11 +1988,44 @@ int say_phonemize_text(
             continue;
         }
         if (normalized_text[i] >= '0' && normalized_text[i] <= '9') {
-            if (!say_append_digit_word(normalized_text[i], language, segments)) {
-                say_set_error(error, error_size, "out of memory while phonemizing digit");
-                return 0;
+            size_t digit_start = i;
+            size_t digit_count;
+
+            while (normalized_text[i] >= '0' && normalized_text[i] <= '9') {
+                ++i;
             }
-            ++i;
+            digit_count = i - digit_start;
+
+            /* English 10..9999 with no leading zero: speak as words.
+             * Anything else (leading zero like "007", values > 9999, French) falls
+             * through to per-digit spelling so we don't mispronounce postal codes,
+             * phone numbers, or strings of leading-zero IDs. */
+            if (language == SAY_LANG_EN
+                && digit_count >= 2 && digit_count <= 4
+                && normalized_text[digit_start] != '0') {
+                unsigned value = 0;
+                size_t k;
+                for (k = 0; k < digit_count; ++k) {
+                    value = value * 10u + (unsigned) (normalized_text[digit_start + k] - '0');
+                }
+                if (value >= 10u && value <= 9999u) {
+                    if (!say_append_number_words_en(value, segments)) {
+                        say_set_error(error, error_size, "out of memory while phonemizing number");
+                        return 0;
+                    }
+                    continue;
+                }
+            }
+
+            {
+                size_t k;
+                for (k = digit_start; k < i; ++k) {
+                    if (!say_append_digit_word(normalized_text[k], language, segments)) {
+                        say_set_error(error, error_size, "out of memory while phonemizing digit");
+                        return 0;
+                    }
+                }
+            }
             continue;
         }
         if (say_is_token_char(normalized_text[i])) {

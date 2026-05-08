@@ -232,6 +232,13 @@ int   say_append_text_word(const char *word, say_language_t language,
                            segment_buffer_t *segments);
 const char *say_digit_word(char digit, say_language_t language);
 
+/* Convert an English integer in the range 10..9999 into a sequence of word
+ * pointers (e.g. 1234 → "one", "thousand", "two", "hundred", "thirty",
+ * "four"). Returns the count written; 0 if `value` is out of range or
+ * `capacity` is below 6. The caller can feed the words to either the
+ * segment-building phonemizer or the debug-report walker. */
+size_t say_number_words_en(unsigned value, const char **out_words, size_t capacity);
+
 /* D1/D2 — NRL letter-to-sound rule engine (English). Tries the bundled reference
  * rule set against `word`, appending the resulting PH_* segments. Returns 1
  * on success and a non-empty emission, 0 otherwise. The caller is responsible

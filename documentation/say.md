@@ -52,6 +52,11 @@ Text → Phonemizer → Prosody → Frame Generator → DSP Synth → Audio Outp
 ### 1. Text Processing
 - Normalize input (lowercase, punctuation handling)
 - Tokenization
+- Number expansion: runs of 2–4 digits in English input are spoken as words
+  (e.g. `42` → "forty two", `1234` → "one thousand two hundred thirty four").
+  Out-of-range runs (single digits, ≥ 5 digits) and runs with a leading zero
+  (`007`, postal/phone IDs) fall back to per-digit spelling so identifiers stay
+  readable. French and the phoneme-input mode keep the per-digit behaviour.
 
 ### 2. Phonemizer
 - Rule-based grapheme-to-phoneme conversion
