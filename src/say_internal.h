@@ -64,11 +64,10 @@ typedef enum phoneme_id_t {
     PH_JH,
     PH_TS,
     PH_DZ,
-    /* P4 — allophones introduced by the phonological-rule pass. The base
+    /* Allophones introduced by the phonological-rule pass. The base
      * phonemes above are emitted by NRL / lexicon; PHONOL turns them into
-     * the allophones below depending on context. The biquad synth treats
-     * each allophone like its closest base phoneme; the Amiga substrate
-     * (P5+) renders them distinctly via the bridge layer's PC_* mapping. */
+     * the allophones below depending on context. The synth treats each
+     * allophone like its closest base phoneme. */
     PH_TQ,    /* unreleased T (e.g. "button" first T) */
     PH_Q,     /* glottal stop ("uh-oh", glottalised T) */
     PH_DX,    /* flap (intervocalic /t/ or /d/ in "letter", "ladder") */
@@ -160,11 +159,6 @@ typedef struct frame_t {
     double noise_path_f_high;
     double noise_path_gain;
     double voicing_bar_amp;
-    /* P5/P6 — phoneme that produced this frame. The biquad path doesn't read
-     * it; the Amiga bridge uses it to route nasals (M/N/NY/NG) through the
-     * substrate's V+N "AN" branch instead of the vowel branch, since the
-     * acoustic class can't be inferred from voiced + noise_mix alone. */
-    phoneme_id_t source_phoneme;
 } frame_t;
 
 typedef struct frame_buffer_t {
@@ -276,40 +270,6 @@ int   say_synthesize_frames(const frame_t *frames, size_t frame_count,
 /* say_audio_io.c implements the public say_write_audio_file / say_encode_audio
  * declared in say.h. Private writers / IEEE 754 helpers are static to that
  * translation unit. */
-
-/* ---------------------------------------------------------------------------
- * say_amiga_bridge.c — P5 bridge from lib-say frames to the Amiga substrate
- *
- * The biquad path (say_synth.c) and the Amiga substrate (say_synth_amiga.c)
- * share the same upstream pipeline up to frame generation. The bridge takes
- * those frames and produces an 8-byte coefficient buffer the substrate's
- * synth.asm-port accepts. Output is at SAY_AMIGA_SAMPLE_RATE — the rate at
- * which the impulse-response LUTs were measured on the original hardware.
- * ------------------------------------------------------------------------- */
-
-/* The Amiga substrate emits one logical audio sample per inner-loop iteration.
- * In synth.asm each iteration writes TWO bytes (`move.b d7,(a0)+` twice — see
- * syn.i:36-37) which the audio chip plays as two sequential 8-bit samples at
- * its 22 200 Hz byte rate. So the logical sample rate is half that, and that
- * is the rate the F0 byte (pitch period in samples) and the LUTs were
- * calibrated for — convert.asm uses `SAMPRATE equ 11100` for the F0 conversion
- * (convert.asm:73). The bridge upsamples 4x to deliver 44100 Hz output. */
-#define SAY_AMIGA_SAMPLE_RATE 11025
-
-int say_synth_amiga_from_frames(
-    const frame_t *frames, size_t frame_count, int frame_ms,
-    int16_t **out_samples, size_t *out_sample_count,
-    char *error, size_t error_size);
-
-/* Substrate entry points (defined in say_synth_amiga.c). The bridge uses the
- * _ex variant so it can pin samperframe to the lib-say frame cadence. */
-int say_synth_amiga_run_ex(
-    const uint8_t *coef, int sample_rate, int rate_wpm,
-    int samperframe_override,
-    int16_t **out_samples, size_t *out_sample_count);
-int say_synth_amiga_run(
-    const uint8_t *coef, int sample_rate, int rate_wpm,
-    int16_t **out_samples, size_t *out_sample_count);
 
 /* ---------------------------------------------------------------------------
  * Tiny math helpers used by both prosody and synth

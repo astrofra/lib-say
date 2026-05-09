@@ -76,10 +76,9 @@ static const phoneme_def_t g_phonemes[PH_COUNT] = {
     { PH_JH,    "JH",    0, 1, AFRV, 52.0,  92.0, 0.70, 0.48, { 1300, 2600, 3700, 4800, 5900 }, { 220, 270, 320, 370, 420 }, { 0.22, 0.34, 0.52, 0.40, 0.22 } },
     { PH_TS,    "TS",    0, 0, AFR,  50.0,  90.0, 0.66, 1.00, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.46, 0.38, 0.30, 0.24, 0.18 } },
     { PH_DZ,    "DZ",    0, 1, AFRV, 50.0,  90.0, 0.68, 0.48, { 1200, 2500, 3600, 4700, 5800 }, { 220, 270, 320, 370, 420 }, { 0.48, 0.38, 0.30, 0.24, 0.18 } },
-    /* P4 allophones — formant data cloned from the nearest base phoneme.
+    /* Allophones — formant data cloned from the nearest base phoneme.
      * Acoustic distinctness comes mainly from duration tweaks (TQ/DX shorter,
-     * AXP shorter, LX with darker F2) and from how the Amiga substrate
-     * renders the corresponding PC_* once the bridge layer is in place. */
+     * AXP shorter, LX with darker F2). */
     { PH_TQ,    "TQ",    0, 0, PLS,  35.0,  55.0, 0.55, 1.00, { 600, 1700, 2800, 3800, 4800 }, { 280, 330, 380, 420, 500 }, { 0.30, 0.22, 0.18, 0.15, 0.10 } }, /* unreleased T — short, low burst */
     { PH_Q,     "Q",     0, 0, F_PLOS, 25.0, 40.0, 0.20, 0.0, { 0 }, { 0 }, { 0 } }, /* glottal stop — brief silent closure */
     { PH_DX,    "DX",    0, 1, PLSV, 25.0,  40.0, 0.62, 0.30, { 600, 1700, 2800, 3800, 4800 }, { 280, 330, 380, 420, 500 }, { 0.42, 0.30, 0.24, 0.20, 0.14 } }, /* flap — very short */

@@ -1,9 +1,8 @@
 """Generate the curated English demo set.
 
-For each phrase in ../tests/corpus.tsv this writes two WAVs into
-./output/{biquad,amiga}/<id>.wav using the lib-say tts.exe in both rendering
-paths. Run after `cmake --build build --config Release` so the binary is
-fresh.
+For each phrase in ../tests/corpus.tsv this writes a WAV into
+./output/<id>.wav using the lib-say tts.exe. Run after
+`cmake --build build --config Release` so the binary is fresh.
 
 Usage:
     python samples/generate.py             # render all phrases
@@ -33,15 +32,13 @@ def load_corpus() -> list[tuple[str, str]]:
     return rows
 
 
-def render(sample_id: str, text: str, path: pathlib.Path, amiga: bool) -> None:
+def render(sample_id: str, text: str, path: pathlib.Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     cmd = [str(TTS), text, "-o", str(path), "--lang", "en"]
-    if amiga:
-        cmd.append("--amiga")
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
         raise SystemExit(
-            f"tts.exe failed for {sample_id} ({'amiga' if amiga else 'biquad'}):\n"
+            f"tts.exe failed for {sample_id}:\n"
             f"{result.stderr}"
         )
 
@@ -55,12 +52,11 @@ def main(filters: list[str]) -> int:
     if filters:
         corpus = [r for r in corpus if any(r[0].startswith(p) for p in filters)]
 
-    print(f"Rendering {len(corpus)} phrases x 2 paths -> {OUTPUT}")
+    print(f"Rendering {len(corpus)} phrases -> {OUTPUT}")
     for sample_id, text in corpus:
-        for path_label, amiga_flag in (("biquad", False), ("amiga", True)):
-            wav = OUTPUT / path_label / f"{sample_id}.wav"
-            render(sample_id, text, wav, amiga_flag)
-            print(f"  {path_label:6}/{sample_id}.wav  ({len(text)} chars)")
+        wav = OUTPUT / f"{sample_id}.wav"
+        render(sample_id, text, wav)
+        print(f"  {sample_id}.wav  ({len(text)} chars)")
     print("Done.")
     return 0
 

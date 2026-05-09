@@ -2,7 +2,7 @@
 
 For each phrase in corpus.tsv, runs the CLI to capture:
   - phoneme_stream  (logic check, exact match required)
-  - sample_count    (timing check, ±5% tolerance per render path)
+  - sample_count    (timing check, ±5% tolerance)
 
 Compares against expected/baseline.tsv. Sample-count tolerance is loose so
 benign synthesis tweaks (amp scaling, formant tilt, etc.) don't cry wolf —
@@ -92,13 +92,11 @@ def get_phoneme_stream(text: str) -> str:
     return extract_phoneme_stream(result.stdout)
 
 
-def get_sample_count(text: str, amiga: bool) -> int:
+def get_sample_count(text: str) -> int:
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
         out_path = tmp.name
     try:
         cmd = [str(TTS), text, "-o", out_path, "--lang", "en"]
-        if amiga:
-            cmd.append("--amiga")
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
             raise RuntimeError(f"render failed: {result.stderr}")
@@ -121,8 +119,7 @@ def collect(corpus: list[tuple[str, str]]) -> list[tuple[str, str, str]]:
     rows: list[tuple[str, str, str]] = []
     for sample_id, text in corpus:
         rows.append((sample_id, "phonemes", get_phoneme_stream(text)))
-        rows.append((sample_id, "biquad_samples", str(get_sample_count(text, amiga=False))))
-        rows.append((sample_id, "amiga_samples",  str(get_sample_count(text, amiga=True))))
+        rows.append((sample_id, "biquad_samples", str(get_sample_count(text))))
     return rows
 
 
@@ -157,14 +154,13 @@ def cmd_check(corpus: list[tuple[str, str]]) -> int:
             print(f"{sample_id:22} {'phonemes':18} FAIL      stream differs")
 
         # sample counts
-        for check in ("biquad_samples", "amiga_samples"):
-            amiga = check.startswith("amiga")
-            actual_n = get_sample_count(text, amiga=amiga)
-            want_str = expected.get((sample_id, check))
-            if want_str is None:
-                failures.append(f"{sample_id} {check}: no baseline")
-                print(f"{sample_id:22} {check:18} MISSING")
-                continue
+        check = "biquad_samples"
+        actual_n = get_sample_count(text)
+        want_str = expected.get((sample_id, check))
+        if want_str is None:
+            failures.append(f"{sample_id} {check}: no baseline")
+            print(f"{sample_id:22} {check:18} MISSING")
+        else:
             want_n = int(want_str)
             ok, pct = check_within_tolerance(actual_n, want_n)
             if ok:
@@ -182,7 +178,7 @@ def cmd_check(corpus: list[tuple[str, str]]) -> int:
         for f in failures:
             print(f"  - {f}")
         return 1
-    print(f"PASSED ({len(corpus)} phrases x 3 checks)")
+    print(f"PASSED ({len(corpus)} phrases x 2 checks)")
     return 0
 
 

@@ -136,7 +136,7 @@ The library ships with a single output-side knob, `say_apply_gain(samples, count
 
 ### Phone Filter
 
-`say_apply_phone_filter(samples, count, sample_rate)` shapes the PCM buffer to sound like a remote, bad-connection telephone call. It runs a tight 500–2800 Hz bandpass with 24 dB/oct skirts (two HPF biquads + two LPF biquads), a +8 dB peak EQ around 1700 Hz to mimic an earpiece capsule resonance, and a hard tanh saturator that stands in for low-bitrate codec compression. Because it operates after synthesis on int16 PCM, it is synthesizer-agnostic — both the formant path and the Amiga substrate produce the same effect. Exposed as `--phone` on the CLI and as `phone = true` in the Lua binding. When combined with `--gain`, the phone filter runs first so the gain stage shapes the already-bandlimited signal.
+`say_apply_phone_filter(samples, count, sample_rate)` shapes the PCM buffer to sound like a remote, bad-connection telephone call. It runs a tight 500–2800 Hz bandpass with 24 dB/oct skirts (two HPF biquads + two LPF biquads), a +8 dB peak EQ around 1700 Hz to mimic an earpiece capsule resonance, and a hard tanh saturator that stands in for low-bitrate codec compression. Exposed as `--phone` on the CLI and as `phone = true` in the Lua binding. When combined with `--gain`, the phone filter runs first so the gain stage shapes the already-bandlimited signal.
 
 ---
 

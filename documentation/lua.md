@@ -26,12 +26,12 @@ Generates audio in memory and returns:
 Supported options:
 
 - `lang` or `language`: `"en"` or `"fr"`
-- `sample_rate` or `rate`: `44100` (default) on the biquad path; ignored on the Amiga path (output is fixed at 44100 Hz, see `amiga` below)
+- `sample_rate` or `rate`: `44100` (default)
 - `frame_ms`: integer between `5` and `10`
 - `phonemes`: boolean, interpret `input` as phoneme symbols
 - `format`: `"raw"`, `"aiff"`, or `"wav"` (`"raw"` by default)
-- `amiga`: boolean, route synthesis through the Amiga substrate (clean-room C port of the original Amiga `narrator` synth). The substrate runs at 11025 Hz internally and the bridge upsamples 4x to 44100 Hz, so the returned blob is always at 44100 Hz regardless of `sample_rate`. `info.sample_rate` reflects the effective rate.
 - `gain`: number > 0, post-synthesis linear gain with a soft-knee limiter. `1.0` (default) is unchanged; `2.0` ≈ +6 dB; values up to ~3 are useful for cutting through music with no audible clipping. The knee is fixed at -3 dBFS — below that the response is purely linear, above it a tanh curve bends peaks toward the ceiling instead of square-clipping. Practical range is roughly 1.0–5.0; past that the saturator is doing real compression and the timbre starts to get squashed.
+- `phone`: boolean, post-synthesis "remote phone call" filter. Tight 500–2800 Hz bandpass with 24 dB/oct skirts, a +8 dB resonance peak at ~1700 Hz to mimic an earpiece capsule, and a hard tanh saturator that stands in for low-bitrate codec compression. When combined with `gain`, the phone filter runs first so the gain stage shapes the already-bandlimited signal.
 
 Example:
 ```lua
@@ -46,25 +46,21 @@ print(info.format, info.sample_count, info.duration_seconds)
 print(blob:GetSize())
 ```
 
-Amiga substrate example (uses the ported `narrator` synth instead of the biquad path):
-```lua
-local blob, info = say.synthesize("This is Amiga speaking.", {
-    lang  = "en",
-    amiga = true,
-    format = "wav",
-})
-
-print(info.sample_rate)        -- 44100 (substrate runs at 11025 Hz, bridge upsamples 4x)
-print(info.duration_seconds)
-```
-
 Cutting through music with the soft-knee gain pass:
 ```lua
 local blob, info = say.synthesize("Stand by for incoming transmission.", {
     lang  = "en",
-    amiga = true,
     format = "wav",
     gain  = 2.0,                -- ~+6 dB, lands just under full-scale, no clipping
+})
+```
+
+Telephone-call effect:
+```lua
+local blob, info = say.synthesize("Allo, ne quittez pas.", {
+    lang  = "fr",
+    format = "wav",
+    phone = true,               -- 500-2800 Hz bandpass + earpiece resonance + codec-style saturation
 })
 ```
 

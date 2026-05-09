@@ -27,7 +27,6 @@ static void tts_print_usage(FILE *stream)
         "  --phonemes            Treat the input as phoneme symbols instead of plain text\n"
         "  --debug-report <p>    Write a debug report to a file, or use - for stdout\n"
         "  --dry-run             Build the debug pipeline but skip audio rendering/output\n"
-        "  --amiga               Render through the ported Amiga substrate (22050 Hz LUTs, 44100 Hz output)\n"
         "  --gain <x>            Post-synthesis linear gain with soft-knee limiter (default: 1.0)\n"
         "  --phone               Telephone-band filter (300-3400 Hz bandpass + light saturation)\n"
         "  -h, --help            Show this message\n"
@@ -136,7 +135,6 @@ int main(int argc, char **argv)
     size_t sample_count;
     char error[256];
     int dry_run;
-    int use_amiga;
     int phone;
     double gain;
     int i;
@@ -150,7 +148,6 @@ int main(int argc, char **argv)
     samples = NULL;
     sample_count = 0;
     dry_run = 0;
-    use_amiga = 0;
     phone = 0;
     gain = 1.0;
     error[0] = '\0';
@@ -245,10 +242,6 @@ int main(int argc, char **argv)
             dry_run = 1;
             continue;
         }
-        if (strcmp(argv[i], "--amiga") == 0) {
-            use_amiga = 1;
-            continue;
-        }
         if (strcmp(argv[i], "--phone") == 0) {
             phone = 1;
             continue;
@@ -338,21 +331,11 @@ int main(int argc, char **argv)
     }
 
     int output_sample_rate = options.sample_rate;
-    if (use_amiga) {
-        if (!say_synthesize_amiga(input_text, &options, &samples, &sample_count,
-                                  &output_sample_rate, error, sizeof(error))) {
-            free(input_text);
-            say_free(debug_report);
-            fprintf(stderr, "%s\n", error);
-            return 1;
-        }
-    } else {
-        if (!say_synthesize(input_text, &options, &samples, &sample_count, error, sizeof(error))) {
-            free(input_text);
-            say_free(debug_report);
-            fprintf(stderr, "%s\n", error);
-            return 1;
-        }
+    if (!say_synthesize(input_text, &options, &samples, &sample_count, error, sizeof(error))) {
+        free(input_text);
+        say_free(debug_report);
+        fprintf(stderr, "%s\n", error);
+        return 1;
     }
 
     if (phone) {

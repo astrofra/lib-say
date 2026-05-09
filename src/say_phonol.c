@@ -73,13 +73,10 @@ typedef struct phonol_rule_t {
 /* ---- Rule table -------------------------------------------------------- */
 /*
  * Rules are tried top-to-bottom; the first match fires. After delete/replace
- * the loop re-tests at the same index so a rule can chain into another. The
- * table mirrors the high-value subset of the Amiga's phonrules.i, ported per
- * P4 of documentation/amiga-substrate-port-plan.md.
+ * the loop re-tests at the same index so a rule can chain into another.
  *
- * Rule outputs (PH_TQ, PH_LX, PH_RX, PH_DX, PH_Q, PH_AXP) are P4-introduced
- * allophones; the biquad synth treats them like their nearest base phoneme,
- * but the Amiga substrate (P5+) renders them distinctly via the bridge.
+ * Rule outputs (PH_TQ, PH_LX, PH_RX, PH_DX, PH_Q, PH_AXP) are allophones; the
+ * synth treats them like their nearest base phoneme.
  */
 
 static const phonol_rule_t g_phonol_rules[] = {
@@ -130,8 +127,7 @@ static const phonol_rule_t g_phonol_rules[] = {
     /*
      * "feel" /fiːl/ → /fiːɫ/, "bell" /bɛl/ → /bɛɫ/. Fires when /l/ follows
      * a vowel and is NOT followed by another vowel (which would keep it
-     * "clear"). The Amiga rule keeps L between two vowels with stress on
-     * the right; we use the simpler "vowel /l/ ~vowel" form. */
+     * "clear"). Simple "vowel /l/ ~vowel" form. */
     {
         M_FEAT(F_VOWEL), M_ID(PH_L), M_FEAT_NOT(0, F_VOWEL),
         PHONOL_REPLACE, PH_LX,
@@ -140,8 +136,7 @@ static const phonol_rule_t g_phonol_rules[] = {
 
     /* === Postvocalic R → RX (when not before stressed vowel) =============== */
     /*
-     * The Amiga uses RR as the canonical /r/ and RX for "weakened" postvocalic
-     * R. Matches /r/ after a vowel at word/clause end. */
+     * Matches /r/ after a vowel at word/clause end and weakens it. */
     {
         M_FEAT(F_VOWEL), M_ID(PH_R), M_FEAT_NOT(0, F_VOWEL),
         PHONOL_REPLACE, PH_RX,
@@ -150,8 +145,7 @@ static const phonol_rule_t g_phonol_rules[] = {
 
     /* === Glottal stop substitution: /t/ at clause end before silence ======= */
     /*
-     * "what?" /wɒt/ → /wɒʔ/. The Amiga has multiple Q-substitution rules; we
-     * port the simplest one — final voiceless plosive becomes Q at clause
+     * "what?" /wɒt/ → /wɒʔ/. Final voiceless plosive becomes Q at clause
      * boundary. Fires before our /nd/ rule so order matters. */
     {
         M_ANY, M_ID(PH_T), M_BOUNDARY,
