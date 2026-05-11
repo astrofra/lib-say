@@ -1,6 +1,8 @@
 # lib-say
 Say It. Experimental formant-based TTS
 
+_This project is part of an experiment : how to create a TTS from the ground up, only by instructing a coding assistant._
+
 ## Build
 
 Windows batch helper:
